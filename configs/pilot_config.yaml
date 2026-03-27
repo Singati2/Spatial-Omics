@@ -1,0 +1,52 @@
+# Pilot Experiment Configuration
+
+data:
+  spatial_path: "data/xenium_breast_cancer.h5ad"
+  reference_path: "data/scrna_reference.h5ad"  # optional, needed for Tangram/gimVI
+
+panel:
+  size: 300
+  strategy: "mixed"  # mixed: 50% HVG + 30% LR genes + 20% random
+  seed: 42
+
+imputation:
+  methods:
+    - tangram       # reference-based
+    - gimvi         # deep generative
+    - spatial_gnn   # GNN-based
+    - diffusion     # diffusion-based
+  gnn:
+    hidden_dim: 128
+    latent_dim: 64
+    epochs: 300
+    lr: 0.001
+  diffusion:
+    timesteps: 100
+    hidden_dim: 512
+    epochs: 200
+    lr: 0.001
+    batch_size: 2048
+
+cci:
+  n_permutations: 1000       # reduce to 200 for initial pilot
+  fdr_threshold: 0.05
+  normalization: "cp10k"
+
+calibration:
+  bias_estimation: "moran"   # spatial autocorrelation-based
+
+stability:
+  n_perturbations: 50        # reduce to 20 for initial pilot
+  drop_fraction: 0.2
+  seed: 42
+
+evaluation:
+  output_dir: "results/pilot"
+  dpi: 300
+  n_calibration_bins: 5
+
+go_no_go:
+  min_inflation_rate: 0.20         # 20% more significant CCI
+  min_fp_reduction: 0.50           # correction removes >50% of FPs
+  min_reliability_correlation: 0.5 # Spearman r > 0.5
+  min_methods_showing_inflation: 2 # across at least 2 method families
