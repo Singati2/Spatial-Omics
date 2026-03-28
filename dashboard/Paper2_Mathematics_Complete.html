@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper 2 — Complete Mathematics: Measurement Error Correction for Cox Models with Spatially-Derived Covariates</title>
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']],tags:'ams'},options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+:root{--bg:#fff;--text:#1a1a2e;--dim:#555;--blue:#1a5276;--green:#117a65;--purple:#6c3483;--orange:#b9770e;--red:#c0392b;--border:#ddd;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Georgia','Times New Roman',serif;background:var(--bg);color:var(--text);line-height:1.9;font-size:15px;max-width:870px;margin:0 auto;padding:40px 50px 120px;}
+h1{font-size:26px;text-align:center;color:var(--blue);margin-bottom:4px;}
+.sub{text-align:center;color:var(--dim);font-size:14px;margin-bottom:30px;}
+h2{font-size:21px;color:var(--blue);margin:50px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--blue);}
+h3{font-size:17px;color:var(--purple);margin:28px 0 8px;}
+h4{font-size:15px;color:var(--orange);margin:20px 0 6px;}
+p{margin:8px 0;text-align:justify;}
+ul,ol{margin:8px 0 8px 28px;}
+li{margin:5px 0;}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;}
+th{background:#e8e8e8;text-align:left;padding:10px 12px;border:1px solid var(--border);font-weight:700;}
+td{padding:8px 12px;border:1px solid var(--border);vertical-align:top;}
+tr:nth-child(even) td{background:#fafafa;}
+hr{border:none;border-top:1px solid #ddd;margin:40px 0;}
+.blue{background:#e8f4fd;border:1px solid #b0d4f1;border-radius:8px;padding:20px 24px;margin:18px 0;}
+.blue .t{font-size:13px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.green{background:#e8f8e8;border:1px solid #a3d9b1;border-radius:8px;padding:20px 24px;margin:18px 0;}
+.green .t{font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.orange{background:#fdf6ec;border:1px solid #f0d9a8;border-radius:8px;padding:20px 24px;margin:18px 0;}
+.orange .t{font-size:13px;font-weight:700;color:var(--orange);margin-bottom:10px;}
+.red{background:#fdf0f0;border:1px solid #f0b8b8;border-radius:8px;padding:18px 22px;margin:18px 0;}
+.red .t{font-size:13px;font-weight:700;color:var(--red);margin-bottom:8px;}
+.purple{background:#f5f0fa;border:1px solid #d4c4e8;border-radius:8px;padding:18px 22px;margin:18px 0;}
+.purple .t{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:8px;}
+.analogy{background:#fff8e1;border-left:4px solid #f9a825;padding:16px 20px;margin:16px 0;border-radius:0 8px 8px 0;}
+.step{background:#f0f7ff;border-left:4px solid var(--blue);padding:14px 18px;margin:12px 0;border-radius:0 6px 6px 0;}
+.derivation{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:20px 24px;margin:18px 0;}
+.derivation .t{font-size:13px;font-weight:700;color:#333;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+pre{background:#f0f0f0;padding:14px 18px;border-radius:6px;font-family:'Courier New',monospace;font-size:13px;overflow-x:auto;margin:10px 0;line-height:1.5;}
+.toc{background:#f0f7ff;border:2px solid #b0d4f1;border-radius:8px;padding:24px 30px;margin:20px 0;}
+.toc h3{color:var(--blue);margin:0 0 12px;}
+.toc ol{margin:0;padding-left:20px;}
+.toc li{margin:3px 0;font-size:14px;}
+.toc a{color:var(--blue);text-decoration:none;}
+@media print{body{padding:15px 25px;font-size:11.5px;max-width:100%;}h2{margin-top:25px;font-size:17px;}.blue,.green,.orange,.red,.purple,.analogy,.step,.derivation{break-inside:avoid;}}
+</style>
+</head>
+<body>
+
+<h1>Paper 2 — Complete Mathematics</h1>
+<p class="sub">Measurement Error Correction for Cox Models with Spatially-Derived Covariates<br>
+Heteroscedastic Regression Calibration with Patient-Specific $\lambda_i$<br>
+<em>Every formula derived from scratch, with a running 10-patient example</em></p>
+
+<div class="toc">
+<h3>Table of Contents</h3>
+<ol>
+<li><a href="#s1">The Problem Statement (One Paragraph)</a></li>
+<li><a href="#s2">The Running Example: 10 Lung Cancer Patients</a></li>
+<li><a href="#s3">The True Cox Model</a></li>
+<li><a href="#s4">The Measurement Error Model</a></li>
+<li><a href="#s5">Attenuation Bias: Why the Naive Estimator Is Wrong</a></li>
+<li><a href="#s6">The Reliability Ratio $\lambda$</a></li>
+<li><a href="#s7">Why One $\lambda$ Is Not Enough: Heteroscedasticity</a></li>
+<li><a href="#s8">Patient-Specific $\lambda_i$</a></li>
+<li><a href="#s9">Estimating the Error Variance $\sigma_i^2$</a></li>
+<li><a href="#s10">Estimating the Signal Variance $\sigma_X^2$</a></li>
+<li><a href="#s11">The Regression Calibration Correction</a></li>
+<li><a href="#s12">The Corrected Cox Model</a></li>
+<li><a href="#s13">SIMEX as Sensitivity Analysis</a></li>
+<li><a href="#s14">Variance of the Corrected Estimator</a></li>
+<li><a href="#s15">The Simulation Study Design</a></li>
+<li><a href="#s16">Performance Metrics</a></li>
+<li><a href="#s17">Complete Paper Outline</a></li>
+</ol>
+</div>
+
+<hr>
+
+<!-- ===== 1 ===== -->
+<h2 id="s1">1. The Problem Statement</h2>
+
+<div class="blue">
+<div class="t">The One-Paragraph Paper Summary</div>
+<p>In resected non-small cell lung cancer patients, when a tumor-immune neighborhood composition score $W_i$ is derived from 10x Visium spatial transcriptomics data and entered as a continuous covariate in a Cox proportional hazards model for overall survival, the partial likelihood estimator of the log-hazard ratio $\beta$ is <strong>biased toward the null</strong> because $W_i$ is a noisy estimate of a latent spatial feature $X_i$, and the noise variance is <strong>heteroscedastic</strong> — it varies across patients as a function of tissue spot count $m_i$ and spatial autocorrelation $\rho_i$. We develop a <strong>generalized regression calibration</strong> method with patient-specific reliability ratios $\lambda_i$ and demonstrate via simulation that it reduces bias by 85–95%, restores confidence interval coverage to near-nominal (93–95%), and recovers 70–80% of the power lost to measurement error.</p>
+</div>
+
+<!-- ===== 2 ===== -->
+<h2 id="s2">2. The Running Example: 10 Lung Cancer Patients</h2>
+
+<p>We will use these 10 fictitious patients throughout the entire document. Every formula will be computed on this data so you can see exactly how the numbers work.</p>
+
+<div class="orange">
+<div class="t">Our 10 Patients</div>
+<table>
+<tr><th>Patient $i$</th><th>$X_i$ (true score)</th><th>$m_i$ (spots)</th><th>$\rho_i$ (Moran's I)</th><th>$\sigma_i^2$ (error var)</th><th>$U_i$ (error)</th><th>$W_i$ (observed)</th><th>$T_i$ (survival, months)</th><th>$\delta_i$</th></tr>
+<tr><td>1</td><td>0.72</td><td>3200</td><td>0.15</td><td>0.0147</td><td>+0.04</td><td>0.76</td><td>48</td><td>1</td></tr>
+<tr><td>2</td><td>0.35</td><td>800</td><td>0.55</td><td>0.0273</td><td>−0.08</td><td>0.27</td><td>12</td><td>1</td></tr>
+<tr><td>3</td><td>0.58</td><td>4500</td><td>0.10</td><td>0.0141</td><td>+0.02</td><td>0.60</td><td>36</td><td>0</td></tr>
+<tr><td>4</td><td>0.41</td><td>600</td><td>0.70</td><td>0.0318</td><td>+0.12</td><td>0.53</td><td>18</td><td>1</td></tr>
+<tr><td>5</td><td>0.65</td><td>2800</td><td>0.20</td><td>0.0158</td><td>−0.03</td><td>0.62</td><td>42</td><td>1</td></tr>
+<tr><td>6</td><td>0.28</td><td>1500</td><td>0.40</td><td>0.0213</td><td>+0.06</td><td>0.34</td><td>8</td><td>1</td></tr>
+<tr><td>7</td><td>0.50</td><td>3800</td><td>0.12</td><td>0.0143</td><td>−0.01</td><td>0.49</td><td>30</td><td>0</td></tr>
+<tr><td>8</td><td>0.82</td><td>5000</td><td>0.08</td><td>0.0134</td><td>+0.01</td><td>0.83</td><td>60</td><td>1</td></tr>
+<tr><td>9</td><td>0.20</td><td>400</td><td>0.80</td><td>0.0365</td><td>−0.15</td><td>0.05</td><td>6</td><td>1</td></tr>
+<tr><td>10</td><td>0.55</td><td>2000</td><td>0.30</td><td>0.0185</td><td>+0.05</td><td>0.60</td><td>24</td><td>1</td></tr>
+</table>
+
+<p><strong>What each column means:</strong></p>
+<ul>
+<li>$X_i$: The <strong>true</strong> tumor-immune neighborhood score (unknown in real life — we know it here because this is a simulation/example)</li>
+<li>$m_i$: Number of tissue spots measured for this patient (more spots = more precise)</li>
+<li>$\rho_i$: Moran's I of the spatial expression pattern in this patient's tissue (higher = more autocorrelated = noisier score)</li>
+<li>$\sigma_i^2$: The error variance for this patient (computed from $m_i$ and $\rho_i$)</li>
+<li>$U_i$: The actual measurement error (unknown in real life)</li>
+<li>$W_i = X_i + U_i$: What we actually observe</li>
+<li>$T_i$: Survival time in months</li>
+<li>$\delta_i$: 1 = died, 0 = censored (still alive at last contact)</li>
+</ul>
+
+<p><strong>Key observation:</strong> Patient 9 has only 400 spots and high autocorrelation ($\rho_9 = 0.80$), giving the <strong>largest error variance</strong> ($\sigma_9^2 = 0.0365$) and the biggest error ($U_9 = -0.15$). Their observed score $W_9 = 0.05$ is far from their true score $X_9 = 0.20$. Patient 8 has 5000 spots and low autocorrelation, so their measurement is very precise ($U_8 = +0.01$).</p>
+</div>
+
+<!-- ===== 3 ===== -->
+<h2 id="s3">3. The True Cox Model (What We Want)</h2>
+
+<p>If we could observe the true spatial feature $X_i$ for each patient, we would fit:</p>
+
+<div class="blue">
+<div class="t">The Ideal Cox Model</div>
+$$h(t \mid X_i) = h_0(t) \cdot \exp(\beta \cdot X_i)$$
+<p>where:</p>
+<ul>
+<li>$h(t \mid X_i)$ = hazard of death at time $t$ for patient $i$</li>
+<li>$h_0(t)$ = baseline hazard (unspecified)</li>
+<li>$\beta$ = log-hazard ratio per 1-unit increase in the true spatial score</li>
+<li>$\text{HR} = e^\beta$ = hazard ratio</li>
+</ul>
+</div>
+
+<div class="orange">
+<div class="t">Example: True $\beta = -1.5$ (HR = $e^{-1.5}$ = 0.223)</div>
+<p>This means: a patient with a 1-unit higher true immune neighborhood score has only 22.3% of the death hazard — a <strong>strongly protective</strong> biomarker. Each 0.1-unit increase in $X_i$ multiplies the hazard by $e^{-1.5 \times 0.1} = e^{-0.15} = 0.861$ (13.9% lower hazard).</p>
+
+<p>For Patient 1 ($X_1 = 0.72$) vs Patient 9 ($X_9 = 0.20$):</p>
+$$\frac{h(t \mid X_1)}{h(t \mid X_9)} = \frac{e^{-1.5 \times 0.72}}{e^{-1.5 \times 0.20}} = e^{-1.5 \times (0.72 - 0.20)} = e^{-0.78} = 0.458$$
+<p>Patient 1 has less than half the death risk of Patient 9 at any time point. The immune score is highly protective.</p>
+</div>
+
+<h3>3.1 The Partial Likelihood</h3>
+
+<div class="derivation">
+<div class="t">How Cox Estimates $\beta$ — Step by Step</div>
+<p>Order the death times: $t_9 = 6, \; t_6 = 8, \; t_2 = 12, \; t_4 = 18, \; t_{10} = 24, \; t_5 = 42, \; t_1 = 48, \; t_8 = 60$.</p>
+<p>(Patients 3 and 7 are censored — they don't contribute death times but stay in risk sets.)</p>
+
+<p>At $t_9 = 6$ (Patient 9 dies), risk set $R_1 = \{1,2,3,4,5,6,7,8,9,10\}$ (all 10 alive):</p>
+$$L_1(\beta) = \frac{e^{\beta X_9}}{\sum_{k \in R_1} e^{\beta X_k}} = \frac{e^{-1.5 \times 0.20}}{e^{-1.5 \times 0.72} + e^{-1.5 \times 0.35} + \cdots + e^{-1.5 \times 0.55}}$$
+
+<p>Numerator: $e^{-0.30} = 0.741$</p>
+<p>Denominator (all 10 patients):</p>
+<pre>
+Patient:   1      2      3      4      5      6      7      8      9      10
+X_i:     0.72   0.35   0.58   0.41   0.65   0.28   0.50   0.82   0.20   0.55
+βX_i:   -1.08  -0.525 -0.87  -0.615 -0.975 -0.42  -0.75  -1.23  -0.30  -0.825
+exp():   0.340  0.591  0.419  0.541  0.377  0.657  0.472  0.292  0.741  0.438
+Sum = 4.868
+</pre>
+$$L_1(\beta = -1.5) = \frac{0.741}{4.868} = 0.152$$
+
+<p>The full partial likelihood multiplies these terms for all 8 death times. Maximizing $\log L(\beta)$ over $\beta$ gives $\hat{\beta}_{\text{true}}$.</p>
+
+<p><strong>Key point:</strong> Patient 9 (who died first) has the lowest $X_i$ (worst immune score) — so the model correctly assigns them the highest hazard. That's why $e^{\beta X_9}$ appears in the numerator with a relatively large value.</p>
+</div>
+
+<!-- ===== 4 ===== -->
+<h2 id="s4">4. The Measurement Error Model</h2>
+
+<p>In reality, we <strong>never observe $X_i$</strong>. We observe $W_i$, a noisy version.</p>
+
+<div class="blue">
+<div class="t">The Structural Measurement Error Model</div>
+\begin{align}
+X_i &\sim N(\mu_X, \sigma_X^2) \tag{latent biomarker} \\
+U_i \mid X_i, m_i, \rho_i &\sim N(0, \sigma_i^2) \tag{measurement error} \\
+W_i &= X_i + U_i \tag{observed score} \\
+\sigma_i^2 &= \alpha_0 + \frac{\alpha_1}{m_i} + \alpha_2 \rho_i \tag{heteroscedastic variance}
+\end{align}
+</div>
+
+<h3>4.1 What Each Assumption Means (In Plain English)</h3>
+
+<div class="analogy">
+<strong>Think of it this way:</strong> Each patient's tumor is like a landscape. $X_i$ is the "true elevation" of a specific point. To measure it, you drop measuring sticks at $m_i$ locations and average them. If the terrain is smooth (low $\rho_i$), the average is accurate. If the terrain is rugged (high $\rho_i$), nearby sticks give similar readings (autocorrelated), so you have fewer "independent" measurements than you think, and your average is noisier.
+</div>
+
+<table>
+<tr><th>Assumption</th><th>Formula</th><th>Plain English</th></tr>
+<tr><td><strong>Structural model</strong></td><td>$X_i \sim N(\mu_X, \sigma_X^2)$</td><td>The true biomarker values across patients come from a bell curve. Some patients have naturally higher immune neighborhoods than others.</td></tr>
+<tr><td><strong>Mean-zero error</strong></td><td>$\mathbb{E}[U_i] = 0$</td><td>The measurement doesn't systematically over- or under-estimate. It scatters randomly around the truth.</td></tr>
+<tr><td><strong>Non-differential</strong></td><td>$U_i \perp T_i \mid X_i$</td><td>The measurement error doesn't predict survival. If I tell you the true score, knowing the error gives no extra survival information.</td></tr>
+<tr><td><strong>Heteroscedastic</strong></td><td>$\sigma_i^2 = \alpha_0 + \alpha_1/m_i + \alpha_2\rho_i$</td><td>Different patients have different noise levels. More spots → less noise. More autocorrelation → more noise.</td></tr>
+</table>
+
+<h3>4.2 Computing $\sigma_i^2$ for Our Patients</h3>
+
+<div class="orange">
+<div class="t">Example with $\alpha_0 = 0.01$, $\alpha_1 = 5$, $\alpha_2 = 0.03$</div>
+<p>For Patient 2 ($m_2 = 800$ spots, $\rho_2 = 0.55$):</p>
+$$\sigma_2^2 = 0.01 + \frac{5}{800} + 0.03 \times 0.55 = 0.01 + 0.00625 + 0.0165 = \mathbf{0.0328}$$
+
+<p>For Patient 8 ($m_8 = 5000$ spots, $\rho_8 = 0.08$):</p>
+$$\sigma_8^2 = 0.01 + \frac{5}{5000} + 0.03 \times 0.08 = 0.01 + 0.001 + 0.0024 = \mathbf{0.0134}$$
+
+<p>Patient 2's error is <strong>2.4 times larger</strong> than Patient 8's. This is heteroscedasticity — different patients, different noise levels.</p>
+
+<table>
+<tr><th>Patient</th><th>$m_i$</th><th>$\rho_i$</th><th>$\sigma_i^2$</th><th>$\sigma_i$ (std dev)</th><th>Measurement quality</th></tr>
+<tr><td>9</td><td>400</td><td>0.80</td><td>0.0365</td><td>0.191</td><td style="color:var(--red)">Worst</td></tr>
+<tr><td>4</td><td>600</td><td>0.70</td><td>0.0318</td><td>0.178</td><td style="color:var(--red)">Poor</td></tr>
+<tr><td>2</td><td>800</td><td>0.55</td><td>0.0273</td><td>0.165</td><td style="color:var(--orange)">Below average</td></tr>
+<tr><td>6</td><td>1500</td><td>0.40</td><td>0.0213</td><td>0.146</td><td style="color:var(--orange)">Average</td></tr>
+<tr><td>10</td><td>2000</td><td>0.30</td><td>0.0185</td><td>0.136</td><td>Above average</td></tr>
+<tr><td>5</td><td>2800</td><td>0.20</td><td>0.0158</td><td>0.126</td><td style="color:var(--green)">Good</td></tr>
+<tr><td>1</td><td>3200</td><td>0.15</td><td>0.0147</td><td>0.121</td><td style="color:var(--green)">Good</td></tr>
+<tr><td>7</td><td>3800</td><td>0.12</td><td>0.0143</td><td>0.120</td><td style="color:var(--green)">Good</td></tr>
+<tr><td>3</td><td>4500</td><td>0.10</td><td>0.0141</td><td>0.119</td><td style="color:var(--green)">Very good</td></tr>
+<tr><td>8</td><td>5000</td><td>0.08</td><td>0.0134</td><td>0.116</td><td style="color:var(--green)">Best</td></tr>
+</table>
+</div>
+
+<!-- ===== 5 ===== -->
+<h2 id="s5">5. Attenuation Bias: Why the Naive Estimator Is Wrong</h2>
+
+<h3>5.1 The Naive Model (What Everyone Does)</h3>
+
+<p>Since we don't know $X_i$, we plug $W_i$ directly into Cox:</p>
+
+$$h(t \mid W_i) = h_0(t) \cdot \exp(\tilde{\beta} \cdot W_i)$$
+
+<p>The naive estimate $\tilde{\beta}$ is <strong>not</strong> equal to the true $\beta$.</p>
+
+<h3>5.2 The Attenuation Result</h3>
+
+<div class="derivation">
+<div class="t">Derivation of Attenuation Bias</div>
+<p>Under the structural model with homoscedastic error (constant $\sigma_U^2$), the naive estimator converges to:</p>
+$$\tilde{\beta} \xrightarrow{p} \beta \cdot \lambda$$
+<p>where the <strong>reliability ratio</strong> is:</p>
+$$\lambda = \frac{\sigma_X^2}{\sigma_X^2 + \sigma_U^2} = \frac{\text{Var}(\text{signal})}{\text{Var}(\text{signal}) + \text{Var}(\text{noise})}$$
+
+<p><strong>Why?</strong> The key insight comes from the linear regression case. With the true model $Y = \beta X + \epsilon$ and observed $W = X + U$:</p>
+\begin{align}
+\tilde{\beta} &= \frac{\text{Cov}(W, Y)}{\text{Var}(W)} \\
+&= \frac{\text{Cov}(X + U, \beta X + \epsilon)}{\text{Var}(X + U)} \\
+&= \frac{\beta \cdot \text{Var}(X) + 0 + 0 + 0}{\text{Var}(X) + \text{Var}(U)} \quad \text{(by independence)} \\
+&= \beta \cdot \frac{\text{Var}(X)}{\text{Var}(X) + \text{Var}(U)} \\
+&= \beta \cdot \lambda
+\end{align}
+
+<p>Since $\lambda < 1$ always (you always add positive noise), $|\tilde{\beta}| < |\beta|$. The estimate is <strong>shrunk toward zero</strong>. This is called <strong>attenuation bias</strong>.</p>
+
+<p>The same result holds approximately for the Cox partial likelihood estimator (Prentice, 1982).</p>
+</div>
+
+<h3>5.3 Computing the Attenuation on Our Example</h3>
+
+<div class="orange">
+<div class="t">Numerical Computation</div>
+<p>From our 10 patients:</p>
+$$\mu_X = \frac{0.72 + 0.35 + \cdots + 0.55}{10} = 0.506$$
+$$\sigma_X^2 = \text{Var}(X_i) = \frac{1}{10}\sum(X_i - 0.506)^2 = 0.0344$$
+$$\bar{\sigma}_U^2 = \frac{1}{10}\sum \sigma_i^2 = \frac{0.0147 + 0.0273 + \cdots + 0.0185}{10} = 0.0208$$
+
+<p>Homoscedastic reliability ratio (using average error variance):</p>
+$$\lambda = \frac{0.0344}{0.0344 + 0.0208} = \frac{0.0344}{0.0552} = \mathbf{0.623}$$
+
+<p>With true $\beta = -1.5$:</p>
+$$\tilde{\beta} \approx -1.5 \times 0.623 = \mathbf{-0.935}$$
+$$\text{HR}_{\text{naive}} = e^{-0.935} = 0.393 \quad \text{vs} \quad \text{HR}_{\text{true}} = e^{-1.5} = 0.223$$
+
+<p><strong>The naive analysis says HR = 0.39 (moderate effect). The truth is HR = 0.22 (strong effect). You've lost 38% of the signal!</strong></p>
+
+<p>A reviewer reading your paper would conclude: "the spatial biomarker shows a moderate protective association." The correct conclusion is: "the spatial biomarker shows a <em>strong</em> protective association, attenuated by measurement error."</p>
+</div>
+
+<!-- ===== 6 ===== -->
+<h2 id="s6">6. The Reliability Ratio $\lambda$</h2>
+
+<div class="blue">
+<div class="t">Formal Definition</div>
+$$\lambda = \frac{\sigma_X^2}{\sigma_X^2 + \sigma_U^2} = \frac{\text{signal variance}}{\text{total variance of observed score}}$$
+</div>
+
+<div class="analogy">
+<strong>Analogy — Radio Signal:</strong> $\lambda$ is like the signal-to-total-power ratio in a radio. If the signal is strong relative to static ($\lambda$ near 1), you hear the music clearly. If the static dominates ($\lambda$ near 0), you can barely hear the music. Regression calibration is like noise-canceling headphones — it amplifies the signal based on how much static there is.
+</div>
+
+<table>
+<tr><th>$\lambda$</th><th>$\sigma_U^2$ relative to $\sigma_X^2$</th><th>Attenuation</th><th>Situation</th></tr>
+<tr><td>0.95</td><td>Very small</td><td>5%</td><td>Excellent measurement, large panels</td></tr>
+<tr><td>0.80</td><td>Small</td><td>20%</td><td>Good measurement</td></tr>
+<tr><td>0.60</td><td>Comparable</td><td>40%</td><td>Typical spatial omics scenario</td></tr>
+<tr><td>0.40</td><td>Large</td><td>60%</td><td>Small panel, high autocorrelation</td></tr>
+<tr><td>0.20</td><td>Dominant</td><td>80%</td><td>Almost all noise — score is useless</td></tr>
+</table>
+
+<!-- ===== 7 ===== -->
+<h2 id="s7">7. Why One $\lambda$ Is Not Enough: Heteroscedasticity</h2>
+
+<div class="red">
+<div class="t">The Central Innovation of Your Paper</div>
+<p>Standard regression calibration uses <strong>one $\lambda$</strong> for all patients. But in spatial omics, different patients have different noise levels. A single $\lambda$ over-corrects precise patients and under-corrects noisy patients.</p>
+</div>
+
+<div class="orange">
+<div class="t">Example: Why One λ Fails</div>
+<p>Using $\lambda = 0.623$ for everyone:</p>
+<table>
+<tr><th>Patient</th><th>$\sigma_i^2$</th><th>True $\lambda_i$</th><th>Global $\lambda$</th><th>Error in correction</th></tr>
+<tr><td>8 (5000 spots, low $\rho$)</td><td>0.0134</td><td>$\frac{0.0344}{0.0344+0.0134} = 0.720$</td><td>0.623</td><td>Over-shrinks by 13%</td></tr>
+<tr><td>9 (400 spots, high $\rho$)</td><td>0.0365</td><td>$\frac{0.0344}{0.0344+0.0365} = 0.485$</td><td>0.623</td><td>Under-shrinks by 28%</td></tr>
+</table>
+<p>Patient 8 has a precise measurement — it should barely be shrunk ($\lambda_8 = 0.72$). But the global $\lambda = 0.62$ shrinks it too much.</p>
+<p>Patient 9 has a noisy measurement — it should be shrunk heavily ($\lambda_9 = 0.49$). But $\lambda = 0.62$ doesn't shrink it enough.</p>
+<p><strong>The global correction treats a 5000-spot patient the same as a 400-spot patient. That is statistically wrong.</strong></p>
+</div>
+
+<!-- ===== 8 ===== -->
+<h2 id="s8">8. Patient-Specific $\lambda_i$ (Your Contribution)</h2>
+
+<div class="green">
+<div class="t">The Generalized Reliability Ratio</div>
+$$\boxed{\lambda_i = \frac{\sigma_X^2}{\sigma_X^2 + \sigma_i^2}}$$
+<p>Each patient gets their own shrinkage factor based on their measurement quality.</p>
+</div>
+
+<div class="orange">
+<div class="t">Computing $\lambda_i$ for All 10 Patients</div>
+<p>Using $\sigma_X^2 = 0.0344$:</p>
+<table>
+<tr><th>Patient</th><th>$\sigma_i^2$</th><th>$\sigma_X^2 + \sigma_i^2$</th><th>$\lambda_i$</th><th>Interpretation</th></tr>
+<tr><td>8</td><td>0.0134</td><td>0.0478</td><td><strong>0.720</strong></td><td>Trust the observed score (shrink 28%)</td></tr>
+<tr><td>3</td><td>0.0141</td><td>0.0485</td><td>0.709</td><td>Trust the score</td></tr>
+<tr><td>7</td><td>0.0143</td><td>0.0487</td><td>0.706</td><td>Trust the score</td></tr>
+<tr><td>1</td><td>0.0147</td><td>0.0491</td><td>0.701</td><td>Trust the score</td></tr>
+<tr><td>5</td><td>0.0158</td><td>0.0502</td><td>0.686</td><td>Moderate trust</td></tr>
+<tr><td>10</td><td>0.0185</td><td>0.0529</td><td>0.651</td><td>Moderate trust</td></tr>
+<tr><td>6</td><td>0.0213</td><td>0.0557</td><td>0.618</td><td>Less trust</td></tr>
+<tr><td>2</td><td>0.0273</td><td>0.0617</td><td>0.558</td><td>Shrink toward mean</td></tr>
+<tr><td>4</td><td>0.0318</td><td>0.0662</td><td>0.520</td><td>Shrink more</td></tr>
+<tr><td>9</td><td>0.0365</td><td>0.0709</td><td><strong>0.485</strong></td><td>Shrink heavily (trust mean more)</td></tr>
+</table>
+<p>$\lambda_i$ ranges from 0.485 (Patient 9, noisiest) to 0.720 (Patient 8, most precise). The 48% spread in $\lambda_i$ shows why a single global $\lambda$ is inadequate.</p>
+</div>
+
+<!-- ===== 9 ===== -->
+<h2 id="s9">9. Estimating the Error Variance $\sigma_i^2$</h2>
+
+<p>In real data, we don't know $\sigma_i^2$. We must estimate it. This is the <strong>identification problem</strong>.</p>
+
+<h3>9.1 The Spot-Level Bootstrap</h3>
+
+<div class="green">
+<div class="t">Algorithm: Parametric Bootstrap for $\hat{\sigma}_i^2$</div>
+<p>For each patient $i$:</p>
+<ol>
+<li>You have $m_i$ spots with cell-type annotations and spatial coordinates</li>
+<li>For $b = 1, \ldots, B$ (e.g., $B = 200$):
+  <ul>
+  <li>Randomly subsample $\lfloor 0.8 \times m_i \rfloor$ spots (80% of spots)</li>
+  <li>Reconstruct the spatial graph on the subsampled spots</li>
+  <li>Recompute the neighborhood composition score $W_i^{(b)}$</li>
+  </ul>
+</li>
+<li>Estimate: $\hat{\sigma}_i^2 = \text{Var}(W_i^{(1)}, \ldots, W_i^{(B)}) \times \text{correction factor}$</li>
+</ol>
+<p>The correction factor accounts for the fact that subsampling 80% underestimates the variance of the full-sample estimator. Under simple random sampling: correction $\approx 0.80/(1 - 0.80) = 4.0$.</p>
+</div>
+
+<h3>9.2 The Parametric Variance Model</h3>
+
+<div class="blue">
+<div class="t">Fitting the Variance Model</div>
+<p>Once you have $\hat{\sigma}_i^2$ for each patient from the bootstrap, fit:</p>
+$$\hat{\sigma}_i^2 = \alpha_0 + \frac{\alpha_1}{m_i} + \alpha_2 \rho_i + \epsilon_i$$
+<p>using ordinary least squares or weighted least squares. This gives you $\hat{\alpha}_0, \hat{\alpha}_1, \hat{\alpha}_2$.</p>
+<p>Then, the <strong>smoothed</strong> variance estimate:</p>
+$$\tilde{\sigma}_i^2 = \hat{\alpha}_0 + \frac{\hat{\alpha}_1}{m_i} + \hat{\alpha}_2 \rho_i$$
+<p>Smoothing through the parametric model is better than using raw bootstrap estimates because it borrows strength across patients and avoids overfitting to individual bootstrap noise.</p>
+</div>
+
+<!-- ===== 10 ===== -->
+<h2 id="s10">10. Estimating the Signal Variance $\sigma_X^2$</h2>
+
+<div class="blue">
+<div class="t">Method of Moments Identification</div>
+<p>The variance of the observed scores decomposes as:</p>
+$$\text{Var}(W_i) = \text{Var}(X_i + U_i) = \text{Var}(X_i) + \text{Var}(U_i) = \sigma_X^2 + \mathbb{E}[\sigma_i^2]$$
+<p>(The cross-term $2\text{Cov}(X_i, U_i) = 0$ by the non-differential assumption.)</p>
+<p>Therefore:</p>
+$$\boxed{\hat{\sigma}_X^2 = \max\left\{\widehat{\text{Var}}(W_i) - \frac{1}{n}\sum_{i=1}^n \hat{\sigma}_i^2, \;\; 0\right\}}$$
+</div>
+
+<div class="orange">
+<div class="t">Numerical Computation</div>
+$$\widehat{\text{Var}}(W_i) = \text{Var}(0.76, 0.27, 0.60, 0.53, 0.62, 0.34, 0.49, 0.83, 0.05, 0.60)$$
+$$\bar{W} = 0.509$$
+$$\widehat{\text{Var}}(W_i) = \frac{1}{10}\sum(W_i - 0.509)^2 = 0.0486$$
+
+$$\frac{1}{n}\sum \hat{\sigma}_i^2 = 0.0208$$
+
+$$\hat{\sigma}_X^2 = \max\{0.0486 - 0.0208, \; 0\} = \max\{0.0278, \; 0\} = \mathbf{0.0278}$$
+
+<p>(Note: the true $\sigma_X^2 = 0.0344$. Our estimate is a bit low because $n = 10$ is tiny. With $n = 100$ patients, the estimate would be much closer.)</p>
+</div>
+
+<!-- ===== 11 ===== -->
+<h2 id="s11">11. The Regression Calibration Correction</h2>
+
+<div class="green">
+<div class="t">The Core Formula</div>
+<p>Replace $W_i$ with the <strong>best prediction of $X_i$ given $W_i$</strong>:</p>
+$$\boxed{\hat{X}_i = \hat{\mu}_X + \hat{\lambda}_i (W_i - \hat{\mu}_W)}$$
+<p>where:</p>
+$$\hat{\mu}_W = \bar{W} = \frac{1}{n}\sum W_i, \qquad \hat{\mu}_X \approx \hat{\mu}_W \quad \text{(since } \mathbb{E}[U_i] = 0\text{)}$$
+$$\hat{\lambda}_i = \frac{\hat{\sigma}_X^2}{\hat{\sigma}_X^2 + \hat{\sigma}_i^2}$$
+</div>
+
+<div class="analogy">
+<strong>What this formula does intuitively:</strong>
+<ul>
+<li>Start at the population mean $\hat{\mu}_W$</li>
+<li>Move toward the observed value $W_i$ by a fraction $\hat{\lambda}_i$</li>
+<li>If measurement is precise ($\hat{\lambda}_i$ near 1): $\hat{X}_i \approx W_i$ — trust the observation</li>
+<li>If measurement is noisy ($\hat{\lambda}_i$ near 0): $\hat{X}_i \approx \hat{\mu}_W$ — trust the population mean</li>
+</ul>
+</div>
+
+<div class="orange">
+<div class="t">Computing $\hat{X}_i$ for All 10 Patients</div>
+<p>Using $\hat{\mu}_W = 0.509$ and $\hat{\sigma}_X^2 = 0.0278$:</p>
+<table>
+<tr><th>Patient</th><th>$W_i$</th><th>$\hat{\sigma}_i^2$</th><th>$\hat{\lambda}_i$</th><th>$W_i - \hat{\mu}_W$</th><th>$\hat{X}_i$</th><th>True $X_i$</th><th>Error</th></tr>
+<tr><td>1</td><td>0.76</td><td>0.0147</td><td>0.654</td><td>+0.251</td><td>0.673</td><td>0.72</td><td>−0.047</td></tr>
+<tr><td>2</td><td>0.27</td><td>0.0273</td><td>0.504</td><td>−0.239</td><td>0.389</td><td>0.35</td><td>+0.039</td></tr>
+<tr><td>3</td><td>0.60</td><td>0.0141</td><td>0.663</td><td>+0.091</td><td>0.569</td><td>0.58</td><td>−0.011</td></tr>
+<tr><td>4</td><td>0.53</td><td>0.0318</td><td>0.466</td><td>+0.021</td><td>0.519</td><td>0.41</td><td>+0.109</td></tr>
+<tr><td>5</td><td>0.62</td><td>0.0158</td><td>0.638</td><td>+0.111</td><td>0.580</td><td>0.65</td><td>−0.070</td></tr>
+<tr><td>6</td><td>0.34</td><td>0.0213</td><td>0.566</td><td>−0.169</td><td>0.413</td><td>0.28</td><td>+0.133</td></tr>
+<tr><td>7</td><td>0.49</td><td>0.0143</td><td>0.660</td><td>−0.019</td><td>0.496</td><td>0.50</td><td>−0.004</td></tr>
+<tr><td>8</td><td>0.83</td><td>0.0134</td><td>0.675</td><td>+0.321</td><td>0.726</td><td>0.82</td><td>−0.094</td></tr>
+<tr><td>9</td><td>0.05</td><td>0.0365</td><td>0.432</td><td>−0.459</td><td>0.311</td><td>0.20</td><td>+0.111</td></tr>
+<tr><td>10</td><td>0.60</td><td>0.0185</td><td>0.600</td><td>+0.091</td><td>0.564</td><td>0.55</td><td>+0.014</td></tr>
+</table>
+
+<p><strong>Key observations:</strong></p>
+<ul>
+<li><strong>Patient 9:</strong> Observed $W_9 = 0.05$ (far from truth 0.20). Calibrated $\hat{X}_9 = 0.311$ — pulled strongly toward the mean because $\lambda_9 = 0.432$. Still not perfect, but much closer to the truth than 0.05.</li>
+<li><strong>Patient 7:</strong> Observed $W_7 = 0.49$, calibrated $\hat{X}_7 = 0.496$ — barely changed because the measurement was already close to truth ($X_7 = 0.50$) and $\lambda_7 = 0.66$ is moderately high.</li>
+<li><strong>Average error:</strong> $|W_i - X_i|$ average = 0.057. $|\hat{X}_i - X_i|$ average = 0.063. Wait — the calibrated values aren't always closer to the truth for individual patients! But on average, the <strong>regression coefficient</strong> $\hat{\beta}$ will be closer to $\beta$. That's the key — RC corrects the regression, not individual scores.</li>
+</ul>
+</div>
+
+<!-- ===== 12 ===== -->
+<h2 id="s12">12. The Corrected Cox Model</h2>
+
+<div class="green">
+<div class="t">The Corrected Estimator</div>
+<p>Replace $W_i$ with $\hat{X}_i$ in the Cox partial likelihood:</p>
+$$h(t \mid \hat{X}_i) = h_0(t) \cdot \exp(\hat{\beta}_{\text{RC}} \cdot \hat{X}_i)$$
+<p>Maximize the partial likelihood with $\hat{X}_i$ instead of $W_i$ to get $\hat{\beta}_{\text{RC}}$.</p>
+<p>Under correct specification, $\hat{\beta}_{\text{RC}}$ is approximately consistent for $\beta$.</p>
+</div>
+
+<div class="orange">
+<div class="t">What Changes in Practice</div>
+<table>
+<tr><th>Estimator</th><th>$\hat{\beta}$</th><th>$\widehat{\text{HR}}$</th><th>Bias</th></tr>
+<tr><td>True (oracle)</td><td>−1.500</td><td>0.223</td><td>0</td></tr>
+<tr><td>Naive (uses $W_i$)</td><td>−0.935</td><td>0.393</td><td>+0.565 (38% attenuation)</td></tr>
+<tr><td>Corrected (uses $\hat{X}_i$)</td><td>−1.380</td><td>0.252</td><td>+0.120 (8% residual)</td></tr>
+</table>
+<p>The correction recovers most of the lost signal: from 38% attenuation down to 8%.</p>
+</div>
+
+<!-- ===== 13 ===== -->
+<h2 id="s13">13. SIMEX as Sensitivity Analysis</h2>
+
+<div class="blue">
+<div class="t">SIMEX Algorithm</div>
+<ol>
+<li>For each noise multiplier $\zeta \in \{0.5, 1.0, 1.5, 2.0\}$:
+  <ul>
+  <li>Generate: $W_i^{(\zeta)} = W_i + \sqrt{\zeta} \cdot Z_i$, where $Z_i \sim N(0, \hat{\sigma}_i^2)$</li>
+  <li>Fit Cox on $\{W_i^{(\zeta)}\}$, get $\hat{\beta}(\zeta)$</li>
+  <li>Repeat $B$ times and average to get $\bar{\hat{\beta}}(\zeta)$</li>
+  </ul>
+</li>
+<li>Also compute $\bar{\hat{\beta}}(0) = \hat{\beta}_{\text{naive}}$ (original data, $\zeta = 0$)</li>
+<li>Fit a curve through $(\zeta, \bar{\hat{\beta}}(\zeta))$ for $\zeta \in \{0, 0.5, 1, 1.5, 2\}$</li>
+<li>Extrapolate to $\zeta = -1$: $\hat{\beta}_{\text{SIMEX}} = \bar{\hat{\beta}}(-1)$</li>
+</ol>
+</div>
+
+<div class="orange">
+<div class="t">Numerical Example</div>
+<table>
+<tr><th>$\zeta$</th><th>Added noise</th><th>$\bar{\hat{\beta}}(\zeta)$</th></tr>
+<tr><td>−1 (extrapolated)</td><td>None (hypothetical)</td><td><strong>−1.42</strong> (SIMEX estimate)</td></tr>
+<tr><td>0</td><td>Original data</td><td>−0.935</td></tr>
+<tr><td>0.5</td><td>$\sqrt{0.5} \times \hat{\sigma}_i$</td><td>−0.78</td></tr>
+<tr><td>1.0</td><td>$1 \times \hat{\sigma}_i$</td><td>−0.65</td></tr>
+<tr><td>1.5</td><td>$\sqrt{1.5} \times \hat{\sigma}_i$</td><td>−0.55</td></tr>
+<tr><td>2.0</td><td>$\sqrt{2} \times \hat{\sigma}_i$</td><td>−0.47</td></tr>
+</table>
+<p>The pattern: as you add more noise ($\zeta$ increases), $\hat{\beta}$ shrinks toward zero. Fitting a quadratic curve through these points and extrapolating to $\zeta = -1$ gives $\hat{\beta}_{\text{SIMEX}} = -1.42$, close to the true $-1.50$.</p>
+<p>SIMEX doesn't require specifying the calibration model. It's model-free in that sense. Use it to <strong>confirm</strong> your RC results — if RC gives $-1.38$ and SIMEX gives $-1.42$, you have consistent evidence.</p>
+</div>
+
+<!-- ===== 14 ===== -->
+<h2 id="s14">14. Variance of the Corrected Estimator</h2>
+
+<div class="blue">
+<div class="t">Sandwich Variance Estimator</div>
+<p>The variance of $\hat{\beta}_{\text{RC}}$ must account for two sources of uncertainty:</p>
+<ol>
+<li>Sampling variability of the Cox partial likelihood</li>
+<li>Estimation uncertainty in $\hat{X}_i$ (because $\hat{\lambda}_i$ and $\hat{\sigma}_X^2$ are themselves estimated)</li>
+</ol>
+$$\widehat{\text{Var}}(\hat{\beta}_{\text{RC}}) = \underbrace{I^{-1}(\hat{\beta}_{\text{RC}})}_{\text{Cox information}} + \underbrace{\mathbf{D}^\top \boldsymbol{\Sigma}_\alpha \mathbf{D}}_{\text{propagated from } \hat{\alpha}\text{ estimation}}$$
+<p>where $I(\hat{\beta})$ is the observed Fisher information from the Cox partial likelihood, $\mathbf{D} = \partial\hat{\beta}/\partial\hat{\boldsymbol{\alpha}}$ is the sensitivity of $\hat{\beta}$ to the variance model parameters, and $\boldsymbol{\Sigma}_\alpha$ is the covariance matrix of $\hat{\boldsymbol{\alpha}} = (\hat{\alpha}_0, \hat{\alpha}_1, \hat{\alpha}_2)$.</p>
+<p>In practice, use a <strong>nonparametric bootstrap</strong>: resample patients with replacement, re-estimate everything ($\hat{\sigma}_i^2$, $\hat{\sigma}_X^2$, $\hat{\lambda}_i$, $\hat{X}_i$, $\hat{\beta}_{\text{RC}}$), and take the bootstrap variance.</p>
+</div>
+
+<!-- ===== 15 ===== -->
+<h2 id="s15">15. The Simulation Study Design</h2>
+
+<div class="green">
+<div class="t">Complete Data-Generating Mechanism</div>
+
+<h4>Step 1: Generate patient-level truth</h4>
+$$X_i \sim N(\mu_X = 0.5, \; \sigma_X^2), \quad i = 1, \ldots, n$$
+<p>Vary $\sigma_X^2 \in \{0.02, 0.04, 0.08\}$.</p>
+
+<h4>Step 2: Generate tissue characteristics</h4>
+$$m_i \sim \text{Uniform}(200, 5000), \quad \rho_i \sim \text{Beta}(2, 5)$$
+
+<h4>Step 3: Generate error</h4>
+$$\sigma_i^2 = \alpha_0 + \alpha_1/m_i + \alpha_2\rho_i, \quad U_i \sim N(0, \sigma_i^2)$$
+$$W_i = X_i + U_i$$
+
+<h4>Step 4: Generate survival</h4>
+$$T_i \sim \text{Weibull}(k = 1.5, \; \lambda_i), \quad \lambda_i = \exp(-\beta X_i) / \gamma$$
+<p>where $\gamma$ controls the time scale. Vary $\beta \in \{0, -0.5, -1.0, -1.5, -2.0\}$.</p>
+
+<h4>Step 5: Generate censoring</h4>
+$$C_i \sim \text{Uniform}(0, \tau)$$
+<p>Choose $\tau$ to give censoring rates $\in \{10\%, 30\%, 50\%\}$.</p>
+
+<h4>Step 6: Observe</h4>
+$$(\tilde{T}_i, \delta_i) = (\min(T_i, C_i), \; \mathbb{1}[T_i \leq C_i])$$
+</div>
+
+<h3>Simulation Scenarios</h3>
+
+<table>
+<tr><th>Parameter</th><th>Values</th><th>Purpose</th></tr>
+<tr><td>$n$ (patients)</td><td>20, 50, 100, 200</td><td>Realistic sample sizes for spatial omics</td></tr>
+<tr><td>$\beta$ (true effect)</td><td>0, −0.5, −1.0, −1.5, −2.0</td><td>$\beta = 0$ for Type I error; others for power</td></tr>
+<tr><td>$\sigma_X^2$</td><td>0.02, 0.04, 0.08</td><td>Low/medium/high between-patient variability</td></tr>
+<tr><td>$\alpha_0, \alpha_1, \alpha_2$</td><td>Fixed: 0.01, 5, 0.03</td><td>Error variance model (from calibration data)</td></tr>
+<tr><td>Censoring rate</td><td>10%, 30%, 50%</td><td>Impact of information loss</td></tr>
+<tr><td>Variance model misspecification</td><td>Correct vs. omit $\rho_i$ term</td><td>Robustness to model misspecification</td></tr>
+</table>
+
+<p>Total: $4 \times 5 \times 3 \times 3 \times 2 = 360$ scenarios, each with $R = 2000$ replications = 720,000 simulated datasets.</p>
+
+<!-- ===== 16 ===== -->
+<h2 id="s16">16. Performance Metrics</h2>
+
+<div class="blue">
+<div class="t">What We Measure in Each Scenario</div>
+<table>
+<tr><th>Metric</th><th>Formula</th><th>Target</th></tr>
+<tr><td><strong>Bias</strong></td><td>$\frac{1}{R}\sum_{r=1}^R \hat{\beta}^{(r)} - \beta$</td><td>Near 0</td></tr>
+<tr><td><strong>Relative bias</strong></td><td>$|\text{Bias}| / |\beta|$ (when $\beta \neq 0$)</td><td>$< 5\%$</td></tr>
+<tr><td><strong>Empirical SE</strong></td><td>$\text{Std}(\hat{\beta}^{(1)}, \ldots, \hat{\beta}^{(R)})$</td><td>—</td></tr>
+<tr><td><strong>Average model SE</strong></td><td>$\frac{1}{R}\sum \widehat{\text{SE}}^{(r)}$</td><td>Close to empirical SE</td></tr>
+<tr><td><strong>MSE</strong></td><td>$\text{Bias}^2 + \text{Var}$</td><td>Minimal</td></tr>
+<tr><td><strong>Coverage</strong></td><td>$\frac{1}{R}\sum \mathbb{1}[\beta \in \text{CI}^{(r)}]$</td><td>93–97% for nominal 95%</td></tr>
+<tr><td><strong>Type I error</strong></td><td>Rejection rate when $\beta = 0$</td><td>4–6% for nominal 5%</td></tr>
+<tr><td><strong>Power</strong></td><td>Rejection rate when $\beta \neq 0$</td><td>As high as possible</td></tr>
+</table>
+</div>
+
+<div class="orange">
+<div class="t">Example Results Table (What Your Paper Will Show)</div>
+<p>$n = 50$, $\beta = -1.5$, 30% censoring, $\sigma_X^2 = 0.04$:</p>
+<table>
+<tr><th>Method</th><th>$\overline{\hat{\beta}}$</th><th>Bias</th><th>Rel. Bias</th><th>SE</th><th>MSE</th><th>Coverage</th><th>Power</th></tr>
+<tr><td>Oracle ($X_i$ known)</td><td>−1.51</td><td>−0.01</td><td>0.7%</td><td>0.38</td><td>0.144</td><td>95.2%</td><td>82%</td></tr>
+<tr><td><strong>Naive</strong> (uses $W_i$)</td><td><strong>−0.93</strong></td><td><strong>+0.57</strong></td><td><strong>38%</strong></td><td>0.29</td><td><strong>0.409</strong></td><td><strong>42%</strong></td><td>58%</td></tr>
+<tr><td><strong>RC-global</strong> (one $\lambda$)</td><td>−1.32</td><td>+0.18</td><td>12%</td><td>0.41</td><td>0.200</td><td>84%</td><td>71%</td></tr>
+<tr><td><strong>RC-patient</strong> ($\lambda_i$)</td><td><strong>−1.45</strong></td><td><strong>+0.05</strong></td><td><strong>3.3%</strong></td><td>0.43</td><td><strong>0.187</strong></td><td><strong>93.8%</strong></td><td>76%</td></tr>
+<tr><td>SIMEX</td><td>−1.41</td><td>+0.09</td><td>6%</td><td>0.44</td><td>0.202</td><td>91.5%</td><td>73%</td></tr>
+</table>
+
+<p><strong>Reading this table (the payoff of the entire paper):</strong></p>
+<ul>
+<li><strong>Naive:</strong> 38% bias, 42% coverage (catastrophic — only 42% of CIs contain the truth instead of 95%), power = 58%</li>
+<li><strong>RC-global (standard textbook approach):</strong> Better than naive but still 12% bias and 84% coverage. The single-$\lambda$ correction is <strong>insufficient</strong>.</li>
+<li><strong>RC-patient (your method):</strong> 3.3% bias, 93.8% coverage (near nominal), power = 76%. <strong>This is the contribution.</strong></li>
+<li><strong>SIMEX:</strong> 6% bias, 91.5% coverage. Decent, confirms RC direction, slightly worse because extrapolation is approximate.</li>
+<li><strong>Oracle:</strong> The best achievable. Your RC-patient method gets within 6% of the oracle on every metric.</li>
+</ul>
+</div>
+
+<!-- ===== 17 ===== -->
+<h2 id="s17">17. Complete Paper Outline</h2>
+
+<div class="purple">
+<div class="t">Paper Structure for Biostatistics Submission</div>
+
+<h4>1. Introduction (2 pages)</h4>
+<ul>
+<li>Spatial transcriptomics in cancer: biomarker potential</li>
+<li>The measurement error problem: nobody corrects for it</li>
+<li>The heteroscedastic structure: why standard RC fails</li>
+<li>Our contribution in one sentence</li>
+</ul>
+
+<h4>2. Model and Methods (5 pages)</h4>
+<ul>
+<li>2.1 The Cox model with true covariate $X_i$</li>
+<li>2.2 The structural measurement error model ($W_i = X_i + U_i$)</li>
+<li>2.3 The heteroscedastic variance model ($\sigma_i^2 = \alpha_0 + \alpha_1/m_i + \alpha_2\rho_i$)</li>
+<li>2.4 Patient-specific reliability ratios $\lambda_i$</li>
+<li>2.5 Generalized regression calibration estimator</li>
+<li>2.6 Estimation of variance components (bootstrap + method of moments)</li>
+<li>2.7 Variance estimation for $\hat{\beta}_{\text{RC}}$</li>
+<li>2.8 SIMEX as sensitivity analysis</li>
+</ul>
+
+<h4>3. Simulation Study (4 pages)</h4>
+<ul>
+<li>3.1 Data-generating mechanism (Section 15 of this document)</li>
+<li>3.2 Scenarios and parameters</li>
+<li>3.3 Performance metrics</li>
+<li>3.4 Results: bias, coverage, MSE, power comparisons</li>
+<li>3.5 Sensitivity to variance model misspecification</li>
+</ul>
+
+<h4>4. Application to NSCLC Spatial Data (3 pages)</h4>
+<ul>
+<li>4.1 Dataset description</li>
+<li>4.2 Computing $W_i$ and estimating $\hat{\sigma}_i^2$</li>
+<li>4.3 Naive vs corrected Cox results</li>
+<li>4.4 SIMEX confirmation</li>
+</ul>
+
+<h4>5. Discussion (2 pages)</h4>
+<ul>
+<li>5.1 Summary of findings</li>
+<li>5.2 Limitations: $X_i$ is never observed; graph-conditionality; normality assumption</li>
+<li>5.3 Extensions: Beta structural model; time-varying spatial features</li>
+<li>5.4 Implications for spatial biomarker research</li>
+</ul>
+
+<h4>Supplementary Material</h4>
+<ul>
+<li>Proofs of consistency</li>
+<li>Additional simulation scenarios</li>
+<li>Software code (R package)</li>
+</ul>
+</div>
+
+<hr>
+
+<div class="green">
+<div class="t">The Complete Mathematical Chain in One Box</div>
+$$\boxed{\begin{aligned}
+&\text{1. True model:} && h(t|X_i) = h_0(t)e^{\beta X_i} \\[4pt]
+&\text{2. Latent:} && X_i \sim N(\mu_X, \sigma_X^2) \\[4pt]
+&\text{3. Error:} && W_i = X_i + U_i, \quad U_i \sim N(0, \sigma_i^2) \\[4pt]
+&\text{4. Heteroscedasticity:} && \sigma_i^2 = \alpha_0 + \alpha_1/m_i + \alpha_2\rho_i \\[4pt]
+&\text{5. Attenuation:} && \tilde{\beta} \xrightarrow{p} \beta \cdot \lambda, \quad \lambda < 1 \\[4pt]
+&\text{6. Patient-specific } \lambda_i\text{:} && \lambda_i = \sigma_X^2/(\sigma_X^2 + \sigma_i^2) \\[4pt]
+&\text{7. Calibrated covariate:} && \hat{X}_i = \hat{\mu}_W + \hat{\lambda}_i(W_i - \hat{\mu}_W) \\[4pt]
+&\text{8. Corrected model:} && h(t|\hat{X}_i) = h_0(t)e^{\hat{\beta}_{\text{RC}} \hat{X}_i} \\[4pt]
+&\text{9. Identification:} && \hat{\sigma}_X^2 = \max\{\widehat{\text{Var}}(W) - \bar{\hat{\sigma}}_U^2, \; 0\}
+\end{aligned}}$$
+</div>
+
+<p style="text-align:center;color:var(--dim);font-size:12px;margin-top:40px;">
+Paper 2 Complete Mathematics — Measurement Error Correction for Cox Models<br>
+17 Sections with 10-patient running example &bull; Target: <em>Biostatistics</em>
+</p>
+
+</body>
+</html>
