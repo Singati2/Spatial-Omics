@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complete Biostatistics Reference — Spatial Omics Measurement Error Framework</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], tags:'ams' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+:root { --bg:#fff; --text:#1a1a2e; --dim:#555; --accent:#1a5276; --accent2:#117a65; --accent3:#6c3483; --accent4:#b9770e; --accent5:#c0392b; --border:#ddd; --card:#f8f9fa; --card2:#eef7ff; --card3:#f0faf0; --card4:#fdf6ec; --card5:#fdf0f0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Georgia','Times New Roman',serif; background:var(--bg); color:var(--text); line-height:1.85; font-size:15px; max-width:850px; margin:0 auto; padding:40px 50px 100px; }
+
+h1 { font-size:28px; text-align:center; margin-bottom:4px; color:var(--accent); }
+h2 { font-size:22px; color:var(--accent); margin:50px 0 12px; padding-bottom:6px; border-bottom:2px solid var(--accent); counter-increment:h2; }
+h2::before { content:counter(h2) ". "; }
+body { counter-reset:h2; }
+h3 { font-size:17px; color:var(--accent3); margin:28px 0 8px; }
+h4 { font-size:15px; color:var(--accent4); margin:20px 0 6px; font-style:italic; }
+.subtitle { text-align:center; color:var(--dim); font-size:14px; margin-bottom:6px; }
+.author { text-align:center; color:var(--dim); font-size:13px; margin-bottom:40px; }
+
+p { margin:8px 0; text-align:justify; }
+ul, ol { margin:8px 0 8px 28px; }
+li { margin:4px 0; }
+
+/* Formula boxes */
+.box { border:1px solid var(--border); border-radius:6px; padding:18px 22px; margin:16px 0; background:var(--card); }
+.box.blue { background:var(--card2); border-color:#b0d4f1; }
+.box.green { background:var(--card3); border-color:#a3d9b1; }
+.box.orange { background:var(--card4); border-color:#f0d9a8; }
+.box.red { background:var(--card5); border-color:#f0b8b8; }
+.box .boxtitle { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
+.box.blue .boxtitle { color:var(--accent); }
+.box.green .boxtitle { color:var(--accent2); }
+.box.orange .boxtitle { color:var(--accent4); }
+.box.red .boxtitle { color:var(--accent5); }
+
+/* Tables */
+table { width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; }
+th { background:#e8e8e8; text-align:left; padding:8px 12px; border:1px solid var(--border); font-weight:700; font-size:13px; }
+td { padding:7px 12px; border:1px solid var(--border); }
+
+/* Definition/Theorem */
+.defn { border-left:4px solid var(--accent); padding:14px 18px; margin:14px 0; background:var(--card2); }
+.defn .defn-title { font-weight:700; color:var(--accent); margin-bottom:6px; }
+.thm { border-left:4px solid var(--accent2); padding:14px 18px; margin:14px 0; background:var(--card3); }
+.thm .thm-title { font-weight:700; color:var(--accent2); margin-bottom:6px; }
+.remark { border-left:4px solid var(--accent4); padding:14px 18px; margin:14px 0; background:var(--card4); }
+.remark .remark-title { font-weight:700; color:var(--accent4); margin-bottom:6px; }
+.warning { border-left:4px solid var(--accent5); padding:14px 18px; margin:14px 0; background:var(--card5); }
+.warning .warning-title { font-weight:700; color:var(--accent5); margin-bottom:6px; }
+
+/* Example */
+.example { border:1px dashed #999; padding:16px 20px; margin:14px 0; background:#fafafa; border-radius:4px; }
+.example .ex-title { font-weight:700; color:#333; margin-bottom:8px; }
+
+pre { background:#f0f0f0; padding:12px 16px; border-radius:4px; font-family:'Courier New',monospace; font-size:13px; overflow-x:auto; margin:10px 0; line-height:1.5; }
+code { font-family:'Courier New',monospace; font-size:13px; background:#f0f0f0; padding:1px 4px; border-radius:3px; }
+
+/* TOC */
+.toc { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:20px 28px; margin:30px 0; }
+.toc h3 { color:var(--accent); margin:0 0 12px; font-size:16px; }
+.toc ol { margin:0; padding-left:20px; }
+.toc li { margin:3px 0; font-size:14px; }
+.toc a { color:var(--accent); text-decoration:none; }
+.toc a:hover { text-decoration:underline; }
+
+hr { border:none; border-top:1px solid var(--border); margin:40px 0; }
+
+@media print {
+  body { padding:20px 30px; font-size:12px; max-width:100%; }
+  h2 { font-size:18px; margin-top:30px; }
+  .box, .defn, .thm, .remark, .warning, .example { break-inside:avoid; }
+  h2 { break-after:avoid; }
+}
+</style>
+</head>
+<body>
+
+<h1>Complete Biostatistics Reference</h1>
+<p class="subtitle">Measurement Error Framework for Spatial Omics Inference</p>
+<p class="author">Comprehensive Mathematical Formulations, Derivations, and Examples</p>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+<h3>Table of Contents</h3>
+<ol>
+<li><a href="#s1">Probability Distributions for Count Data</a></li>
+<li><a href="#s2">The Poisson Measurement Model</a></li>
+<li><a href="#s3">Low-Rank Matrix Structure and Gene Programs</a></li>
+<li><a href="#s4">Matrix Completion and Recovery Theory</a></li>
+<li><a href="#s5">Per-Gene Reconstruction Error Analysis</a></li>
+<li><a href="#s6">Spatial Autocorrelation: Moran's I</a></li>
+<li><a href="#s7">Spatial Autocorrelation: Geary's C</a></li>
+<li><a href="#s8">Neighborhood Enrichment (NE) Score</a></li>
+<li><a href="#s9">Cell-Cell Interaction (CCI) Test Statistic</a></li>
+<li><a href="#s10">Permutation Testing and Multiple Comparison Correction</a></li>
+<li><a href="#s11">Bias Decomposition Under Measurement Error</a></li>
+<li><a href="#s12">Regression Calibration for CCI Correction</a></li>
+<li><a href="#s13">Error Propagation to Cell Type Classification</a></li>
+<li><a href="#s14">Error Propagation to CCI False Positive Rate</a></li>
+<li><a href="#s15">Error Propagation to Spatial Domain Detection</a></li>
+<li><a href="#s16">Panel Perturbation Stability Analysis</a></li>
+<li><a href="#s17">Calibration and Discrimination Metrics</a></li>
+<li><a href="#s18">Gene Panel Optimization Theory</a></li>
+<li><a href="#s19">Fisher Information and Cramér-Rao Bounds</a></li>
+<li><a href="#s20">Variance Estimation and Confidence Intervals</a></li>
+<li><a href="#s21">False Discovery Rate Control</a></li>
+<li><a href="#s22">Complete Model Summary and Notation</a></li>
+</ol>
+</div>
+
+<hr>
+
+<!-- ================================================================ -->
+<!-- SECTION 1 -->
+<!-- ================================================================ -->
+<h2 id="s1">Probability Distributions for Count Data</h2>
+
+<p>Spatial transcriptomics data consists of <em>counts</em> &mdash; the number of detected mRNA transcripts per gene per cell. The choice of distributional model fundamentally affects all downstream inference.</p>
+
+<h3>1.1 The Poisson Distribution</h3>
+
+<div class="defn">
+<div class="defn-title">Definition 1.1 (Poisson Distribution)</div>
+A random variable $Y$ follows a Poisson distribution with rate parameter $\lambda > 0$, written $Y \sim \text{Poisson}(\lambda)$, if:
+$$P(Y = k) = \frac{\lambda^k e^{-\lambda}}{k!}, \quad k = 0, 1, 2, \dots$$
+</div>
+
+<p><strong>Properties:</strong></p>
+<ul>
+<li><strong>Mean:</strong> $\mathbb{E}[Y] = \lambda$</li>
+<li><strong>Variance:</strong> $\text{Var}(Y) = \lambda$ &nbsp;(mean equals variance)</li>
+<li><strong>Mode:</strong> $\lfloor\lambda\rfloor$ &nbsp;(greatest integer $\leq \lambda$)</li>
+<li><strong>Moment generating function:</strong> $M_Y(t) = \exp(\lambda(e^t - 1))$</li>
+<li><strong>Cumulant generating function:</strong> $K_Y(t) = \lambda(e^t - 1)$, so all cumulants equal $\lambda$</li>
+<li><strong>Additivity:</strong> If $Y_1 \sim \text{Poisson}(\lambda_1)$ and $Y_2 \sim \text{Poisson}(\lambda_2)$ are independent, then $Y_1 + Y_2 \sim \text{Poisson}(\lambda_1 + \lambda_2)$</li>
+<li><strong>Thinning:</strong> If $Y \sim \text{Poisson}(\lambda)$ and each event is independently retained with probability $\delta$, the retained count follows $\text{Poisson}(\delta\lambda)$</li>
+</ul>
+
+<div class="example">
+<div class="ex-title">Example 1.1 &mdash; Transcript Detection</div>
+<p>A cell expresses gene <em>EGFR</em> at rate $\lambda = 8$ transcripts. The platform has detection efficiency $\delta = 0.6$. The observed count is:</p>
+$$Y \sim \text{Poisson}(0.6 \times 8) = \text{Poisson}(4.8)$$
+<p>Expected count: 4.8. Standard deviation: $\sqrt{4.8} \approx 2.19$. Relative noise: $2.19/4.8 \approx 46\%$.</p>
+<p>Probability of observing exactly 3 transcripts:</p>
+$$P(Y=3) = \frac{4.8^3 \, e^{-4.8}}{3!} = \frac{110.59 \times 0.00823}{6} = 0.152$$
+</div>
+
+<h3>1.2 The Negative Binomial Distribution</h3>
+
+<div class="defn">
+<div class="defn-title">Definition 1.2 (Negative Binomial Distribution)</div>
+$Y \sim \text{NB}(\mu, \theta)$ where $\mu > 0$ is the mean and $\theta > 0$ is the dispersion parameter:
+$$P(Y=k) = \binom{k + \theta - 1}{k} \left(\frac{\theta}{\theta + \mu}\right)^\theta \left(\frac{\mu}{\theta + \mu}\right)^k$$
+</div>
+
+<p><strong>Properties:</strong></p>
+<ul>
+<li><strong>Mean:</strong> $\mathbb{E}[Y] = \mu$</li>
+<li><strong>Variance:</strong> $\text{Var}(Y) = \mu + \mu^2/\theta$ &nbsp;(variance > mean, i.e., <em>overdispersion</em>)</li>
+<li><strong>Limit:</strong> As $\theta \to \infty$, $\text{NB}(\mu, \theta) \to \text{Poisson}(\mu)$</li>
+</ul>
+
+<div class="remark">
+<div class="remark-title">Remark 1.1 &mdash; Poisson vs. Negative Binomial for Spatial Omics</div>
+<p>The Poisson model assumes variance equals mean (technical noise only). The Negative Binomial allows overdispersion (biological variability between cells of the same type). For <strong>imaging-based</strong> spatial transcriptomics (Xenium, MERFISH, CosMx), individual molecule detection is well-modeled by Poisson. For <strong>sequencing-based</strong> platforms (Visium), the NB model is more appropriate due to PCR amplification noise.</p>
+<p>In this framework, we use the Poisson model because our primary data type (Xenium) measures individual molecules without amplification. The extension to NB is straightforward by replacing $\text{Var}(Y) = \lambda$ with $\text{Var}(Y) = \lambda + \lambda^2/\theta$.</p>
+</div>
+
+<h3>1.3 The Zero-Inflated Poisson (ZIP) Model</h3>
+
+<div class="defn">
+<div class="defn-title">Definition 1.3 (Zero-Inflated Poisson)</div>
+$Y \sim \text{ZIP}(\lambda, \pi)$ is a mixture:
+$$P(Y=k) = \begin{cases} \pi + (1-\pi)e^{-\lambda} & k=0 \\ (1-\pi)\frac{\lambda^k e^{-\lambda}}{k!} & k \geq 1 \end{cases}$$
+where $\pi \in [0,1)$ is the zero-inflation probability (probability of a "structural" zero &mdash; the gene is truly silent in that cell, not just undetected).
+</div>
+
+<p><strong>Properties:</strong></p>
+<ul>
+<li>$\mathbb{E}[Y] = (1-\pi)\lambda$</li>
+<li>$\text{Var}(Y) = (1-\pi)\lambda(1 + \pi\lambda)$</li>
+</ul>
+
+<div class="warning">
+<div class="warning-title">Critical Issue: Biological vs. Technical Zeros</div>
+<p>Hafiz et al. (Briefings in Bioinformatics, 2026) showed that all tested imputation methods <strong>overimpute</strong> &mdash; they fill in both technical dropouts (good) and biological zeros (bad), destroying biological signal. This makes the distinction between $\pi$ (biological silence) and detection failure ($\delta_g$) critical for reliable downstream analysis.</p>
+</div>
+
+<h3>1.4 The Multinomial and Dirichlet-Multinomial</h3>
+
+<p>For compositional analysis (e.g., cell type proportions in a spatial spot):</p>
+
+<div class="defn">
+<div class="defn-title">Definition 1.4 (Multinomial Distribution)</div>
+$\mathbf{Y} = (Y_1, \dots, Y_T) \sim \text{Multinomial}(n, \mathbf{p})$ where $n$ is total count and $\mathbf{p} = (p_1, \dots, p_T)$ with $\sum_t p_t = 1$:
+$$P(\mathbf{Y} = \mathbf{y}) = \frac{n!}{\prod_t y_t!} \prod_t p_t^{y_t}$$
+</div>
+
+<p>The <strong>Dirichlet-Multinomial</strong> adds cell type proportion uncertainty: $\mathbf{p} \sim \text{Dirichlet}(\boldsymbol{\alpha})$, then $\mathbf{Y} \mid \mathbf{p} \sim \text{Multinomial}(n, \mathbf{p})$.</p>
+
+<!-- ================================================================ -->
+<!-- SECTION 2 -->
+<!-- ================================================================ -->
+<h2 id="s2">The Poisson Measurement Model for Spatial Omics</h2>
+
+<h3>2.1 Model Specification</h3>
+
+<div class="box blue">
+<div class="boxtitle">The Complete Observation Model</div>
+<p>For cell $i \in \{1, \dots, N\}$ at spatial position $\mathbf{s}_i \in \mathbb{R}^2$ and gene $g \in \{1, \dots, G\}$:</p>
+$$y_{ig} \sim \text{Poisson}(\delta_g \cdot \lambda_{ig}), \quad g \in S$$
+$$y_{ig} = \text{unobserved}, \quad g \notin S$$
+<p>where:</p>
+<ul>
+<li>$y_{ig} \in \mathbb{Z}_+ = \{0, 1, 2, \dots\}$ is the observed transcript count</li>
+<li>$\lambda_{ig} > 0$ is the true biological expression rate</li>
+<li>$\delta_g \in (0, 1]$ is the gene-specific detection efficiency</li>
+<li>$S \subset \{1, \dots, G\}$ is the measured gene panel with $|S| = m \ll G$</li>
+</ul>
+</div>
+
+<h3>2.2 The Selection Matrix Formulation</h3>
+
+<p>Define the <strong>selection matrix</strong> $A_S \in \{0,1\}^{m \times G}$:</p>
+
+$$(A_S)_{jg} = \begin{cases} 1 & \text{if gene } g \text{ is the } j\text{-th element of panel } S \\ 0 & \text{otherwise} \end{cases}$$
+
+<p>$A_S$ consists of $m$ rows of the $G \times G$ identity matrix. The observed data for cell $i$:</p>
+
+$$\mathbf{y}_{i,\text{obs}} = A_S \, \mathbf{y}_i \in \mathbb{Z}_+^m$$
+
+<p>with each component satisfying:</p>
+
+$$[A_S \mathbf{y}_i]_j \sim \text{Poisson}([A_S \, \boldsymbol{\delta} \odot \boldsymbol{\lambda}_i]_j)$$
+
+<p>where $\odot$ is the Hadamard (elementwise) product.</p>
+
+<h3>2.3 Signal-to-Noise Analysis</h3>
+
+<div class="box green">
+<div class="boxtitle">SNR Decomposition</div>
+<p>The signal-to-noise ratio for gene $g$ in cell $i$:</p>
+$$\text{SNR}_{ig} = \frac{\mathbb{E}[y_{ig}]^2}{\text{Var}(y_{ig})} = \frac{(\delta_g \lambda_{ig})^2}{\delta_g \lambda_{ig}} = \delta_g \lambda_{ig}$$
+<p>The <strong>coefficient of variation</strong>:</p>
+$$\text{CV}_{ig} = \frac{\sqrt{\text{Var}(y_{ig})}}{\mathbb{E}[y_{ig}]} = \frac{1}{\sqrt{\delta_g \lambda_{ig}}}$$
+</div>
+
+<div class="example">
+<div class="ex-title">Example 2.1 &mdash; SNR Across Expression Levels</div>
+<p>With detection efficiency $\delta = 0.7$:</p>
+<table>
+<tr><th>Gene Type</th><th>$\lambda$ (true rate)</th><th>$\delta\lambda$ (observed rate)</th><th>SNR</th><th>CV</th><th>Quality</th></tr>
+<tr><td>Housekeeping (GAPDH)</td><td>200</td><td>140</td><td>140</td><td>8.5%</td><td>Excellent</td></tr>
+<tr><td>Marker (CD3E)</td><td>30</td><td>21</td><td>21</td><td>21.8%</td><td>Good</td></tr>
+<tr><td>Signaling (CXCL12)</td><td>5</td><td>3.5</td><td>3.5</td><td>53.5%</td><td>Poor</td></tr>
+<tr><td>Rare TF (FOXP3)</td><td>0.5</td><td>0.35</td><td>0.35</td><td>169%</td><td>Unreliable</td></tr>
+</table>
+<p>Many ligands and receptors critical for CCI analysis (CXCL12, CCL5, etc.) fall in the <strong>poor SNR regime</strong>, making CCI inference inherently fragile even before imputation.</p>
+</div>
+
+<h3>2.4 The Full Data Matrix</h3>
+
+$$\mathbf{Y} \in \mathbb{Z}_+^{N \times G} \quad \text{(full count matrix — mostly unobserved)}$$
+$$\mathbf{Y}_{\text{obs}} = \mathbf{Y} A_S^\top \in \mathbb{Z}_+^{N \times m} \quad \text{(observed data)}$$
+$$\boldsymbol{\Lambda} \in \mathbb{R}_+^{N \times G} \quad \text{(true rate matrix — the target)}$$
+
+<p>The <strong>observation fraction</strong>: $\rho = m/G$.</p>
+
+<table>
+<tr><th>Platform</th><th>Panel Size $m$</th><th>$\rho$</th><th>Resolution</th></tr>
+<tr><td>Xenium (standard)</td><td>313</td><td>1.6%</td><td>Subcellular</td></tr>
+<tr><td>Xenium 5K</td><td>5,000</td><td>25%</td><td>Subcellular</td></tr>
+<tr><td>CosMx 6K</td><td>6,000</td><td>30%</td><td>Subcellular</td></tr>
+<tr><td>MERFISH</td><td>100&ndash;500</td><td>0.5&ndash;2.5%</td><td>Subcellular</td></tr>
+<tr><td>Visium</td><td>~18,000</td><td>~90%</td><td>Multi-cell spot</td></tr>
+<tr><td>Visium HD</td><td>~18,000</td><td>~90%</td><td>2&mu;m bins</td></tr>
+</table>
+
+<h3>2.5 Log-Likelihood Function</h3>
+
+<p>The joint log-likelihood of all observed data, given the rate matrix $\boldsymbol{\Lambda}$:</p>
+
+<div class="box">
+<div class="boxtitle">Poisson Log-Likelihood</div>
+$$\ell(\boldsymbol{\Lambda}; \mathbf{Y}_{\text{obs}}) = \sum_{i=1}^{N} \sum_{g \in S} \left[ y_{ig} \log(\delta_g \lambda_{ig}) - \delta_g \lambda_{ig} - \log(y_{ig}!) \right]$$
+<p>Dropping constant terms and absorbing $\delta_g$ into $\lambda_{ig}$:</p>
+$$\ell(\boldsymbol{\Lambda}) = \sum_{i=1}^{N} \sum_{g \in S} \left[ y_{ig} \log \lambda_{ig} - \lambda_{ig} \right]$$
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 3 -->
+<!-- ================================================================ -->
+<h2 id="s3">Low-Rank Matrix Structure and Gene Programs</h2>
+
+<h3>3.1 The Biological Basis for Low Rank</h3>
+
+<p>Gene expression is not arbitrary. Cells activate coordinated <em>gene programs</em> &mdash; sets of genes regulated together by shared transcription factors, signaling pathways, or epigenetic states. For example:</p>
+
+<ul>
+<li><strong>Proliferation program:</strong> MKI67, TOP2A, CDK1, PCNA co-express</li>
+<li><strong>Interferon response:</strong> ISG15, MX1, IFIT1, STAT1 co-express</li>
+<li><strong>EMT program:</strong> VIM, FN1, SNAI1/2, ZEB1 co-express</li>
+</ul>
+
+<p>If there are $K$ independent programs, the expression of all $G$ genes is determined by $K$ latent factors &mdash; the rate matrix $\boldsymbol{\Lambda}$ is approximately rank-$K$.</p>
+
+<h3>3.2 The Log-Linear Factor Model</h3>
+
+<div class="box blue">
+<div class="boxtitle">Gene Program Decomposition</div>
+$$\log \boldsymbol{\Lambda} = \mathbf{1}\boldsymbol{\mu}^\top + \mathbf{U}\mathbf{V}^\top + \mathbf{E}$$
+<p>Elementwise:</p>
+$$\log \lambda_{ig} = \mu_g + \sum_{k=1}^{K} u_{ik} v_{gk} + \epsilon_{ig}$$
+</div>
+
+<table>
+<tr><th>Symbol</th><th>Dimension</th><th>Interpretation</th><th>What Determines It</th></tr>
+<tr><td>$\mu_g$</td><td>scalar per gene</td><td>Baseline expression level of gene $g$</td><td>Gene identity (housekeeping vs. rare)</td></tr>
+<tr><td>$u_{ik}$</td><td>scalar per cell-program pair</td><td>Activity of program $k$ in cell $i$</td><td>Cell type + cell state</td></tr>
+<tr><td>$v_{gk}$</td><td>scalar per gene-program pair</td><td>Membership of gene $g$ in program $k$</td><td>Gene regulatory network</td></tr>
+<tr><td>$\epsilon_{ig}$</td><td>scalar per cell-gene pair</td><td>Residual noise</td><td>Stochastic gene expression</td></tr>
+</table>
+
+<h3>3.3 Identifiability and Parameter Counting</h3>
+
+<p>Total unknowns in the factor model (ignoring $\mathbf{E}$):</p>
+
+$$\text{Parameters} = \underbrace{G}_{\boldsymbol{\mu}} + \underbrace{NK}_{\mathbf{U}} + \underbrace{GK}_{\mathbf{V}} = G(1+K) + NK$$
+
+<p>Observations: $Nm$ (one count per cell per measured gene).</p>
+
+<div class="thm">
+<div class="thm-title">Proposition 3.1 (Necessary Condition for Identifiability)</div>
+<p>Recovery of $\boldsymbol{\Lambda}$ from $\mathbf{Y}_{\text{obs}}$ requires at minimum:</p>
+$$Nm \geq G(1+K) + NK$$
+$$\Leftrightarrow \quad m \geq \frac{G(1+K)}{N} + K$$
+<p>For $N \gg G$: $m \gtrsim K$.</p>
+<p>For $N = G$: $m \gtrsim 2K + 1$.</p>
+</div>
+
+<div class="example">
+<div class="ex-title">Example 3.1 &mdash; Minimum Panel Size</div>
+<table>
+<tr><th>Scenario</th><th>$N$</th><th>$G$</th><th>$K$</th><th>Min $m$</th></tr>
+<tr><td>Xenium breast cancer</td><td>100,000</td><td>20,000</td><td>30</td><td>~37</td></tr>
+<tr><td>Small tissue section</td><td>5,000</td><td>20,000</td><td>30</td><td>~150</td></tr>
+<tr><td>Rare cell study</td><td>500</td><td>20,000</td><td>30</td><td>~1,230</td></tr>
+</table>
+<p>Key insight: <strong>more cells help</strong>. Large datasets can tolerate smaller panels because there is more information to estimate the gene programs.</p>
+</div>
+
+<h3>3.4 Empirical Rank Estimation</h3>
+
+<p>To estimate $K$ empirically from data $\mathbf{Y}_{\text{obs}}$:</p>
+
+<ol>
+<li>Normalize: $\tilde{\mathbf{Y}} = \log(1 + \text{CP10K}(\mathbf{Y}_{\text{obs}}))$</li>
+<li>Center: $\bar{\mathbf{Y}} = \tilde{\mathbf{Y}} - \mathbf{1}\bar{\mathbf{y}}^\top$</li>
+<li>Compute SVD: $\bar{\mathbf{Y}} = \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^\top$</li>
+<li>$K$ = number of singular values $\sigma_k$ exceeding the Marchenko-Pastur threshold (random matrix theory baseline)</li>
+</ol>
+
+<p>The <strong>Marchenko-Pastur law</strong> gives the expected largest singular value of a random $N \times m$ matrix with i.i.d. entries of variance $\sigma^2$:</p>
+
+$$\sigma_{\text{MP}} = \sigma \left(1 + \sqrt{N/m}\right)$$
+
+<p>Singular values exceeding this are signal; those below are noise.</p>
+
+<!-- ================================================================ -->
+<!-- SECTION 4 -->
+<!-- ================================================================ -->
+<h2 id="s4">Matrix Completion and Recovery Theory</h2>
+
+<h3>4.1 The Recovery Problem</h3>
+
+<p>Given observed entries $\{y_{ig} : g \in S\}$ and the low-rank model, we seek to recover the full rate matrix $\boldsymbol{\Lambda} \in \mathbb{R}_+^{N \times G}$.</p>
+
+<div class="box blue">
+<div class="boxtitle">Penalized Poisson Maximum Likelihood</div>
+$$\hat{\boldsymbol{\Lambda}} = \arg\min_{\boldsymbol{\Lambda} \succ 0} \left[ -\ell(\boldsymbol{\Lambda}) + \tau \|\boldsymbol{\Lambda}\|_* \right]$$
+<p>where $\|\boldsymbol{\Lambda}\|_* = \sum_k \sigma_k(\boldsymbol{\Lambda})$ is the nuclear norm (convex relaxation of rank), and $\tau > 0$ is the regularization strength.</p>
+</div>
+
+<h3>4.2 The Incoherence Condition</h3>
+
+<div class="defn">
+<div class="defn-title">Definition 4.1 (Incoherence)</div>
+<p>A rank-$K$ matrix $\boldsymbol{\Lambda} \in \mathbb{R}^{N \times G}$ with SVD $\boldsymbol{\Lambda} = \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^\top$ is <strong>$\mu_0$-incoherent</strong> if:</p>
+$$\max_i \|\mathbf{U}_{i,:}\|^2 \leq \frac{\mu_0 K}{N}, \qquad \max_g \|\mathbf{V}_{g,:}\|^2 \leq \frac{\mu_0 K}{G}$$
+<p>This requires that no single cell or gene dominates the signal. $\mu_0 = 1$ is the best case (uniform spread); $\mu_0 = N/K$ is the worst (all signal in one cell).</p>
+</div>
+
+<p><strong>Biological interpretation:</strong> Incoherence fails when one cell type is extremely rare (all signal in a few cells) or one gene uniquely defines a program (all signal in one gene). This predicts that <strong>rare cell types are harder to recover</strong> &mdash; a biologically meaningful limitation.</p>
+
+<h3>4.3 Recovery Guarantee</h3>
+
+<div class="thm">
+<div class="thm-title">Theorem 4.1 (Poisson Matrix Completion; after Cao &amp; Xie, 2015)</div>
+<p>Let $\boldsymbol{\Lambda} \in \mathbb{R}_+^{N \times G}$ have rank $K$, be $\mu_0$-incoherent, with $\lambda_{\max} = \max_{i,g} \lambda_{ig}$. If the panel $S$ is chosen uniformly at random with $|S| = m$, and:</p>
+$$m \geq C_0 \mu_0^2 K^2 \log^2(N+G)$$
+<p>then with probability at least $1 - (N+G)^{-3}$:</p>
+$$\frac{1}{NG}\|\hat{\boldsymbol{\Lambda}} - \boldsymbol{\Lambda}\|_F^2 \leq C_1 \cdot \frac{K(N+G)\lambda_{\max}}{Nm}$$
+</div>
+
+<p>For $N \gg G$, this simplifies to:</p>
+
+$$\boxed{\text{MSE} \approx C \cdot \frac{K \lambda_{\max}}{m}}$$
+
+<h3>4.4 Understanding the Bound</h3>
+
+<table>
+<tr><th>Factor</th><th>Effect on MSE</th><th>Why</th></tr>
+<tr><td>$K$ increases</td><td>MSE increases linearly</td><td>More latent dimensions to estimate from same number of measurements</td></tr>
+<tr><td>$m$ increases</td><td>MSE decreases as $1/m$</td><td>More observed genes provide more constraints</td></tr>
+<tr><td>$\lambda_{\max}$ increases</td><td>MSE increases linearly</td><td>Poisson variance scales with rate; highly expressed genes contribute more noise</td></tr>
+<tr><td>$N$ increases</td><td>MSE decreases as $1/N$</td><td>More cells share the same gene programs, providing more samples to estimate $\mathbf{V}$</td></tr>
+</table>
+
+<h3>4.5 The Factored Estimator</h3>
+
+<p>In practice, we solve the factored form (computationally more efficient than nuclear norm minimization):</p>
+
+<div class="box">
+<div class="boxtitle">Factored Poisson NMF</div>
+$$\hat{\mathbf{U}}, \hat{\mathbf{V}} = \arg\min_{\mathbf{U}, \mathbf{V}} \sum_{i=1}^{N}\sum_{g \in S} \left[\exp\!\left(\mu_g + \mathbf{u}_i^\top \mathbf{v}_g\right) - y_{ig}\left(\mu_g + \mathbf{u}_i^\top \mathbf{v}_g\right)\right] + \frac{\tau}{2}\left(\|\mathbf{U}\|_F^2 + \|\mathbf{V}\|_F^2\right)$$
+<p>The regularization $\|\mathbf{U}\|_F^2 + \|\mathbf{V}\|_F^2$ implicitly constrains the nuclear norm of $\mathbf{U}\mathbf{V}^\top$.</p>
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 5 -->
+<!-- ================================================================ -->
+<h2 id="s5">Per-Gene Reconstruction Error Analysis</h2>
+
+<h3>5.1 MSE Decomposition</h3>
+
+<p>The reconstruction error for gene $g$ can be decomposed into two independent sources:</p>
+
+<div class="box green">
+<div class="boxtitle">Per-Gene MSE</div>
+$$\text{MSE}(g) = \underbrace{\frac{1}{\delta_g \bar{\lambda}_g}}_{\substack{\text{Poisson shot noise}\\\text{(irreducible)}}} + \underbrace{\|\mathbf{v}_g\|^2 (1 - R_g^2)}_{\substack{\text{Panel incompleteness}\\\text{(reducible by panel design)}}}$$
+<p>where $\bar{\lambda}_g = \frac{1}{N}\sum_i \lambda_{ig}$ is the mean expression of gene $g$.</p>
+</div>
+
+<h3>5.2 Gene Predictability: The $R^2_g$ Statistic</h3>
+
+<div class="defn">
+<div class="defn-title">Definition 5.1 (Latent-Space $R^2$)</div>
+<p>The predictability of unmeasured gene $g$ from panel $S$, in the latent factor space:</p>
+$$R_g^2 = \frac{\mathbf{v}_g^\top \mathbf{P}_{V_S} \mathbf{v}_g}{\|\mathbf{v}_g\|^2}$$
+<p>where $\mathbf{P}_{V_S} = \mathbf{V}_S^\top(\mathbf{V}_S \mathbf{V}_S^\top)^{-1}\mathbf{V}_S$ is the projection matrix onto the column space of $\mathbf{V}_S^\top$ (the latent representations of the measured genes).</p>
+</div>
+
+<p><strong>Derivation:</strong> The expression of gene $g$ in the latent space is $\mathbf{v}_g \in \mathbb{R}^K$. The best linear predictor of $\mathbf{v}_g$ from the measured gene loadings $\mathbf{V}_S = [\mathbf{v}_{g'}]_{g' \in S}$ is the orthogonal projection $\hat{\mathbf{v}}_g = \mathbf{P}_{V_S}\mathbf{v}_g$. The fraction of variance explained is $R_g^2$.</p>
+
+<p><strong>Residual variance:</strong></p>
+$$\sigma_g^2 = \|\mathbf{v}_g - \hat{\mathbf{v}}_g\|^2 = \|\mathbf{v}_g\|^2 - \mathbf{v}_g^\top \mathbf{P}_{V_S} \mathbf{v}_g = \|\mathbf{v}_g\|^2(1 - R_g^2)$$
+
+<div class="example">
+<div class="ex-title">Example 5.1 &mdash; Gene Predictability</div>
+<p>Suppose $K = 3$ programs. Gene <em>CXCL12</em> has loading $\mathbf{v}_{\text{CXCL12}} = (0.8, 0.3, 0.1)$ (primarily in program 1). If the panel $S$ contains genes that span programs 1 and 2 but not 3:</p>
+<ul>
+<li>The projection captures the (0.8, 0.3) components but misses 0.1</li>
+<li>$R^2_{\text{CXCL12}} = (0.8^2 + 0.3^2)/(0.8^2 + 0.3^2 + 0.1^2) = 0.73/0.74 = 0.986$</li>
+<li>Residual variance: $0.74 \times (1 - 0.986) = 0.010$</li>
+<li>This gene is highly predictable &mdash; imputation will work well.</li>
+</ul>
+<p>Now consider gene <em>FOXP3</em> with loading $\mathbf{v}_{\text{FOXP3}} = (0.05, 0.05, 0.9)$ (primarily in the uncovered program 3):</p>
+<ul>
+<li>$R^2_{\text{FOXP3}} = (0.05^2 + 0.05^2)/(0.05^2 + 0.05^2 + 0.9^2) = 0.005/0.815 = 0.006$</li>
+<li>Residual variance: $0.815 \times (1 - 0.006) = 0.810$</li>
+<li>This gene is <strong>essentially unrecoverable</strong> from this panel.</li>
+</ul>
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 6 -->
+<!-- ================================================================ -->
+<h2 id="s6">Spatial Autocorrelation: Moran's I</h2>
+
+<h3>6.1 Definition and Formula</h3>
+
+<div class="box blue">
+<div class="boxtitle">Moran's I (Global Spatial Autocorrelation)</div>
+<p><strong>Question:</strong> "Are nearby cells more similar in expression than expected by chance?"</p>
+$$I = \frac{N}{W} \cdot \frac{\displaystyle\sum_{i=1}^N \sum_{j=1}^N w_{ij}(x_i - \bar{x})(x_j - \bar{x})}{\displaystyle\sum_{i=1}^N (x_i - \bar{x})^2}$$
+<p>Equivalently, using matrix notation with $\mathbf{x} = (x_1, \dots, x_N)^\top$, centered $\tilde{\mathbf{x}} = \mathbf{x} - \bar{x}\mathbf{1}$:</p>
+$$I = \frac{N}{W} \cdot \frac{\tilde{\mathbf{x}}^\top \mathbf{W} \tilde{\mathbf{x}}}{\tilde{\mathbf{x}}^\top \tilde{\mathbf{x}}}$$
+<p>where $\mathbf{W}$ is the spatial weight matrix with $W_{ij} = w_{ij}$ and $W = \sum_{ij} w_{ij}$.</p>
+</div>
+
+<h3>6.2 Expected Value and Variance Under the Null</h3>
+
+<div class="thm">
+<div class="thm-title">Proposition 6.1 (Null Distribution of Moran's I)</div>
+<p>Under the null hypothesis of no spatial autocorrelation (random permutation of values across locations):</p>
+$$\mathbb{E}[I] = -\frac{1}{N-1}$$
+$$\text{Var}(I) = \frac{N^2 S_1 - N S_2 + 3W^2}{W^2(N^2 - 1)} - \left(\frac{1}{N-1}\right)^2$$
+<p>where $S_1 = \frac{1}{2}\sum_i\sum_j (w_{ij} + w_{ji})^2$ and $S_2 = \sum_i (w_{i\cdot} + w_{\cdot i})^2$.</p>
+</div>
+
+<p>The <strong>Z-score</strong> for testing spatial autocorrelation:</p>
+$$Z_I = \frac{I - \mathbb{E}[I]}{\sqrt{\text{Var}(I)}}$$
+<p>Under the null, $Z_I \xrightarrow{d} \mathcal{N}(0,1)$ for large $N$.</p>
+
+<h3>6.3 Complete Worked Example</h3>
+
+<div class="example">
+<div class="ex-title">Example 6.1 &mdash; 9-Cell Grid, Gene X Expression</div>
+<p>Cells in a $3 \times 3$ grid with expression values and neighbor connections (horizontal and vertical adjacency):</p>
+<pre>
+Position:  (1,1) (1,2) (1,3)     Expression:  8  7  9
+           (2,1) (2,2) (2,3)                  7  8  2
+           (3,1) (3,2) (3,3)                  1  2  1
+</pre>
+<p>$N = 9$ cells. 12 undirected edges (= 24 directed pairs). $W = 24$.</p>
+
+<p><strong>Step 1: Compute mean.</strong></p>
+$$\bar{x} = \frac{8+7+9+7+8+2+1+2+1}{9} = \frac{45}{9} = 5.0$$
+
+<p><strong>Step 2: Compute deviations.</strong></p>
+<table>
+<tr><th>Cell $i$</th><th>$x_i$</th><th>$x_i - \bar{x}$</th><th>$(x_i - \bar{x})^2$</th></tr>
+<tr><td>1</td><td>8</td><td>+3</td><td>9</td></tr>
+<tr><td>2</td><td>7</td><td>+2</td><td>4</td></tr>
+<tr><td>3</td><td>9</td><td>+4</td><td>16</td></tr>
+<tr><td>4</td><td>7</td><td>+2</td><td>4</td></tr>
+<tr><td>5</td><td>8</td><td>+3</td><td>9</td></tr>
+<tr><td>6</td><td>2</td><td>-3</td><td>9</td></tr>
+<tr><td>7</td><td>1</td><td>-4</td><td>16</td></tr>
+<tr><td>8</td><td>2</td><td>-3</td><td>9</td></tr>
+<tr><td>9</td><td>1</td><td>-4</td><td>16</td></tr>
+</table>
+$$\sum_i (x_i - \bar{x})^2 = 9+4+16+4+9+9+16+9+16 = 92$$
+
+<p><strong>Step 3: Compute cross-products for each neighbor pair.</strong></p>
+<table>
+<tr><th>Edge</th><th>$x_i - \bar{x}$</th><th>$x_j - \bar{x}$</th><th>Product</th></tr>
+<tr><td>1&harr;2</td><td>+3</td><td>+2</td><td>+6</td></tr>
+<tr><td>1&harr;4</td><td>+3</td><td>+2</td><td>+6</td></tr>
+<tr><td>2&harr;3</td><td>+2</td><td>+4</td><td>+8</td></tr>
+<tr><td>2&harr;5</td><td>+2</td><td>+3</td><td>+6</td></tr>
+<tr><td>3&harr;6</td><td>+4</td><td>-3</td><td>-12</td></tr>
+<tr><td>4&harr;5</td><td>+2</td><td>+3</td><td>+6</td></tr>
+<tr><td>4&harr;7</td><td>+2</td><td>-4</td><td>-8</td></tr>
+<tr><td>5&harr;6</td><td>+3</td><td>-3</td><td>-9</td></tr>
+<tr><td>5&harr;8</td><td>+3</td><td>-3</td><td>-9</td></tr>
+<tr><td>6&harr;9</td><td>-3</td><td>-4</td><td>+12</td></tr>
+<tr><td>7&harr;8</td><td>-4</td><td>-3</td><td>+12</td></tr>
+<tr><td>8&harr;9</td><td>-3</td><td>-4</td><td>+12</td></tr>
+</table>
+<p>Sum of products (each edge counted once): $6+6+8+6-12+6-8-9-9+12+12+12 = 30$</p>
+<p>Double sum (symmetric $w_{ij}$): $\sum_i\sum_j w_{ij}(x_i-\bar{x})(x_j-\bar{x}) = 2 \times 30 = 60$</p>
+
+<p><strong>Step 4: Compute Moran's I.</strong></p>
+$$I = \frac{9}{24} \cdot \frac{60}{92} = 0.375 \times 0.652 = \mathbf{0.245}$$
+
+<p><strong>Step 5: Significance test.</strong></p>
+$$\mathbb{E}[I] = -\frac{1}{9-1} = -0.125$$
+<p>Under normality approximation with $\text{Var}(I) \approx 0.035$ (computed from $S_1, S_2$ formulas):</p>
+$$Z_I = \frac{0.245 - (-0.125)}{\sqrt{0.035}} = \frac{0.370}{0.187} = 1.98$$
+<p>Two-sided $p = 0.048$ — marginally significant spatial autocorrelation.</p>
+</div>
+
+<h3>6.4 Interpretation Scale</h3>
+
+<table>
+<tr><th>$I$ Value</th><th>$Z_I$</th><th>Interpretation</th><th>Spatial Pattern</th></tr>
+<tr><td>$+0.8$ to $+1.0$</td><td>$\gg 2$</td><td>Strong positive autocorrelation</td><td>Smooth gradient or large domains</td></tr>
+<tr><td>$+0.3$ to $+0.8$</td><td>$> 2$</td><td>Moderate positive autocorrelation</td><td>Spatial clustering with mixing zones</td></tr>
+<tr><td>$-0.125$ to $+0.3$</td><td>$\approx 0$</td><td>No significant spatial pattern</td><td>Random distribution</td></tr>
+<tr><td>$-0.5$ to $-0.125$</td><td>$< -2$</td><td>Negative autocorrelation</td><td>Alternating / checkerboard</td></tr>
+</table>
+
+<h3>6.5 Local Moran's I (LISA)</h3>
+
+<div class="defn">
+<div class="defn-title">Definition 6.1 (Local Indicator of Spatial Association)</div>
+$$I_i = \frac{(x_i - \bar{x})}{\frac{1}{N}\sum_j (x_j - \bar{x})^2} \sum_j w_{ij}(x_j - \bar{x})$$
+</div>
+
+<p>Properties: $\sum_i I_i = N \cdot I$ (local values sum to global). Local Moran's $I_i$ identifies individual cells contributing to spatial autocorrelation: <strong>HH</strong> (hot spot), <strong>LL</strong> (cold spot), <strong>HL</strong> (spatial outlier high), <strong>LH</strong> (spatial outlier low).</p>
+
+<!-- ================================================================ -->
+<!-- SECTION 7 -->
+<!-- ================================================================ -->
+<h2 id="s7">Spatial Autocorrelation: Geary's C</h2>
+
+<h3>7.1 Definition and Formula</h3>
+
+<div class="box orange">
+<div class="boxtitle">Geary's C (Local Dissimilarity Measure)</div>
+<p><strong>Question:</strong> "How different are neighboring cells from each other?"</p>
+$$C = \frac{(N-1)}{2W} \cdot \frac{\displaystyle\sum_{i=1}^N \sum_{j=1}^N w_{ij}(x_i - x_j)^2}{\displaystyle\sum_{i=1}^N (x_i - \bar{x})^2}$$
+</div>
+
+<h3>7.2 Relationship to Moran's I</h3>
+
+<p>Expanding $(x_i - x_j)^2 = (x_i - \bar{x})^2 - 2(x_i-\bar{x})(x_j-\bar{x}) + (x_j - \bar{x})^2$:</p>
+
+$$C = \frac{(N-1)}{2W} \cdot \frac{\sum_{ij} w_{ij}\left[(x_i-\bar{x})^2 + (x_j-\bar{x})^2\right] - 2\sum_{ij}w_{ij}(x_i-\bar{x})(x_j-\bar{x})}{\sum_i (x_i-\bar{x})^2}$$
+
+<p>For a symmetric weight matrix with constant row sums (regular lattice): $C \approx 1 - I$. In general, $C$ and $I$ are inversely but not perfectly linearly related.</p>
+
+<h3>7.3 Null Distribution</h3>
+
+<div class="thm">
+<div class="thm-title">Proposition 7.1</div>
+<p>Under random permutation:</p>
+$$\mathbb{E}[C] = 1, \qquad Z_C = \frac{C - 1}{\sqrt{\text{Var}(C)}}$$
+</div>
+
+<h3>7.4 Comparison Table</h3>
+
+<table>
+<tr><th>Property</th><th>Moran's I</th><th>Geary's C</th></tr>
+<tr><td>Numerator uses</td><td>$(x_i - \bar{x})(x_j - \bar{x})$ &mdash; cross-products relative to <em>global</em> mean</td><td>$(x_i - x_j)^2$ &mdash; <em>direct</em> pairwise squared differences</td></tr>
+<tr><td>Sensitivity</td><td>Global pattern (overall mean-based)</td><td>Local variation (edge-level)</td></tr>
+<tr><td>Clustering</td><td>$I \to +1$</td><td>$C \to 0$</td></tr>
+<tr><td>Random</td><td>$I \to -1/(N-1) \approx 0$</td><td>$C \to 1$</td></tr>
+<tr><td>Dispersion</td><td>$I \to -1$</td><td>$C \to 2$</td></tr>
+<tr><td>Robust to outliers</td><td>Less (products can be dominated by extreme deviations from mean)</td><td>More (squared differences are local)</td></tr>
+</table>
+
+<h3>7.5 Worked Example (Same 9-Cell Grid)</h3>
+
+<div class="example">
+<div class="ex-title">Example 7.1 &mdash; Geary's C Computation</div>
+<table>
+<tr><th>Edge</th><th>$x_i$</th><th>$x_j$</th><th>$(x_i - x_j)^2$</th><th>Location</th></tr>
+<tr><td>1&harr;2</td><td>8</td><td>7</td><td>1</td><td>Within high region</td></tr>
+<tr><td>1&harr;4</td><td>8</td><td>7</td><td>1</td><td>Within high region</td></tr>
+<tr><td>2&harr;3</td><td>7</td><td>9</td><td>4</td><td>Within high region</td></tr>
+<tr><td>2&harr;5</td><td>7</td><td>8</td><td>1</td><td>Within high region</td></tr>
+<tr><td><strong>3&harr;6</strong></td><td>9</td><td>2</td><td><strong>49</strong></td><td><strong>Boundary</strong></td></tr>
+<tr><td>4&harr;5</td><td>7</td><td>8</td><td>1</td><td>Within high region</td></tr>
+<tr><td><strong>4&harr;7</strong></td><td>7</td><td>1</td><td><strong>36</strong></td><td><strong>Boundary</strong></td></tr>
+<tr><td><strong>5&harr;6</strong></td><td>8</td><td>2</td><td><strong>36</strong></td><td><strong>Boundary</strong></td></tr>
+<tr><td><strong>5&harr;8</strong></td><td>8</td><td>2</td><td><strong>36</strong></td><td><strong>Boundary</strong></td></tr>
+<tr><td>6&harr;9</td><td>2</td><td>1</td><td>1</td><td>Within low region</td></tr>
+<tr><td>7&harr;8</td><td>1</td><td>2</td><td>1</td><td>Within low region</td></tr>
+<tr><td>8&harr;9</td><td>2</td><td>1</td><td>1</td><td>Within low region</td></tr>
+</table>
+
+<p>Sum of squared differences (single-counted): $1+1+4+1+49+1+36+36+36+1+1+1 = 168$</p>
+<p>Double sum: $2 \times 168 = 336$</p>
+
+$$C = \frac{(9-1)}{2 \times 24} \cdot \frac{336}{92} = \frac{8}{48} \times 3.652 = 0.167 \times 3.652 = \mathbf{0.609}$$
+
+<p><strong>Key observation:</strong> The 4 boundary edges (3&harr;6, 4&harr;7, 5&harr;6, 5&harr;8) contribute $49+36+36+36 = 157$ out of 168 total &mdash; <strong>93.5%</strong> of the signal. Geary's C is dominated by the boundary between high and low expression regions.</p>
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 8 -->
+<!-- ================================================================ -->
+<h2 id="s8">Neighborhood Enrichment (NE) Score</h2>
+
+<h3>8.1 Definition</h3>
+
+<div class="box purple" style="background:#f5f0fa; border-color:#c8b7d9;">
+<div class="boxtitle" style="color:var(--accent3);">Neighborhood Enrichment Score</div>
+<p><strong>Question:</strong> "Do cells of type $a$ neighbor cells of type $b$ more (or less) often than expected by chance?"</p>
+<p>For cell types $a$ and $b$:</p>
+$$NE(a,b) = \frac{n_{\text{obs}}(a,b) - \mu_{\text{perm}}(a,b)}{\sigma_{\text{perm}}(a,b)}$$
+<p>where:</p>
+<ul>
+<li>$n_{\text{obs}}(a,b) = \sum_{(i,j) \in \mathcal{E}} \mathbb{1}[c_i = a, c_j = b]$ &nbsp;(observed count of $a$-$b$ neighbor pairs)</li>
+<li>$\mu_{\text{perm}}(a,b) = \mathbb{E}_\pi[n(a,b)]$ &nbsp;(expected count under random label permutations)</li>
+<li>$\sigma_{\text{perm}}(a,b) = \text{Std}_\pi[n(a,b)]$ &nbsp;(standard deviation under permutations)</li>
+</ul>
+</div>
+
+<h3>8.2 Analytical Expected Value</h3>
+
+<p>Under random permutation of cell type labels, the expected number of $a$-$b$ edges:</p>
+
+$$\mu_{\text{perm}}(a,b) = |\mathcal{E}| \cdot \begin{cases} \frac{n_a(n_a-1)}{N(N-1)} & \text{if } a = b \\[6pt] \frac{2 \, n_a \, n_b}{N(N-1)} & \text{if } a \neq b \end{cases}$$
+
+<p>where $n_a = |\{i : c_i = a\}|$ is the number of cells of type $a$, and $|\mathcal{E}|$ is the total number of directed edges.</p>
+
+<h3>8.3 Complete Worked Example</h3>
+
+<div class="example">
+<div class="ex-title">Example 8.1 &mdash; Tumor-Fibroblast Neighborhood Enrichment</div>
+<p>9 cells in a $3 \times 3$ grid: 5 Tumor (T) cells, 4 Fibroblast (F) cells.</p>
+<pre>
+Cell types:     T  T  T
+                T  T  F
+                F  F  F
+</pre>
+<p>12 undirected edges. Edges by type pair:</p>
+<table>
+<tr><th>Edge</th><th>Types</th><th>Pair</th></tr>
+<tr><td>1&harr;2</td><td>T&harr;T</td><td>T-T</td></tr>
+<tr><td>1&harr;4</td><td>T&harr;T</td><td>T-T</td></tr>
+<tr><td>2&harr;3</td><td>T&harr;T</td><td>T-T</td></tr>
+<tr><td>2&harr;5</td><td>T&harr;T</td><td>T-T</td></tr>
+<tr><td>3&harr;6</td><td>T&harr;F</td><td>T-F</td></tr>
+<tr><td>4&harr;5</td><td>T&harr;T</td><td>T-T</td></tr>
+<tr><td>4&harr;7</td><td>T&harr;F</td><td>T-F</td></tr>
+<tr><td>5&harr;6</td><td>T&harr;F</td><td>T-F</td></tr>
+<tr><td>5&harr;8</td><td>T&harr;F</td><td>T-F</td></tr>
+<tr><td>6&harr;9</td><td>F&harr;F</td><td>F-F</td></tr>
+<tr><td>7&harr;8</td><td>F&harr;F</td><td>F-F</td></tr>
+<tr><td>8&harr;9</td><td>F&harr;F</td><td>F-F</td></tr>
+</table>
+
+<p>Observed counts: T-T = 5, T-F = 4, F-F = 3.</p>
+
+<p><strong>Expected T-T count</strong> under random permutation ($n_T = 5, N = 9$, directed edges $= 24$):</p>
+$$\mu(T,T) = 24 \times \frac{5 \times 4}{9 \times 8} = 24 \times \frac{20}{72} = 24 \times 0.278 = 6.67 \text{ directed} = 3.33 \text{ undirected}$$
+
+<p>From 10,000 permutations, $\sigma(T,T) \approx 1.2$.</p>
+
+$$NE(T,T) = \frac{5 - 3.33}{1.2} = \frac{1.67}{1.2} = \mathbf{+1.39}$$
+
+<p>$NE(T,T) > 0$: tumor cells are <strong>enriched</strong> as neighbors of other tumor cells (spatial clustering).</p>
+
+<p><strong>Expected T-F count:</strong></p>
+$$\mu(T,F) = 24 \times \frac{2 \times 5 \times 4}{9 \times 8} = 24 \times \frac{40}{72} = 13.33 \text{ directed} = 6.67 \text{ undirected}$$
+
+$$NE(T,F) = \frac{4 - 6.67}{\sigma(T,F)} < 0$$
+
+<p>$NE(T,F) < 0$: tumor and fibroblast cells are <strong>depleted</strong> as neighbors (they tend to segregate).</p>
+</div>
+
+<h3>8.4 NE Score Matrix</h3>
+
+<p>For $T$ cell types, the full NE matrix is $T \times T$:</p>
+$$\mathbf{NE} = \begin{pmatrix} NE(1,1) & NE(1,2) & \cdots & NE(1,T) \\ NE(2,1) & NE(2,2) & \cdots & NE(2,T) \\ \vdots & & \ddots & \vdots \\ NE(T,1) & NE(T,2) & \cdots & NE(T,T) \end{pmatrix}$$
+
+<p>Diagonal entries: self-clustering. Off-diagonal: cross-type interactions. This matrix is the primary output of squidpy's <code>sq.gr.nhood_enrichment()</code>.</p>
+
+<!-- ================================================================ -->
+<!-- SECTION 9 -->
+<!-- ================================================================ -->
+<h2 id="s9">Cell-Cell Interaction (CCI) Test Statistic</h2>
+
+<h3>9.1 The Ligand-Receptor Co-Expression Score</h3>
+
+<div class="box blue">
+<div class="boxtitle">CCI Test Statistic</div>
+<p>For ligand gene $l$ and receptor gene $r$, the spatial co-expression score:</p>
+$$T_{lr} = \frac{1}{|\mathcal{E}|} \sum_{(i,j) \in \mathcal{E}} x_{il} \cdot x_{jr}$$
+<p>where $\mathcal{E} = \{(i,j) : w_{ij} = 1\}$ is the set of spatial neighbor pairs.</p>
+</div>
+
+<p><strong>Biological interpretation:</strong> $T_{lr}$ measures whether cells expressing ligand $l$ tend to be spatially adjacent to cells expressing receptor $r$. High $T_{lr}$ suggests a potential signaling interaction.</p>
+
+<h3>9.2 Variants</h3>
+
+<table>
+<tr><th>Variant</th><th>Formula</th><th>Used By</th></tr>
+<tr><td>Product score</td><td>$\frac{1}{|\mathcal{E}|}\sum_{(i,j)} x_{il} x_{jr}$</td><td>CellPhoneDB, squidpy</td></tr>
+<tr><td>Correlation-based</td><td>$\frac{\sum_{(i,j)} (x_{il}-\bar{x}_l)(x_{jr}-\bar{x}_r)}{|\mathcal{E}| \cdot \sigma_l \sigma_r}$</td><td>SpatialDM</td></tr>
+<tr><td>Binary co-expression</td><td>$\frac{1}{|\mathcal{E}|}\sum_{(i,j)} \mathbb{1}[x_{il} > 0] \cdot \mathbb{1}[x_{jr} > 0]$</td><td>CellChat (simplified)</td></tr>
+<tr><td>Weighted by distance</td><td>$\sum_{(i,j)} k(\|\mathbf{s}_i - \mathbf{s}_j\|) \, x_{il} \, x_{jr}$</td><td>COMMOT</td></tr>
+</table>
+
+<h3>9.3 Null Model and Expected Value</h3>
+
+<p>Under the null of no spatial interaction (expression and location are independent):</p>
+
+$$\mathbb{E}_0[T_{lr}] = \bar{x}_l \cdot \bar{x}_r + \frac{I_W}{N-1}(\bar{x^2}_l - \bar{x}_l^2)^{1/2}(\bar{x^2}_r - \bar{x}_r^2)^{1/2}$$
+
+<p>where $I_W$ is the Moran-like autocorrelation of the spatial weight matrix. For most spatial graphs, $I_W / (N-1)$ is negligible, so:</p>
+
+$$\mathbb{E}_0[T_{lr}] \approx \bar{x}_l \cdot \bar{x}_r$$
+
+<!-- ================================================================ -->
+<!-- SECTION 10 -->
+<!-- ================================================================ -->
+<h2 id="s10">Permutation Testing and Multiple Comparison Correction</h2>
+
+<h3>10.1 Permutation Test for CCI</h3>
+
+<div class="box">
+<div class="boxtitle">Algorithm: Permutation Test for CCI Significance</div>
+<ol>
+<li>Compute observed statistic: $T_{lr}^{\text{obs}}$</li>
+<li>For $b = 1, \dots, B$:
+<ul>
+<li>Draw random permutation $\pi_b$ of cell indices</li>
+<li>Compute null statistic: $T_{lr}^{(b)} = \frac{1}{|\mathcal{E}|}\sum_{(i,j) \in \mathcal{E}} x_{\pi_b(i), l} \cdot x_{j,r}$</li>
+</ul>
+</li>
+<li>$p$-value: $p = \frac{\#\{b : T_{lr}^{(b)} \geq T_{lr}^{\text{obs}}\} + 1}{B + 1}$</li>
+</ol>
+</div>
+
+<p>The "+1" in numerator and denominator ensures the $p$-value is never exactly 0 (conservative correction).</p>
+
+<h3>10.2 Benjamini-Hochberg FDR Control</h3>
+
+<div class="defn">
+<div class="defn-title">Definition 10.1 (False Discovery Rate)</div>
+$$\text{FDR} = \mathbb{E}\left[\frac{V}{R \vee 1}\right]$$
+<p>where $V$ = number of false rejections (false positives), $R$ = total rejections, and $a \vee b = \max(a,b)$.</p>
+</div>
+
+<div class="box green">
+<div class="boxtitle">Benjamini-Hochberg Procedure</div>
+<p>Given $L$ tests with $p$-values $p_{(1)} \leq p_{(2)} \leq \cdots \leq p_{(L)}$:</p>
+<ol>
+<li>Find the largest $k$ such that $p_{(k)} \leq \frac{k}{L} \cdot q$, where $q$ is the target FDR (typically 0.05)</li>
+<li>Reject all hypotheses $H_{(1)}, \dots, H_{(k)}$</li>
+</ol>
+<p>Adjusted $p$-values: $p_{(i)}^{\text{BH}} = \min\left\{\frac{L}{i} p_{(i)}, \; 1\right\}$ (with monotonicity enforcement).</p>
+</div>
+
+<h3>10.3 Impact of Multiple Testing on CCI</h3>
+
+<div class="example">
+<div class="ex-title">Example 10.1</div>
+<p>Testing 200 LR pairs at FDR $q = 0.05$. If 40 have true signal and 160 are null:</p>
+<ul>
+<li>Expected false discoveries at 5% FDR: $0.05 \times R \approx 0.05 \times 50 = 2.5$</li>
+<li>But if imputation inflates scores, many null pairs cross the significance threshold</li>
+<li>BH procedure assumes valid $p$-values &mdash; biased test statistics produce <strong>anti-conservative</strong> $p$-values, and BH no longer controls FDR at the nominal level</li>
+</ul>
+<p>This is why regression calibration (Section 12) is essential: it restores validity of the $p$-values.</p>
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 11 -->
+<!-- ================================================================ -->
+<h2 id="s11">Bias Decomposition Under Measurement Error</h2>
+
+<h3>11.1 The Measurement Error Model</h3>
+
+<p>After imputation, the estimated expression for cell $i$, gene $g$ is:</p>
+
+$$\hat{\lambda}_{ig} = \lambda_{ig} + e_{ig}$$
+
+<p>where $e_{ig}$ is the imputation error with:</p>
+<ul>
+<li>$\mathbb{E}[e_{ig}] \approx 0$ &nbsp;(unbiased imputation, approximately)</li>
+<li>$\text{Var}(e_{ig}) = \text{MSE}(g)$ &nbsp;(gene-specific error variance)</li>
+<li>$\text{Cov}(e_{ig}, e_{jg}) \neq 0$ when $w_{ij} = 1$ &nbsp;(<strong>spatially correlated errors</strong>)</li>
+</ul>
+
+<h3>11.2 Bias in the CCI Statistic</h3>
+
+<div class="box red">
+<div class="boxtitle">Bias Derivation</div>
+<p>The CCI statistic computed on imputed data:</p>
+$$\hat{T}_{lr} = \frac{1}{|\mathcal{E}|}\sum_{(i,j)\in\mathcal{E}} \hat{\lambda}_{il} \cdot \hat{\lambda}_{jr}$$
+<p>Substituting $\hat{\lambda}_{il} = \lambda_{il} + e_{il}$ and $\hat{\lambda}_{jr} = \lambda_{jr} + e_{jr}$:</p>
+\begin{align}
+\hat{\lambda}_{il} \cdot \hat{\lambda}_{jr} &= (\lambda_{il} + e_{il})(\lambda_{jr} + e_{jr}) \\
+&= \lambda_{il}\lambda_{jr} + \lambda_{il} e_{jr} + \lambda_{jr} e_{il} + e_{il} e_{jr}
+\end{align}
+<p>Taking expectations:</p>
+\begin{align}
+\mathbb{E}[\hat{T}_{lr}] &= \underbrace{\frac{1}{|\mathcal{E}|}\sum_{(i,j)} \lambda_{il}\lambda_{jr}}_{= T_{lr}^{\text{true}}} + \underbrace{\frac{1}{|\mathcal{E}|}\sum_{(i,j)} \lambda_{il}\mathbb{E}[e_{jr}]}_{= 0} + \underbrace{\frac{1}{|\mathcal{E}|}\sum_{(i,j)} \lambda_{jr}\mathbb{E}[e_{il}]}_{= 0} + \underbrace{\frac{1}{|\mathcal{E}|}\sum_{(i,j)} \mathbb{E}[e_{il} e_{jr}]}_{= \text{BIAS}}
+\end{align}
+</div>
+
+<h3>11.3 Why the Bias Is Positive for Graph-Based Methods</h3>
+
+<p>The bias term is:</p>
+$$\text{bias} = \frac{1}{|\mathcal{E}|}\sum_{(i,j) \in \mathcal{E}} \text{Cov}(e_{il}, e_{jr})$$
+
+<div class="warning">
+<div class="warning-title">The Fundamental Problem</div>
+<p>Graph-based imputation methods (GNN, graph diffusion, spatial smoothing) share information across spatial neighbors. If cell $j$ is a neighbor of cell $i$, the imputed value $\hat{\lambda}_{jg}$ depends partly on $\hat{\lambda}_{ig}$ (through message passing). This means:</p>
+$$\text{Cov}(e_{il}, e_{jr}) > 0 \quad \text{when } (i,j) \in \mathcal{E}$$
+<p>But $\mathcal{E}$ is the <em>exact same set of edges</em> used in the CCI computation. The imputation method creates positive correlations on the same edges where we test for biological interactions. The bias is <strong>structurally guaranteed to be positive</strong>.</p>
+</div>
+
+<h3>11.4 Magnitude Estimation</h3>
+
+<p>Under the approximation that error correlations are proportional to Moran's I:</p>
+
+$$\frac{1}{|\mathcal{E}|}\sum_{(i,j) \in \mathcal{E}} \text{Cov}(e_{il}, e_{jr}) \approx \rho_{lr} \cdot \sqrt{\text{MSE}(l) \cdot \text{MSE}(r)}$$
+
+<p>where $\rho_{lr} = \sqrt{|I_l| \cdot |I_r|}$ is the cross-gene spatial error correlation and $I_l, I_r$ are Moran's I values of the imputed expression for the ligand and receptor genes.</p>
+
+<!-- ================================================================ -->
+<!-- SECTION 12 -->
+<!-- ================================================================ -->
+<h2 id="s12">Regression Calibration for CCI Correction</h2>
+
+<p>Regression calibration (Carroll, Ruppert, Stefanski &amp; Crainiceanu, 2006) is a standard technique for correcting bias in statistics computed from error-contaminated variables.</p>
+
+<h3>12.1 The Correction</h3>
+
+<div class="box green">
+<div class="boxtitle">Regression-Calibrated CCI Statistic</div>
+$$\hat{T}_{lr}^{\text{corrected}} = \hat{T}_{lr}^{\text{naive}} - \widehat{\text{bias}}_{lr}$$
+<p>where:</p>
+$$\widehat{\text{bias}}_{lr} = \hat{\rho}_{lr} \cdot \sqrt{\widehat{\text{MSE}}(l) \cdot \widehat{\text{MSE}}(r)}$$
+$$\hat{\rho}_{lr} = \sqrt{|I_l| \cdot |I_r|}$$
+</div>
+
+<h3>12.2 MSE Estimation via Cross-Validation</h3>
+
+<p>For <strong>measured genes</strong> ($g \in S$): direct comparison with observed counts.</p>
+$$\widehat{\text{MSE}}(g) = \frac{1}{N}\sum_{i=1}^N (x_{ig}^{\text{norm}} - \hat{\lambda}_{ig})^2, \quad g \in S$$
+
+<p>For <strong>unmeasured genes</strong> ($g \notin S$): predict MSE from a meta-model trained on measured genes. Features: mean expression, variance, latent-space $R^2_g$.</p>
+
+$$\widehat{\text{MSE}}(g) = f_{\text{meta}}(\bar{\hat{\lambda}}_g, \; \text{Var}(\hat{\lambda}_{ig}), \; R_g^2), \quad g \notin S$$
+
+<h3>12.3 Corrected Variance and P-Values</h3>
+
+<div class="box">
+<div class="boxtitle">Corrected Inference</div>
+<p>The variance of the corrected statistic includes uncertainty from the correction itself:</p>
+$$\text{Var}(\hat{T}_{lr}^{\text{corr}}) \approx \text{Var}(\hat{T}_{lr}^{\text{naive}}) + \frac{\widehat{\text{MSE}}(l) \cdot \widehat{\text{MSE}}(r)}{|\mathcal{E}|}$$
+<p>The corrected permutation test subtracts the same bias estimate from null replicates:</p>
+$$T_{lr}^{(b),\text{corr}} = T_{lr}^{(b),\text{naive}} - \widehat{\text{bias}}_{lr}$$
+$$p^{\text{corr}} = \frac{\#\{b : T_{lr}^{(b),\text{corr}} \geq \hat{T}_{lr}^{\text{corr}}\} + 1}{B+1}$$
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 13 -->
+<!-- ================================================================ -->
+<h2 id="s13">Error Propagation to Cell Type Classification</h2>
+
+<h3>13.1 Nearest-Centroid Classifier</h3>
+
+<p>Cell type classification assigns cell $i$ to the type whose centroid is closest in expression space:</p>
+$$\hat{c}_i = \arg\min_t \|\hat{\boldsymbol{\lambda}}_i - \boldsymbol{\mu}^{(t)}\|_2$$
+
+<h3>13.2 Misclassification Bound</h3>
+
+<div class="thm">
+<div class="thm-title">Theorem 13.1 (Error Propagation to Cell Typing)</div>
+<p>For a cell of true type $t$, the misclassification probability satisfies:</p>
+$$P(\hat{c}_i \neq t) \leq \exp\!\left(-\frac{\Delta_t^2}{8 \, \sigma_{\text{recon}}^2}\right)$$
+<p>where:</p>
+$$\Delta_t = \min_{t' \neq t} \|\boldsymbol{\mu}^{(t)} - \boldsymbol{\mu}^{(t')}\|_2$$
+$$\sigma_{\text{recon}}^2 = \sum_{g=1}^G \text{MSE}(g)$$
+</div>
+
+<p><strong>Derivation sketch:</strong> Misclassification occurs when $\|\hat{\boldsymbol{\lambda}}_i - \boldsymbol{\mu}^{(t')}\| < \|\hat{\boldsymbol{\lambda}}_i - \boldsymbol{\mu}^{(t)}\|$ for some $t' \neq t$. This requires the error $\mathbf{e}_i = \hat{\boldsymbol{\lambda}}_i - \boldsymbol{\lambda}_i$ to have a component of magnitude $\geq \Delta_t/2$ along the direction $\boldsymbol{\mu}^{(t)} - \boldsymbol{\mu}^{(t')}$. By the sub-Gaussian tail bound on the projected error: $P(\langle \mathbf{e}_i, \mathbf{d}_{tt'}\rangle > \Delta_t/2) \leq \exp(-\Delta_t^2 / (8\sigma_{\text{recon}}^2))$.</p>
+
+<h3>13.3 Critical Panel Size per Cell Type</h3>
+
+<p>Setting the misclassification probability to a target $\alpha$:</p>
+
+$$m_t^* = \frac{8 \, C \, K \, \lambda_{\max}}{\Delta_t^2 \cdot \log(1/\alpha)}$$
+
+<div class="example">
+<div class="ex-title">Example 13.1</div>
+<p>With $K=30$, $\lambda_{\max}=500$, $C=2$, target $\alpha = 0.05$:</p>
+<table>
+<tr><th>Cell Type Pair</th><th>$\Delta_t$</th><th>$m_t^*$</th><th>Identifiable at $m=300$?</th></tr>
+<tr><td>Tumor vs Fibroblast</td><td>45.2</td><td>26</td><td>Yes</td></tr>
+<tr><td>Macrophage vs Monocyte</td><td>12.8</td><td>325</td><td>Marginal</td></tr>
+<tr><td>CD4 naive vs CD4 memory</td><td>4.1</td><td>3,162</td><td>No</td></tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 14 -->
+<!-- ================================================================ -->
+<h2 id="s14">Error Propagation to CCI False Positive Rate</h2>
+
+<div class="box red">
+<div class="boxtitle">CCI Variance Inflation</div>
+$$\text{Var}(\hat{T}_{lr}) \geq \frac{1}{|\mathcal{E}|}\left[\bar{\lambda}_r^2 \cdot \text{MSE}(l) + \bar{\lambda}_l^2 \cdot \text{MSE}(r) + \text{MSE}(l) \cdot \text{MSE}(r)\right]$$
+</div>
+
+<table>
+<tr><th>Scenario</th><th>Dominant Variance Term</th><th>Scaling</th></tr>
+<tr><td>Both measured ($l,r \in S$)</td><td>Poisson noise only</td><td>$O(1/\delta\bar{\lambda})$</td></tr>
+<tr><td>One imputed ($l \notin S, r \in S$)</td><td>$\bar{\lambda}_r^2 \cdot \text{MSE}(l)$</td><td>Linear in MSE</td></tr>
+<tr><td>Both imputed ($l, r \notin S$)</td><td>$\text{MSE}(l) \cdot \text{MSE}(r)$</td><td><strong>Quadratic</strong> in MSE</td></tr>
+</table>
+
+<div class="warning">
+<div class="warning-title">Quadratic Degradation</div>
+<p>When both ligand and receptor are imputed, the variance of the CCI test statistic grows as the <em>product</em> of their individual MSEs. This means CCI reliability degrades quadratically &mdash; far faster than gene-level imputation quality alone would suggest.</p>
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 15 -->
+<!-- ================================================================ -->
+<h2 id="s15">Error Propagation to Spatial Domain Detection</h2>
+
+<p>Spatial domain detection clusters cells based on expression similarity + spatial proximity. The effective similarity between neighboring cells:</p>
+
+$$w_{ij}^{\text{eff}} = \text{sim}(\hat{\boldsymbol{\lambda}}_i, \hat{\boldsymbol{\lambda}}_j) \cdot f(\|\mathbf{s}_i - \mathbf{s}_j\|)$$
+
+<p>Reconstruction error perturbs similarity:</p>
+$$\text{sim}(\hat{\boldsymbol{\lambda}}_i, \hat{\boldsymbol{\lambda}}_j) \approx \text{sim}(\boldsymbol{\lambda}_i, \boldsymbol{\lambda}_j) + O\!\left(\frac{\sigma_{\text{recon}}}{\Delta_{\min}}\right)$$
+
+<p>Domains <strong>merge</strong> (under-segmentation) or <strong>split</strong> (over-segmentation) when $\sigma_{\text{recon}} / \Delta_{\min} \gtrsim 1$, where $\Delta_{\min}$ is the minimum inter-domain expression distance.</p>
+
+<!-- ================================================================ -->
+<!-- SECTION 16 -->
+<!-- ================================================================ -->
+<h2 id="s16">Panel Perturbation Stability Analysis</h2>
+
+<h3>16.1 Procedure</h3>
+
+<div class="box" style="background:#f5f0fa; border-color:#c8b7d9;">
+<div class="boxtitle" style="color:var(--accent3);">Panel Perturbation Algorithm</div>
+<p><strong>Input:</strong> Panel $S$ ($m$ genes), imputation function $f$, downstream analysis $\phi$.</p>
+<ol>
+<li>For $b = 1, \dots, B$:
+<ul>
+<li>Sample sub-panel $S_b^* \subset S$ by dropping fraction $\alpha$ of genes uniformly at random</li>
+<li>Re-impute: $\hat{\boldsymbol{\Lambda}}_b = f(\mathbf{Y}_{\text{obs}}, S_b^*)$</li>
+<li>Re-run downstream: $\theta_b = \phi(\hat{\boldsymbol{\Lambda}}_b)$ &nbsp;(e.g., CCI score for each LR pair)</li>
+</ul>
+</li>
+<li>Compute stability metrics from $\{\theta_1, \dots, \theta_B\}$</li>
+</ol>
+</div>
+
+<h3>16.2 Stability Metrics</h3>
+
+<table>
+<tr><th>Metric</th><th>Formula</th><th>Interpretation</th></tr>
+<tr><td>Coefficient of Variation</td><td>$\text{CV} = \text{Std}(\theta_b) / |\text{Mean}(\theta_b)|$</td><td>Relative variability of the conclusion</td></tr>
+<tr><td>Stability Score</td><td>$\text{Stab} = 1 - \text{clip}(\text{CV}, 0, 1)$</td><td>1 = robust, 0 = unstable</td></tr>
+<tr><td>Sign Consistency</td><td>$\text{SC} = |\text{Mean}(\text{sign}(\theta_b))|$</td><td>1 = always same sign, 0 = random sign</td></tr>
+<tr><td>Significance Fraction</td><td>$\text{SF} = \text{Mean}(\mathbb{1}[p_b < 0.05])$</td><td>Fraction of sub-panels yielding significance</td></tr>
+</table>
+
+<h3>16.3 Why This Is Not a Bootstrap</h3>
+
+<div class="remark">
+<div class="remark-title">Remark 16.1 &mdash; Methodological Honesty</div>
+<p>A bootstrap resamples <em>observations</em> (cells) and provides coverage guarantees under regularity conditions. Our procedure resamples <em>features</em> (genes) &mdash; a fundamentally different operation. We <strong>do not claim</strong> that the perturbation intervals have nominal coverage. Instead, we claim:</p>
+<ol>
+<li>Stability (low CV across sub-panels) <strong>predicts</strong> actual reliability</li>
+<li>Instability (high CV) is a <strong>diagnostic</strong> flag for unreliable conclusions</li>
+</ol>
+<p>This must be validated empirically by showing correlation between predicted stability and actual error (ground truth comparison).</p>
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 17 -->
+<!-- ================================================================ -->
+<h2 id="s17">Calibration and Discrimination Metrics</h2>
+
+<h3>17.1 Discrimination (Ranking Quality)</h3>
+
+<p>Can we rank LR pairs from most to least reliable?</p>
+
+$$r_s = \text{Spearman}(\text{Stability}_{lr}, \; |\hat{T}_{lr} - T_{lr}^{\text{true}}|)$$
+
+<p>Target: $|r_s| \geq 0.7$. A negative $r_s$ means high stability predicts low error (desired).</p>
+
+<h3>17.2 Calibration (Absolute Accuracy)</h3>
+
+<p>Does predicted reliability match actual false discovery proportion?</p>
+
+<div class="box green">
+<div class="boxtitle">Calibration Plot Construction</div>
+<ol>
+<li>Restrict to LR pairs called significant in imputed data</li>
+<li>Bin by predicted reliability (quintiles)</li>
+<li>In each bin $b$, compute:
+$$\text{FDP}(b) = 1 - \frac{|\{(l,r) \in b : (l,r) \in \text{True Significant}\}|}{|\{(l,r) \in b\}|}$$</li>
+<li>Plot FDP vs. mean reliability per bin</li>
+</ol>
+<p><strong>Perfect calibration:</strong> FDP decreases monotonically as reliability increases. Highest reliability bin should have FDP $< 0.1$; lowest reliability bin should have FDP $> 0.5$.</p>
+</div>
+
+<h3>17.3 Expected Calibration Error (ECE)</h3>
+
+$$\text{ECE} = \sum_{b=1}^{B} \frac{|n_b|}{n} \left| \text{FDP}(b) - (1 - \overline{\text{Stab}}(b)) \right|$$
+
+<p>where $n_b$ is the number of pairs in bin $b$ and $\overline{\text{Stab}}(b)$ is the mean stability in bin $b$. Lower ECE = better calibration.</p>
+
+<!-- ================================================================ -->
+<!-- SECTION 18 -->
+<!-- ================================================================ -->
+<h2 id="s18">Gene Panel Optimization Theory</h2>
+
+<h3>18.1 Optimal Panel Selection as Subset Selection</h3>
+
+<p>Given the framework, the optimal panel $S^*$ minimizes expected downstream error:</p>
+
+$$S^* = \arg\min_{S \subset \{1,\dots,G\}, |S|=m} \sum_{(l,r) \in \mathcal{L}} \text{Var}(\hat{T}_{lr} \mid S)$$
+
+<p>where $\mathcal{L}$ is the set of LR pairs of interest. This is a combinatorial optimization problem (NP-hard in general).</p>
+
+<h3>18.2 Greedy Approximation</h3>
+
+<p>Using the submodularity of $R^2_g$ as a function of the panel $S$ (adding a gene always reduces residual variance, but with diminishing returns), a greedy algorithm achieves a $(1 - 1/e) \approx 63\%$ approximation ratio:</p>
+
+<div class="box">
+<div class="boxtitle">Greedy Panel Design</div>
+<ol>
+<li>Initialize $S = \emptyset$</li>
+<li>For $j = 1, \dots, m$:
+$$g_j^* = \arg\max_{g \notin S} \sum_{(l,r) \in \mathcal{L}} \left[R_l^2(S \cup \{g\}) - R_l^2(S) + R_r^2(S \cup \{g\}) - R_r^2(S)\right]$$
+$S \leftarrow S \cup \{g_j^*\}$</li>
+</ol>
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 19 -->
+<!-- ================================================================ -->
+<h2 id="s19">Fisher Information and Cramér-Rao Bounds</h2>
+
+<h3>19.1 Fisher Information for Poisson</h3>
+
+<div class="defn">
+<div class="defn-title">Definition 19.1</div>
+<p>For $Y \sim \text{Poisson}(\lambda)$, the Fisher information:</p>
+$$\mathcal{I}(\lambda) = \mathbb{E}\left[\left(\frac{\partial}{\partial \lambda} \log P(Y;\lambda)\right)^2\right] = \frac{1}{\lambda}$$
+</div>
+
+<p><strong>Derivation:</strong></p>
+$$\frac{\partial}{\partial \lambda} \log P(Y;\lambda) = \frac{\partial}{\partial \lambda}\left[Y \log \lambda - \lambda\right] = \frac{Y}{\lambda} - 1$$
+$$\mathcal{I}(\lambda) = \mathbb{E}\left[\left(\frac{Y}{\lambda} - 1\right)^2\right] = \frac{\text{Var}(Y)}{\lambda^2} = \frac{\lambda}{\lambda^2} = \frac{1}{\lambda}$$
+
+<h3>19.2 Cramér-Rao Lower Bound</h3>
+
+<div class="thm">
+<div class="thm-title">Theorem 19.1 (Cramér-Rao Bound for Poisson)</div>
+<p>For any unbiased estimator $\hat{\lambda}$ of $\lambda$ based on a single observation $Y \sim \text{Poisson}(\lambda)$:</p>
+$$\text{Var}(\hat{\lambda}) \geq \frac{1}{\mathcal{I}(\lambda)} = \lambda$$
+<p>For $N$ independent cells observing gene $g$ (all with the same rate $\lambda_g$):</p>
+$$\text{Var}(\hat{\lambda}_g) \geq \frac{\lambda_g}{N}$$
+</div>
+
+<div class="remark">
+<div class="remark-title">Remark 19.1</div>
+<p>The Cramér-Rao bound for Poisson has a surprising implication: <strong>higher expression is harder to estimate precisely in absolute terms</strong> (variance = $\lambda/N$), but <strong>easier to estimate in relative terms</strong> (CV = $1/\sqrt{N\lambda}$). For CCI, where we compute products $\lambda_{il} \cdot \lambda_{jr}$, the absolute error matters more.</p>
+</div>
+
+<h3>19.3 Fisher Information for the Rate Matrix</h3>
+
+<p>For the observed entries of $\boldsymbol{\Lambda}$, the Fisher information matrix:</p>
+
+$$[\mathcal{I}(\boldsymbol{\Lambda})]_{(i,g),(i',g')} = \begin{cases} \frac{1}{\lambda_{ig}} & \text{if } (i,g) = (i',g') \text{ and } g \in S \\ 0 & \text{otherwise} \end{cases}$$
+
+<p>The total information about the rank-$K$ structure from $Nm$ observations:</p>
+$$\text{Total Fisher information} = \sum_{i=1}^N \sum_{g \in S} \frac{1}{\lambda_{ig}}$$
+
+<!-- ================================================================ -->
+<!-- SECTION 20 -->
+<!-- ================================================================ -->
+<h2 id="s20">Variance Estimation and Confidence Intervals</h2>
+
+<h3>20.1 Variance of the CCI Statistic</h3>
+
+<p>For the true (non-imputed) CCI statistic with Poisson-distributed counts:</p>
+
+$$\text{Var}(T_{lr}) = \frac{1}{|\mathcal{E}|^2}\sum_{(i,j) \in \mathcal{E}} \text{Var}(x_{il} \cdot x_{jr})$$
+
+<p>Since $x_{il}$ and $x_{jr}$ are independent (different cells):</p>
+$$\text{Var}(x_{il} \cdot x_{jr}) = \mathbb{E}[x_{il}^2]\mathbb{E}[x_{jr}^2] - (\mathbb{E}[x_{il}])^2(\mathbb{E}[x_{jr}])^2$$
+$$= (\lambda_{il}^2 + \lambda_{il})(\lambda_{jr}^2 + \lambda_{jr}) - \lambda_{il}^2\lambda_{jr}^2$$
+$$= \lambda_{il}^2\lambda_{jr} + \lambda_{il}\lambda_{jr}^2 + \lambda_{il}\lambda_{jr}$$
+
+<h3>20.2 Delta Method for Transformed Statistics</h3>
+
+<p>For a function $h(\hat{T}_{lr})$ of the CCI statistic (e.g., log-transform for normalization):</p>
+
+$$\text{Var}(h(\hat{T}_{lr})) \approx [h'(T_{lr})]^2 \cdot \text{Var}(\hat{T}_{lr})$$
+
+<h3>20.3 Confidence Intervals via Percentile Method</h3>
+
+<p>From the panel perturbation distribution $\{\hat{T}_{lr}^{(1)}, \dots, \hat{T}_{lr}^{(B)}\}$:</p>
+
+$$\text{CI}_{1-\alpha}(\hat{T}_{lr}) = \left[\hat{T}_{lr}^{(\lfloor B\alpha/2\rfloor)}, \; \hat{T}_{lr}^{(\lceil B(1-\alpha/2)\rceil)}\right]$$
+
+<p>where $\hat{T}_{lr}^{(k)}$ is the $k$-th order statistic. These are <em>stability intervals</em>, not confidence intervals with guaranteed coverage.</p>
+
+<!-- ================================================================ -->
+<!-- SECTION 21 -->
+<!-- ================================================================ -->
+<h2 id="s21">False Discovery Rate Control</h2>
+
+<h3>21.1 Local FDR</h3>
+
+<p>The local false discovery rate for an LR pair with test statistic $T$:</p>
+
+$$\text{lfdr}(T) = \frac{\pi_0 f_0(T)}{f(T)}$$
+
+<p>where $\pi_0$ is the proportion of true nulls, $f_0$ is the null density, and $f$ is the mixture density.</p>
+
+<h3>21.2 Storey's Positive FDR</h3>
+
+<div class="defn">
+<div class="defn-title">Definition 21.1</div>
+$$\text{pFDR}(t) = \frac{\pi_0 \cdot P_0(T \geq t)}{P(T \geq t)}$$
+<p>Estimated $\hat{\pi}_0$ via Storey's method:</p>
+$$\hat{\pi}_0 = \frac{\#\{i : p_i > \lambda\}}{L(1-\lambda)}$$
+<p>for a tuning parameter $\lambda \in (0,1)$ (typically $\lambda = 0.5$).</p>
+</div>
+
+<h3>21.3 Impact of Imputation Bias on FDR</h3>
+
+<div class="warning">
+<div class="warning-title">FDR Invalidation Under Biased Statistics</div>
+<p>BH and Storey procedures assume valid $p$-values (uniform under the null). When CCI statistics are biased by imputation, the null $p$-values are <strong>stochastically smaller than uniform</strong> (anti-conservative). This means:</p>
+<ul>
+<li>Nominal FDR control at 5% may produce actual FDR of 20&ndash;50%</li>
+<li>Regression calibration restores validity by debiasing the test statistic</li>
+<li>After correction, the permutation $p$-values should again be approximately uniform under the null</li>
+</ul>
+</div>
+
+<!-- ================================================================ -->
+<!-- SECTION 22 -->
+<!-- ================================================================ -->
+<h2 id="s22">Complete Model Summary and Notation</h2>
+
+<div class="box blue">
+<div class="boxtitle">The Entire Framework</div>
+$$\boxed{\begin{aligned}
+&\textbf{Observation:} && y_{ig} \sim \text{Poisson}(\delta_g \lambda_{ig}), \; g \in S, \; |S| = m \\[8pt]
+&\textbf{Structure:} && \log \lambda_{ig} = \mu_g + \textstyle\sum_{k=1}^K u_{ik}v_{gk} + \epsilon_{ig} \\[8pt]
+&\textbf{Recovery MSE:} && \frac{1}{NG}\|\hat{\boldsymbol{\Lambda}} - \boldsymbol{\Lambda}\|_F^2 \leq C\frac{K\lambda_{\max}}{m} \\[8pt]
+&\textbf{Per-gene error:} && \text{MSE}(g) = \frac{1}{\delta_g\bar{\lambda}_g} + \|\mathbf{v}_g\|^2(1-R_g^2) \\[8pt]
+&\textbf{CCI bias:} && \mathbb{E}[\hat{T}_{lr}] = T_{lr}^{\text{true}} + \rho_{lr}\sqrt{\text{MSE}(l)\cdot\text{MSE}(r)} \\[8pt]
+&\textbf{Corrected CCI:} && \hat{T}_{lr}^{\text{corr}} = \hat{T}_{lr} - \hat{\rho}_{lr}\sqrt{\widehat{\text{MSE}}(l)\cdot\widehat{\text{MSE}}(r)} \\[8pt]
+&\textbf{Cell typing:} && P(\text{misclassify}) \leq \exp\!\left(-\Delta_t^2 \big/ 8\textstyle\sum_g\text{MSE}(g)\right) \\[8pt]
+&\textbf{CCI variance:} && \text{Var}(\hat{T}_{lr}) \propto \text{MSE}(l)\cdot\text{MSE}(r) \;\text{(both imputed)}
+\end{aligned}}$$
+</div>
+
+<h3>Complete Notation Table</h3>
+
+<table>
+<tr><th>Symbol</th><th>Type</th><th>Definition</th><th>Typical Range</th></tr>
+<tr><td>$N$</td><td>Scalar</td><td>Number of cells</td><td>$10^3 - 10^6$</td></tr>
+<tr><td>$G$</td><td>Scalar</td><td>Total genes</td><td>$\sim 20{,}000$</td></tr>
+<tr><td>$m$</td><td>Scalar</td><td>Panel size $|S|$</td><td>$100 - 5{,}000$</td></tr>
+<tr><td>$K$</td><td>Scalar</td><td>Latent rank (gene programs)</td><td>$15 - 60$</td></tr>
+<tr><td>$S$</td><td>Set</td><td>Measured gene panel</td><td>$\subset \{1,\dots,G\}$</td></tr>
+<tr><td>$\mathbf{s}_i$</td><td>$\mathbb{R}^2$</td><td>Spatial coordinates of cell $i$</td><td></td></tr>
+<tr><td>$y_{ig}$</td><td>$\mathbb{Z}_+$</td><td>Observed transcript count</td><td>$0 - 10^3$</td></tr>
+<tr><td>$\lambda_{ig}$</td><td>$\mathbb{R}_+$</td><td>True expression rate</td><td>$0.01 - 10^3$</td></tr>
+<tr><td>$\hat{\lambda}_{ig}$</td><td>$\mathbb{R}_+$</td><td>Imputed expression</td><td></td></tr>
+<tr><td>$e_{ig}$</td><td>$\mathbb{R}$</td><td>Imputation error</td><td></td></tr>
+<tr><td>$\delta_g$</td><td>$(0,1]$</td><td>Detection efficiency</td><td>$0.3 - 0.9$</td></tr>
+<tr><td>$\boldsymbol{\mu}$</td><td>$\mathbb{R}^G$</td><td>Baseline log-expression</td><td></td></tr>
+<tr><td>$\mathbf{U}$</td><td>$\mathbb{R}^{N \times K}$</td><td>Cell loading matrix</td><td></td></tr>
+<tr><td>$\mathbf{V}$</td><td>$\mathbb{R}^{G \times K}$</td><td>Gene program matrix</td><td></td></tr>
+<tr><td>$\mathbf{v}_g$</td><td>$\mathbb{R}^K$</td><td>Gene $g$'s program vector</td><td></td></tr>
+<tr><td>$R_g^2$</td><td>$[0,1]$</td><td>Gene predictability from $S$</td><td></td></tr>
+<tr><td>$w_{ij}$</td><td>$\{0,1\}$</td><td>Spatial adjacency</td><td></td></tr>
+<tr><td>$\mathcal{E}$</td><td>Set</td><td>Spatial edge set</td><td></td></tr>
+<tr><td>$T_{lr}$</td><td>$\mathbb{R}$</td><td>CCI test statistic</td><td></td></tr>
+<tr><td>$I_g$</td><td>$[-1,1]$</td><td>Moran's I for gene $g$</td><td></td></tr>
+<tr><td>$C_g$</td><td>$[0,2]$</td><td>Geary's C for gene $g$</td><td></td></tr>
+<tr><td>$NE(a,b)$</td><td>$\mathbb{R}$</td><td>Neighborhood enrichment</td><td></td></tr>
+<tr><td>$\rho_{lr}$</td><td>$[0,1]$</td><td>Spatial error correlation</td><td></td></tr>
+<tr><td>$\Delta_t$</td><td>$\mathbb{R}_+$</td><td>Min inter-type distance</td><td></td></tr>
+<tr><td>$\alpha$</td><td>$(0,1)$</td><td>Gene drop fraction</td><td>$0.1 - 0.3$</td></tr>
+<tr><td>$B$</td><td>$\mathbb{Z}_+$</td><td>Number of perturbations</td><td>$20 - 500$</td></tr>
+</table>
+
+<hr>
+<p style="text-align:center; color:var(--dim); font-size:12px; margin-top:40px;">
+Complete Biostatistics Reference &mdash; Measurement Error Framework for Spatial Omics Inference<br>
+22 Sections &bull; All formulations paper-ready with derivations and examples
+</p>
+
+</body>
+</html>
