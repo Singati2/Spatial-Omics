@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhD Biostatistics Complete Guide — Spatial Biomarkers in Cancer</title>
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']],tags:'ams'},options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+:root{--bg:#fff;--text:#1a1a2e;--dim:#555;--blue:#1a5276;--green:#117a65;--purple:#6c3483;--orange:#b9770e;--red:#c0392b;--border:#ddd;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Georgia','Times New Roman',serif;background:var(--bg);color:var(--text);line-height:1.85;font-size:15px;max-width:870px;margin:0 auto;padding:40px 50px 120px;}
+h1{font-size:26px;text-align:center;color:var(--blue);margin-bottom:4px;}
+.sub{text-align:center;color:var(--dim);font-size:14px;margin-bottom:30px;}
+h2{font-size:21px;color:var(--blue);margin:50px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--blue);}
+h3{font-size:17px;color:var(--purple);margin:28px 0 8px;}
+h4{font-size:15px;color:var(--orange);margin:20px 0 6px;}
+p{margin:8px 0;text-align:justify;}
+ul,ol{margin:8px 0 8px 28px;}
+li{margin:5px 0;}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;}
+th{background:#e8e8e8;text-align:left;padding:10px 12px;border:1px solid var(--border);font-weight:700;}
+td{padding:8px 12px;border:1px solid var(--border);}
+tr:nth-child(even) td{background:#fafafa;}
+hr{border:none;border-top:1px solid #ddd;margin:40px 0;}
+
+.blue{background:#e8f4fd;border:1px solid #b0d4f1;border-radius:8px;padding:20px 24px;margin:18px 0;}
+.blue .t{font-size:13px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.green{background:#e8f8e8;border:1px solid #a3d9b1;border-radius:8px;padding:20px 24px;margin:18px 0;}
+.green .t{font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.orange{background:#fdf6ec;border:1px solid #f0d9a8;border-radius:8px;padding:20px 24px;margin:18px 0;}
+.orange .t{font-size:13px;font-weight:700;color:var(--orange);margin-bottom:10px;}
+.red{background:#fdf0f0;border:1px solid #f0b8b8;border-radius:8px;padding:18px 22px;margin:18px 0;}
+.red .t{font-size:13px;font-weight:700;color:var(--red);margin-bottom:8px;}
+.purple{background:#f5f0fa;border:1px solid #d4c4e8;border-radius:8px;padding:18px 22px;margin:18px 0;}
+.purple .t{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:8px;}
+.analogy{background:#fff8e1;border-left:4px solid #f9a825;padding:16px 20px;margin:16px 0;border-radius:0 8px 8px 0;}
+.step{background:#f0f7ff;border-left:4px solid var(--blue);padding:14px 18px;margin:12px 0;border-radius:0 6px 6px 0;}
+pre{background:#1e1e1e;color:#d4d4d4;padding:14px 18px;border-radius:6px;font-family:'Courier New',monospace;font-size:13px;overflow-x:auto;margin:10px 0;line-height:1.5;}
+code{font-family:'Courier New',monospace;font-size:13px;background:#f0f0f0;padding:1px 5px;border-radius:3px;}
+
+.toc{background:#f0f7ff;border:2px solid #b0d4f1;border-radius:8px;padding:24px 30px;margin:20px 0;}
+.toc h3{color:var(--blue);margin:0 0 12px;}
+.toc ol{margin:0;padding-left:20px;}
+.toc li{margin:3px 0;font-size:14px;}
+.toc a{color:var(--blue);text-decoration:none;}
+
+@media print{body{padding:15px 25px;font-size:11.5px;max-width:100%;}h2{margin-top:25px;font-size:17px;}.blue,.green,.orange,.red,.purple,.analogy,.step{break-inside:avoid;}}
+</style>
+</head>
+<body>
+
+<h1>PhD Biostatistics Complete Guide</h1>
+<p class="sub">Every Statistical Concept for Your Spatial Biomarker Dissertation<br>
+<em>Beginner-Friendly with Full Mathematics, Worked Examples, and Analogies</em></p>
+
+<div class="toc">
+<h3>Table of Contents (27 Sections)</h3>
+<ol>
+<li><a href="#s1">Prognostic vs Predictive Biomarkers</a></li>
+<li><a href="#s2">Survival Analysis Foundations</a></li>
+<li><a href="#s3">The Cox Proportional Hazards Model</a></li>
+<li><a href="#s4">The Hazard Ratio</a></li>
+<li><a href="#s5">Estimands (ICH E9 Framework)</a></li>
+<li><a href="#s6">The C-Statistic (Discrimination)</a></li>
+<li><a href="#s7">Time-Dependent AUC</a></li>
+<li><a href="#s8">Calibration</a></li>
+<li><a href="#s9">Decision Curve Analysis and Net Benefit</a></li>
+<li><a href="#s10">Internal, Internal-External, and External Validation</a></li>
+<li><a href="#s11">Spatial Graphs and Neighbor Definitions</a></li>
+<li><a href="#s12">Moran's I</a></li>
+<li><a href="#s13">Geary's C</a></li>
+<li><a href="#s14">Neighborhood Enrichment Score</a></li>
+<li><a href="#s15">Permutation Testing</a></li>
+<li><a href="#s16">Multiple Testing and FDR (Benjamini-Hochberg)</a></li>
+<li><a href="#s17">Measurement Error Models</a></li>
+<li><a href="#s18">Attenuation Bias</a></li>
+<li><a href="#s19">Regression Calibration</a></li>
+<li><a href="#s20">SIMEX</a></li>
+<li><a href="#s21">Heteroscedastic Measurement Error</a></li>
+<li><a href="#s22">Your Paper 2: The Complete Statistical Setup</a></li>
+<li><a href="#s23">Simulation Study Design</a></li>
+<li><a href="#s24">Bias, Variance, MSE of Estimators</a></li>
+<li><a href="#s25">Coverage Probability</a></li>
+<li><a href="#s26">Type I Error and Power</a></li>
+<li><a href="#s27">Transportability</a></li>
+</ol>
+</div>
+
+<hr>
+
+<!-- ===== SECTION 1 ===== -->
+<h2 id="s1">1. Prognostic vs Predictive Biomarkers</h2>
+
+<div class="analogy">
+<strong>Analogy — Weather Forecast vs Umbrella Advice:</strong><br>
+A <em>prognostic</em> biomarker is like saying "it will rain tomorrow" — it predicts what will happen regardless of what you do.<br>
+A <em>predictive</em> biomarker is like saying "if you carry an umbrella, you'll stay dry; if you don't, you'll get wet" — it predicts who will <em>benefit from a specific action</em>.
+</div>
+
+<div class="blue">
+<div class="t">Prognostic Biomarker</div>
+<p>A biomarker that is associated with clinical outcome (e.g., survival) <strong>regardless of treatment</strong>.</p>
+$$\text{Prognostic: } P(\text{outcome} \mid \text{biomarker high}) \neq P(\text{outcome} \mid \text{biomarker low})$$
+<p><strong>Example:</strong> "Patients with high tumor-immune neighborhood scores have better 5-year overall survival than patients with low scores." This is prognostic because it says nothing about whether treatment changes that relationship.</p>
+</div>
+
+<div class="green">
+<div class="t">Predictive Biomarker</div>
+<p>A biomarker that predicts <strong>differential treatment benefit</strong> — the biomarker-treatment interaction.</p>
+$$\text{Predictive: } \underbrace{[\text{HR}_{\text{treatment}} \mid \text{biomarker high}]}_{\text{benefit in high group}} \neq \underbrace{[\text{HR}_{\text{treatment}} \mid \text{biomarker low}]}_{\text{benefit in low group}}$$
+<p><strong>Example:</strong> "Patients with high PD-L1 expression benefit from immunotherapy (HR = 0.45), but patients with low PD-L1 do not (HR = 0.98)." The biomarker <em>predicts who benefits from treatment</em>.</p>
+</div>
+
+<div class="orange">
+<div class="t">Worked Example: Is This Prognostic or Predictive?</div>
+<p>A paper reports: "High spatial density of CD8+ T cells in the tumor core is associated with improved overall survival (HR = 0.61, 95% CI: 0.44–0.85, p = 0.003)."</p>
+<p><strong>Answer:</strong> This is a <strong>prognostic</strong> finding only. Here's why:</p>
+<ul>
+<li>It shows an association between the biomarker (CD8+ density) and outcome (OS)</li>
+<li>It does NOT show that this association differs by treatment</li>
+<li>All patients are analyzed together — there is no treatment-biomarker interaction test</li>
+<li>To make it <em>predictive</em>, you would need: a treatment arm and a control arm, and you would need to show that the HR for treatment differs between biomarker-high and biomarker-low groups</li>
+</ul>
+<p><strong>The statistical test for predictive:</strong> an interaction term $\beta_3$ in:</p>
+$$h(t) = h_0(t) \exp(\beta_1 \cdot \text{biomarker} + \beta_2 \cdot \text{treatment} + \beta_3 \cdot \text{biomarker} \times \text{treatment})$$
+<p>If $\beta_3 \neq 0$ (and statistically significant), the biomarker is predictive.</p>
+</div>
+
+<div class="red">
+<div class="t">Why This Matters for Your Dissertation</div>
+<p>Over 95% of spatial omics papers that claim to find "biomarkers" are reporting prognostic associations only. They do not test for treatment interaction. They do not distinguish prognostic from predictive. Paper 1 of your dissertation builds the formal framework to make this distinction correctly in spatial data.</p>
+</div>
+
+<!-- ===== SECTION 2 ===== -->
+<h2 id="s2">2. Survival Analysis Foundations</h2>
+
+<h3>2.1 What Is Survival Data?</h3>
+
+<div class="blue">
+<div class="t">The Three Components of Survival Data</div>
+<p>For each patient $i$:</p>
+<ol>
+<li><strong>Event time $T_i$:</strong> When the event (death, recurrence) would occur</li>
+<li><strong>Censoring time $C_i$:</strong> When observation ends (patient lost to follow-up, study ends)</li>
+<li><strong>What we observe:</strong> $(\tilde{T}_i, \delta_i) = (\min(T_i, C_i), \; \mathbb{1}[T_i \leq C_i])$</li>
+</ol>
+<p>$\delta_i = 1$: we observed the event (death). $\delta_i = 0$: the patient was <em>censored</em> (alive at last contact).</p>
+</div>
+
+<div class="analogy">
+<strong>Analogy — Light Bulbs:</strong> You're testing how long light bulbs last. You turn on 100 bulbs. After 1 year, 40 have burned out ($\delta = 1$) and 60 are still working ($\delta = 0$). For the 60 still working, you know they lasted <em>at least</em> 1 year, but you don't know their true lifetime. That "at least" information is censoring. Survival analysis uses it correctly; simply ignoring censored patients would bias your results.
+</div>
+
+<div class="orange">
+<div class="t">Worked Example</div>
+<table>
+<tr><th>Patient</th><th>Observed Time (months)</th><th>Status ($\delta$)</th><th>Meaning</th></tr>
+<tr><td>A</td><td>8</td><td>1 (died)</td><td>Died at 8 months</td></tr>
+<tr><td>B</td><td>24</td><td>0 (censored)</td><td>Alive at 24 months, study ended</td></tr>
+<tr><td>C</td><td>3</td><td>0 (censored)</td><td>Lost to follow-up at 3 months</td></tr>
+<tr><td>D</td><td>15</td><td>1 (died)</td><td>Died at 15 months</td></tr>
+<tr><td>E</td><td>30</td><td>1 (died)</td><td>Died at 30 months</td></tr>
+</table>
+</div>
+
+<h3>2.2 The Survival Function</h3>
+
+<div class="blue">
+<div class="t">Definition</div>
+$$S(t) = P(T > t) = \text{Probability of surviving beyond time } t$$
+<p>$S(0) = 1$ (everyone alive at start). $S(\infty) = 0$ (everyone eventually dies). $S(t)$ is non-increasing.</p>
+</div>
+
+<h3>2.3 The Hazard Function</h3>
+
+<div class="blue">
+<div class="t">Definition</div>
+$$h(t) = \lim_{\Delta t \to 0} \frac{P(t \leq T < t + \Delta t \mid T \geq t)}{\Delta t}$$
+<p>In words: the <strong>instantaneous risk</strong> of the event at time $t$, given survival up to $t$.</p>
+<p>Relationship: $S(t) = \exp\left(-\int_0^t h(u)\,du\right)$</p>
+</div>
+
+<div class="analogy">
+<strong>Analogy:</strong> The hazard is like the "danger level" at each moment. A cancer patient might have low hazard initially (treatment working), then increasing hazard as the cancer progresses. The survival function integrates this danger over time to give the probability of still being alive.
+</div>
+
+<!-- ===== SECTION 3 ===== -->
+<h2 id="s3">3. The Cox Proportional Hazards Model</h2>
+
+<p>This is the <strong>most important model in your dissertation</strong>. Every paper uses it.</p>
+
+<div class="blue">
+<div class="t">The Cox Model</div>
+$$h(t \mid \mathbf{x}_i) = h_0(t) \cdot \exp(\beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip})$$
+<p>where:</p>
+<ul>
+<li>$h_0(t)$ = <strong>baseline hazard</strong> (unspecified — this is what makes Cox "semi-parametric")</li>
+<li>$\mathbf{x}_i$ = covariates for patient $i$ (age, stage, your spatial biomarker)</li>
+<li>$\beta_j$ = log-hazard ratio for a 1-unit increase in $x_j$</li>
+</ul>
+</div>
+
+<h3>3.1 The "Proportional Hazards" Assumption</h3>
+
+<div class="green">
+<div class="t">What It Means</div>
+<p>The ratio of hazards for any two patients is <strong>constant over time</strong>:</p>
+$$\frac{h(t \mid \mathbf{x}_A)}{h(t \mid \mathbf{x}_B)} = \frac{\exp(\boldsymbol{\beta}^\top \mathbf{x}_A)}{\exp(\boldsymbol{\beta}^\top \mathbf{x}_B)} = \text{constant (does not depend on } t\text{)}$$
+</div>
+
+<div class="analogy">
+<strong>Analogy:</strong> If Patient A has twice the risk of Patient B at month 1, then Patient A still has twice the risk at month 12. The risk ratio doesn't change over time. If it does change (e.g., a treatment works well early but wears off later), the proportional hazards assumption is violated.
+</div>
+
+<h3>3.2 Three Cox Assumptions Violated by Spatial Biomarkers</h3>
+
+<div class="red">
+<div class="t">Assumption Violations in Your Setting</div>
+
+<p><strong>Violation 1 — Measurement error in the covariate.</strong> The Cox model assumes covariates are measured exactly. Your spatial biomarker $W_i$ is an <em>estimate</em> of the true spatial feature $X_i$, contaminated by noise. Consequence: the estimated $\hat{\beta}$ is <strong>attenuated toward zero</strong> — your biomarker appears weaker than it truly is.</p>
+
+<p><strong>Violation 2 — Proportional hazards may not hold.</strong> If the spatial biomarker's prognostic effect changes over time (e.g., strong early but diminishing later), the PH assumption fails. Consequence: $\hat{\beta}$ represents an "average" log-HR that is hard to interpret biologically.</p>
+
+<p><strong>Violation 3 — Correlated observations.</strong> If multiple tissue spots from the same patient are treated as independent observations, you violate the independence assumption. Consequence: standard errors are <strong>too small</strong>, leading to inflated Type I error (false significance).</p>
+</div>
+
+<h3>3.3 How Cox Estimates $\beta$: The Partial Likelihood</h3>
+
+<div class="blue">
+<div class="t">Partial Likelihood</div>
+<p>At each event time $t_j$ (when patient $j$ dies), the partial likelihood contribution is:</p>
+$$L_j(\boldsymbol{\beta}) = \frac{\exp(\boldsymbol{\beta}^\top \mathbf{x}_j)}{\sum_{k \in R(t_j)} \exp(\boldsymbol{\beta}^\top \mathbf{x}_k)}$$
+<p>where $R(t_j)$ = the <strong>risk set</strong> at time $t_j$ (all patients still alive and under observation).</p>
+<p>The full partial likelihood: $L(\boldsymbol{\beta}) = \prod_j L_j(\boldsymbol{\beta})$</p>
+<p>$\hat{\boldsymbol{\beta}}$ maximizes $\log L(\boldsymbol{\beta})$. The baseline hazard $h_0(t)$ cancels out — this is why Cox doesn't need to estimate it.</p>
+</div>
+
+<div class="orange">
+<div class="t">Worked Example — Tiny Dataset</div>
+<p>3 patients with one covariate $x$ (spatial biomarker score):</p>
+<table>
+<tr><th>Patient</th><th>Time</th><th>Status</th><th>$x_i$</th></tr>
+<tr><td>A</td><td>5</td><td>Died</td><td>0.8</td></tr>
+<tr><td>B</td><td>10</td><td>Died</td><td>0.3</td></tr>
+<tr><td>C</td><td>15</td><td>Censored</td><td>0.6</td></tr>
+</table>
+<p>At time 5 (A dies), risk set = {A, B, C}:</p>
+$$L_1(\beta) = \frac{e^{\beta \cdot 0.8}}{e^{\beta \cdot 0.8} + e^{\beta \cdot 0.3} + e^{\beta \cdot 0.6}}$$
+<p>At time 10 (B dies), risk set = {B, C}:</p>
+$$L_2(\beta) = \frac{e^{\beta \cdot 0.3}}{e^{\beta \cdot 0.3} + e^{\beta \cdot 0.6}}$$
+<p>Patient C is censored — they contribute to risk sets but never appear in a numerator.</p>
+$$L(\beta) = L_1(\beta) \times L_2(\beta)$$
+<p>Maximize $\log L(\beta)$ to find $\hat{\beta}$.</p>
+</div>
+
+<!-- ===== SECTION 4 ===== -->
+<h2 id="s4">4. The Hazard Ratio</h2>
+
+<div class="blue">
+<div class="t">Definition</div>
+$$\text{HR} = e^{\beta} = \frac{h(t \mid x + 1)}{h(t \mid x)}$$
+<p>The hazard ratio for a <strong>1-unit increase</strong> in the covariate.</p>
+</div>
+
+<table>
+<tr><th>HR Value</th><th>Meaning</th><th>Example</th></tr>
+<tr><td>HR = 1.0</td><td>No effect</td><td>Biomarker doesn't affect survival</td></tr>
+<tr><td>HR = 0.5</td><td>50% lower hazard (protective)</td><td>Higher immune score → better survival</td></tr>
+<tr><td>HR = 2.0</td><td>2× higher hazard (harmful)</td><td>Higher tumor burden → worse survival</td></tr>
+<tr><td>HR = 0.61</td><td>39% lower hazard</td><td>The CD8+ T cell example from your quiz</td></tr>
+</table>
+
+<div class="analogy">
+<strong>Analogy:</strong> If HR = 0.61, think of it as: at any given moment, patients with high CD8+ density have only 61% of the death risk compared to patients with low CD8+ density. It's as if their "danger meter" is turned down to 61% of the baseline level.
+</div>
+
+<!-- ===== SECTION 5 ===== -->
+<h2 id="s5">5. Estimands (ICH E9 Framework)</h2>
+
+<div class="blue">
+<div class="t">What Is an Estimand?</div>
+<p>An <strong>estimand</strong> is the precise description of what you are trying to estimate. It has 5 components (ICH E9 R1 addendum):</p>
+<ol>
+<li><strong>Population:</strong> Who are the patients?</li>
+<li><strong>Treatment/Stratification:</strong> What treatment or exposure?</li>
+<li><strong>Variable:</strong> What is the endpoint?</li>
+<li><strong>Summary measure:</strong> How do you summarize the effect?</li>
+<li><strong>Intercurrent events:</strong> How do you handle things that disrupt the planned observation (treatment switching, dropout)?</li>
+</ol>
+</div>
+
+<div class="orange">
+<div class="t">Worked Example — Your Paper 2 Estimand</div>
+<ol>
+<li><strong>Population:</strong> Resected stage I–IIIA NSCLC patients</li>
+<li><strong>Variable of interest:</strong> Patient-level tumor-immune neighborhood composition score $W_i$ (continuous, derived from 10x Visium spatial transcriptomics)</li>
+<li><strong>Endpoint:</strong> Overall survival (time from surgery to death from any cause)</li>
+<li><strong>Summary measure:</strong> Hazard ratio per 1-unit increase in $W_i$ from a Cox proportional hazards model: $\text{HR} = \exp(\beta)$</li>
+<li><strong>Intercurrent events:</strong> Subsequent systemic therapy treated as a time-varying covariate or handled via a treatment policy strategy</li>
+</ol>
+<p>Because there is no treatment randomization in the estimand — only the biomarker — this is a <strong>prognostic</strong> estimand. To make it predictive, you would need to add a treatment arm and test the biomarker-treatment interaction ($\beta_3$ from Section 1).</p>
+</div>
+
+<!-- ===== SECTION 6 ===== -->
+<h2 id="s6">6. The C-Statistic (Discrimination)</h2>
+
+<div class="blue">
+<div class="t">What It Measures</div>
+<p>The C-statistic (concordance index) answers: <strong>"If I pick two patients at random, one who died first and one who survived longer, how often does my model give a higher risk to the one who died first?"</strong></p>
+$$C = P(\hat{r}_i > \hat{r}_j \mid T_i < T_j)$$
+<p>where $\hat{r}_i = \hat{\beta}^\top \mathbf{x}_i$ is the predicted risk score.</p>
+</div>
+
+<table>
+<tr><th>C Value</th><th>Meaning</th></tr>
+<tr><td>0.5</td><td>Random guessing (coin flip)</td></tr>
+<tr><td>0.6–0.7</td><td>Poor discrimination</td></tr>
+<tr><td>0.7–0.8</td><td>Acceptable discrimination</td></tr>
+<tr><td>0.8–0.9</td><td>Excellent discrimination</td></tr>
+<tr><td>1.0</td><td>Perfect discrimination</td></tr>
+</table>
+
+<div class="orange">
+<div class="t">Worked Example</div>
+<p>5 patients, ordered by predicted risk score:</p>
+<table>
+<tr><th>Patient</th><th>Risk Score</th><th>Actual Survival (months)</th></tr>
+<tr><td>D</td><td>4.2 (highest risk)</td><td>6 (shortest)</td></tr>
+<tr><td>A</td><td>3.1</td><td>12</td></tr>
+<tr><td>E</td><td>2.5</td><td>18</td></tr>
+<tr><td>B</td><td>1.8</td><td>15 ← out of order!</td></tr>
+<tr><td>C</td><td>0.9 (lowest risk)</td><td>30 (longest)</td></tr>
+</table>
+<p>Concordant pairs (higher risk → shorter survival): (D,A), (D,E), (D,B), (D,C), (A,E), (A,B), (A,C), (E,C) = 8</p>
+<p>Discordant pairs: (E,B) — E has higher risk but B died sooner = 1</p>
+<p>Tied: (B,C) is concordant.</p>
+<p>$C = 8/(8+1) = 0.89$ — excellent discrimination.</p>
+</div>
+
+<div class="red">
+<div class="t">Critical Limitation Your Supervisor Emphasized</div>
+<p>A C-statistic of 0.74 tells you nothing about <strong>calibration</strong>. A model can rank patients correctly (good C-statistic) while predicting completely wrong absolute probabilities. See Section 8.</p>
+</div>
+
+<!-- ===== SECTION 7 ===== -->
+<h2 id="s7">7. Time-Dependent AUC</h2>
+
+<div class="blue">
+<div class="t">Why We Need It</div>
+<p>The standard C-statistic summarizes discrimination over the entire follow-up. But a biomarker might discriminate well at 1 year and poorly at 5 years (or vice versa). Time-dependent AUC evaluates discrimination at <strong>specific time points</strong>.</p>
+$$\text{AUC}(t) = P(\hat{r}_i > \hat{r}_j \mid T_i \leq t, T_j > t)$$
+<p>At time $t$: among patients who have died by $t$ (cases) and those still alive at $t$ (controls), how often does the model correctly assign higher risk to the cases?</p>
+</div>
+
+<!-- ===== SECTION 8 ===== -->
+<h2 id="s8">8. Calibration</h2>
+
+<div class="blue">
+<div class="t">What Calibration Means</div>
+<p><strong>Calibration</strong> asks: "When my model predicts a patient has a 30% chance of dying within 5 years, do approximately 30% of such patients actually die?"</p>
+<p>Discrimination asks: can I <em>rank</em> patients? Calibration asks: are my <em>predicted probabilities correct</em>?</p>
+</div>
+
+<div class="analogy">
+<strong>Analogy — Weather App:</strong> Your weather app says "30% chance of rain." Discrimination means: on days it said 30%, was rain less likely than on days it said 70%? (Yes — good discrimination.) Calibration means: on all days it said 30%, did it actually rain about 30% of the time? A miscalibrated app might say 30% when the real chance is 60% — it still ranks days correctly but gives you wrong probabilities to plan around.
+</div>
+
+<div class="orange">
+<div class="t">Worked Example — Catastrophic Miscalibration</div>
+<p><strong>Your supervisor's quiz Q3 asked you to construct this.</strong></p>
+<p>Model predicts 5-year survival probability for 100 patients:</p>
+<table>
+<tr><th>Predicted 5yr survival</th><th># Patients</th><th>Actual 5yr survival</th><th>Calibration</th></tr>
+<tr><td>90%</td><td>25</td><td>60%</td><td style="color:var(--red)"><strong>Off by 30%!</strong></td></tr>
+<tr><td>70%</td><td>25</td><td>45%</td><td style="color:var(--red)"><strong>Off by 25%!</strong></td></tr>
+<tr><td>50%</td><td>25</td><td>30%</td><td style="color:var(--red)"><strong>Off by 20%!</strong></td></tr>
+<tr><td>30%</td><td>25</td><td>15%</td><td style="color:var(--red)"><strong>Off by 15%!</strong></td></tr>
+</table>
+<p><strong>C-statistic = 0.75</strong> (good ranking — higher predicted survival → actually longer survival).</p>
+<p><strong>But every prediction is wildly optimistic!</strong> The model tells patients they're safer than they are.</p>
+<p><strong>Clinical consequence:</strong> A patient told "90% chance of surviving 5 years" actually has only 60%. They might forgo aggressive treatment based on this false reassurance.</p>
+</div>
+
+<div class="green">
+<div class="t">Integrated Calibration Index (ICI)</div>
+$$\text{ICI} = \frac{1}{n} \sum_{i=1}^n |\hat{p}_i - p_i^{\text{observed}}|$$
+<p>Average absolute difference between predicted and observed probabilities. Lower = better. ICI = 0 is perfect calibration.</p>
+</div>
+
+<!-- ===== SECTION 9 ===== -->
+<h2 id="s9">9. Decision Curve Analysis and Net Benefit</h2>
+
+<div class="blue">
+<div class="t">What Net Benefit Measures</div>
+<p>Even a well-calibrated, discriminating model might not be <strong>clinically useful</strong>. Net benefit asks: "If I use this model to decide who gets treatment, does it produce more good than harm?"</p>
+$$\text{NB}(p_t) = \frac{\text{TP}}{n} - \frac{\text{FP}}{n} \cdot \frac{p_t}{1 - p_t}$$
+<p>where $p_t$ is the threshold probability at which you would treat. The term $p_t/(1-p_t)$ is the harm-to-benefit ratio — it penalizes false positives.</p>
+</div>
+
+<div class="analogy">
+<strong>Analogy:</strong> If you're deciding who gets surgery (which has risks), you need to balance: treating people who need it (benefit) vs. operating on people who don't (harm). Net benefit quantifies this tradeoff.
+</div>
+
+<!-- ===== SECTION 10 ===== -->
+<h2 id="s10">10. Internal, Internal-External, and External Validation</h2>
+
+<div class="blue">
+<div class="t">Three Levels of Validation</div>
+<table>
+<tr><th>Type</th><th>What It Is</th><th>How It's Done</th><th>Strength</th></tr>
+<tr><td><strong>Internal</strong></td><td>Test on the same data you trained on</td><td>Bootstrap, cross-validation</td><td>Weak — tests optimism, not generalizability</td></tr>
+<tr><td><strong>Internal-External</strong></td><td>Leave one center/cohort out, train on others, test on left-out</td><td>Leave-one-center-out CV</td><td>Moderate — tests across-cohort generalization</td></tr>
+<tr><td><strong>External</strong></td><td>Test on completely independent data</td><td>New cohort, new institution, possibly new platform</td><td>Strong — the gold standard</td></tr>
+</table>
+</div>
+
+<div class="red">
+<div class="t">Why LOO-CV Is Insufficient for Spatial Biomarkers</div>
+<p>Leave-one-<em>patient</em>-out CV tests within-cohort generalization. It does not test:</p>
+<ul>
+<li>Across-institution effects (different tissue processing)</li>
+<li>Across-platform effects (Visium vs CosMx)</li>
+<li>Population differences (different demographics)</li>
+</ul>
+<p>For a spatial biomarker targeting clinical translation, you need <strong>external validation</strong> on an independent cohort — ideally from a different institution and platform. This is Paper 3 of your dissertation.</p>
+</div>
+
+<!-- ===== SECTION 11 ===== -->
+<h2 id="s11">11. Spatial Graphs and Neighbor Definitions</h2>
+
+<div class="blue">
+<div class="t">What Is a Spatial Graph?</div>
+<p>In spatial transcriptomics, each cell (or spot) has coordinates $(x_i, y_i)$. A <strong>spatial graph</strong> connects cells that are "neighbors." This graph is the foundation for ALL spatial statistics.</p>
+</div>
+
+<h4>Common Graph Types</h4>
+<table>
+<tr><th>Graph Type</th><th>Rule</th><th>Properties</th></tr>
+<tr><td>Delaunay triangulation</td><td>Connect cells whose Voronoi regions share an edge</td><td>Adapts to density; no parameter to choose</td></tr>
+<tr><td>k-Nearest Neighbors (kNN)</td><td>Connect each cell to its $k$ closest cells</td><td>Fixed degree; must choose $k$</td></tr>
+<tr><td>Radius</td><td>Connect cells within distance $r$</td><td>Variable degree; must choose $r$</td></tr>
+</table>
+
+<div class="red">
+<div class="t">Critical Insight from Your Supervision</div>
+<p>"The graph is part of the model." Changing the graph type or parameters changes every downstream statistic — Moran's I, neighborhood enrichment, your biomarker $W_i$. This is not a preprocessing step. It is a <strong>modeling choice</strong> that affects your estimand $X_i$. Your Paper 2 defines $X_i$ conditional on a fixed graph for exactly this reason.</p>
+</div>
+
+<!-- ===== SECTION 12 ===== -->
+<h2 id="s12">12. Moran's I</h2>
+
+<div class="blue">
+<div class="t">Question It Answers</div>
+<p>"Are nearby cells more similar in expression than expected by chance?"</p>
+$$I = \frac{N}{W} \cdot \frac{\sum_{i}\sum_{j} w_{ij}(x_i - \bar{x})(x_j - \bar{x})}{\sum_{i}(x_i - \bar{x})^2}$$
+</div>
+
+<div class="orange">
+<div class="t">Complete Worked Example</div>
+<p>9 cells in a 3×3 grid. Gene X expression:</p>
+<pre>
+  8  7  9     (top row: HIGH)
+  7  8  2     (middle: mixed)
+  1  2  1     (bottom: LOW)
+</pre>
+<p><strong>Step 1:</strong> Mean $\bar{x} = 45/9 = 5.0$</p>
+<p><strong>Step 2:</strong> Deviations: $+3, +2, +4, +2, +3, -3, -4, -3, -4$</p>
+<p><strong>Step 3:</strong> For each neighbor pair, multiply deviations:</p>
+<table>
+<tr><th>Pair</th><th>Dev $i$</th><th>Dev $j$</th><th>Product</th></tr>
+<tr><td>1↔2</td><td>+3</td><td>+2</td><td>+6</td></tr>
+<tr><td>1↔4</td><td>+3</td><td>+2</td><td>+6</td></tr>
+<tr><td>3↔6</td><td>+4</td><td>-3</td><td><strong>-12</strong> (boundary!)</td></tr>
+<tr><td>6↔9</td><td>-3</td><td>-4</td><td>+12</td></tr>
+<tr><td>7↔8</td><td>-4</td><td>-3</td><td>+12</td></tr>
+</table>
+<p>Sum of all products (double-counted): 60. Sum of squared deviations: 92. $W = 24$.</p>
+$$I = \frac{9}{24} \times \frac{60}{92} = 0.375 \times 0.652 = \mathbf{0.245}$$
+</div>
+
+<table>
+<tr><th>$I$ Value</th><th>Meaning</th></tr>
+<tr><td>≈ +1</td><td>Strong clustering (similar neighbors)</td></tr>
+<tr><td>≈ 0</td><td>Random</td></tr>
+<tr><td>≈ −1</td><td>Checkerboard (dissimilar neighbors)</td></tr>
+</table>
+
+<div class="purple">
+<div class="t">Role in Your Dissertation</div>
+<p>Moran's I of your spatial biomarker tells you <strong>how spatially autocorrelated the measurement error is</strong>. High Moran's I → the error $U_i$ is spatially structured → the error variance $\sigma_i^2$ depends on patient-level autocorrelation → classical regression calibration breaks. This is the chain of reasoning connecting Squidpy to Paper 2.</p>
+</div>
+
+<!-- ===== SECTION 13 ===== -->
+<h2 id="s13">13. Geary's C</h2>
+
+<div class="blue">
+<div class="t">What It Measures</div>
+<p>"How different are neighboring cells from each other?" (Inverse perspective of Moran's I)</p>
+$$C = \frac{(N-1)}{2W} \cdot \frac{\sum_i\sum_j w_{ij}(x_i - x_j)^2}{\sum_i(x_i-\bar{x})^2}$$
+</div>
+
+<table>
+<tr><th>Property</th><th>Moran's I</th><th>Geary's C</th></tr>
+<tr><td>Numerator</td><td>Cross-products from global mean</td><td>Direct pairwise differences</td></tr>
+<tr><td>Clustering</td><td>$I \to +1$</td><td>$C \to 0$</td></tr>
+<tr><td>Random</td><td>$I \to 0$</td><td>$C \to 1$</td></tr>
+<tr><td>Sensitivity</td><td>Global patterns</td><td>Local boundaries</td></tr>
+</table>
+
+<!-- ===== SECTION 14 ===== -->
+<h2 id="s14">14. Neighborhood Enrichment Score</h2>
+
+<div class="blue">
+<div class="t">What It Measures</div>
+<p>"Do cells of type A neighbor cells of type B more than expected by chance?"</p>
+$$NE(a,b) = \frac{n_{\text{obs}}(a,b) - \mu_{\text{perm}}(a,b)}{\sigma_{\text{perm}}(a,b)}$$
+<p>Computed via <strong>permutation test</strong>: shuffle cell type labels randomly, recount, repeat 1000 times, compare observed count to the null distribution.</p>
+</div>
+
+<div class="red">
+<div class="t">The Assumption Violation (Your Overdue Squidpy Paragraph A)</div>
+<p>The null hypothesis assumes <strong>label exchangeability</strong> — any cell could plausibly be any type at any location. In tumor tissue, this is <strong>biologically false</strong>:</p>
+<p>In <strong>lung adenocarcinoma</strong>, tumor epithelial cells cluster in glandular structures. Fibroblasts form the stromal boundary. CD8+ T cells infiltrate from the periphery. This spatial organization is determined by <em>tissue architecture</em>, not by the specific cell-cell interaction you're testing.</p>
+<p>When you permute labels, you compare against a null where any cell could be anywhere — which no real tissue resembles. Consequence: you find "significant" enrichment between tumor cells and fibroblasts not because of a specific biological interaction, but because both cell types are structurally constrained to adjacent tissue zones. The <strong>z-scores are anti-conservative</strong> (too many false positives).</p>
+</div>
+
+<!-- ===== SECTION 15 ===== -->
+<h2 id="s15">15. Permutation Testing</h2>
+
+<div class="blue">
+<div class="t">The Core Idea</div>
+<p>To test whether an observed statistic is "surprising," we ask: "How often would I see a value this extreme if the null hypothesis were true?"</p>
+<ol>
+<li>Compute observed test statistic $T_{\text{obs}}$</li>
+<li>Randomly shuffle the labels (breaking any real association)</li>
+<li>Recompute the statistic $T^{(b)}$ on shuffled data</li>
+<li>Repeat $B$ times (e.g., $B = 1000$)</li>
+<li>$p = \frac{\#\{T^{(b)} \geq T_{\text{obs}}\} + 1}{B + 1}$</li>
+</ol>
+</div>
+
+<div class="analogy">
+<strong>Analogy:</strong> You're at a party and notice that all the tall people are standing on the left side of the room. Is this a real pattern or coincidence? To test: randomly reassign everyone to positions 1000 times. If the tall-people-on-left pattern almost never occurs by chance, it's statistically significant.
+</div>
+
+<!-- ===== SECTION 16 ===== -->
+<h2 id="s16">16. Multiple Testing and FDR</h2>
+
+<div class="blue">
+<div class="t">The Problem</div>
+<p>If you test 200 LR pairs at $\alpha = 0.05$, you expect $200 \times 0.05 = 10$ false positives by chance alone, even if no real interactions exist.</p>
+</div>
+
+<div class="green">
+<div class="t">Benjamini-Hochberg FDR Control</div>
+<p>Controls the <strong>False Discovery Rate</strong> — the expected proportion of false positives among all rejected hypotheses.</p>
+<ol>
+<li>Sort $p$-values: $p_{(1)} \leq p_{(2)} \leq \cdots \leq p_{(L)}$</li>
+<li>Find largest $k$ such that $p_{(k)} \leq \frac{k}{L} \cdot q$ (where $q = 0.05$)</li>
+<li>Reject hypotheses $1, \ldots, k$</li>
+</ol>
+$$p_{\text{adjusted}} = \min\left(\frac{L}{i} \cdot p_{(i)}, \; 1\right)$$
+</div>
+
+<!-- ===== SECTION 17 ===== -->
+<h2 id="s17">17. Measurement Error Models</h2>
+
+<p>This is the <strong>mathematical heart of your dissertation</strong>.</p>
+
+<div class="blue">
+<div class="t">The Classical Additive Error Model</div>
+$$W_i = X_i + U_i$$
+<ul>
+<li>$X_i$ = true value (what you want but can't observe)</li>
+<li>$W_i$ = observed value (what you actually measure)</li>
+<li>$U_i$ = measurement error (the noise)</li>
+</ul>
+</div>
+
+<div class="analogy">
+<strong>Analogy — Weighing with a Broken Scale:</strong><br>
+$X_i$ = your true weight (unknown)<br>
+$W_i$ = what the scale shows (observed)<br>
+$U_i$ = the error (scale reads high/low randomly)<br>
+You want to study how weight affects health outcomes, but you only have the noisy scale readings.
+</div>
+
+<h3>Conditions on the Error</h3>
+
+<div class="green">
+<div class="t">Classical (Non-Differential) Error Assumptions</div>
+<ol>
+<li><strong>Mean zero:</strong> $\mathbb{E}[U_i] = 0$ (no systematic bias in measurement)</li>
+<li><strong>Non-differential:</strong> $U_i \perp T_i \mid X_i$ (the error doesn't predict survival once you know the true value)</li>
+<li><strong>Independent of truth:</strong> $U_i \perp X_i$ (the error doesn't depend on how big the true value is)</li>
+<li><strong>Homoscedastic:</strong> $\text{Var}(U_i) = \sigma_U^2$ (same noise for all patients)</li>
+</ol>
+</div>
+
+<div class="red">
+<div class="t">Why Your Problem Is Non-Classical</div>
+<p>In your spatial biomarker setting, <strong>assumption 4 fails</strong>. The error variance is:</p>
+$$\sigma_i^2 = \alpha_0 + \frac{\alpha_1}{m_i} + \alpha_2 \rho_i$$
+<p>where $m_i$ = number of spots per patient and $\rho_i$ = Moran's I (spatial autocorrelation) for patient $i$.</p>
+<p>Patients with more tissue spots ($m_i$ large) have more stable estimates. Patients with high spatial autocorrelation ($\rho_i$ large) have noisier estimates. <strong>The error is heteroscedastic</strong> — it varies across patients.</p>
+</div>
+
+<!-- ===== SECTION 18 ===== -->
+<h2 id="s18">18. Attenuation Bias</h2>
+
+<div class="blue">
+<div class="t">The Problem</div>
+<p>When you use $W_i$ instead of $X_i$ in a regression, the estimated coefficient is <strong>biased toward zero</strong>:</p>
+$$\hat{\beta}_{\text{naive}} \xrightarrow{p} \beta \cdot \underbrace{\frac{\text{Var}(X)}{\text{Var}(X) + \text{Var}(U)}}_{\lambda = \text{reliability ratio} < 1}$$
+<p>Since $\lambda < 1$, the naive estimate is <strong>attenuated</strong> — your biomarker appears weaker than it truly is.</p>
+</div>
+
+<div class="orange">
+<div class="t">Worked Example</div>
+<p>True $\beta = \log(0.5) = -0.693$ (HR = 0.5, strong protective effect).</p>
+<p>$\text{Var}(X) = 0.04$, $\text{Var}(U) = 0.06$ (noisy measurement).</p>
+$$\lambda = \frac{0.04}{0.04 + 0.06} = 0.40$$
+$$\hat{\beta}_{\text{naive}} \approx -0.693 \times 0.40 = -0.277$$
+$$\text{HR}_{\text{naive}} = e^{-0.277} = 0.76$$
+<p>The true HR is 0.50 (strong effect), but the naive analysis estimates HR = 0.76 (weak effect). You've lost 60% of the signal! A reviewer might conclude "the biomarker is marginally prognostic" when it's actually strongly prognostic.</p>
+</div>
+
+<!-- ===== SECTION 19 ===== -->
+<h2 id="s19">19. Regression Calibration</h2>
+
+<div class="green">
+<div class="t">The Correction Method</div>
+<p>Instead of plugging noisy $W_i$ into the Cox model, plug in the <strong>best guess of $X_i$ given $W_i$</strong>:</p>
+$$\hat{X}_i = \mathbb{E}[X_i \mid W_i] = \hat{\mu}_X + \hat{\lambda}_i (W_i - \hat{\mu}_W)$$
+<p>where $\hat{\lambda}_i = \hat{\sigma}_X^2 / (\hat{\sigma}_X^2 + \hat{\sigma}_i^2)$ is the patient-specific reliability ratio.</p>
+<p>Then fit: $h(t \mid \hat{X}_i) = h_0(t) \exp(\hat{\beta} \cdot \hat{X}_i)$</p>
+</div>
+
+<div class="analogy">
+<strong>Analogy:</strong> If your broken scale adds random noise, regression calibration says: "Don't use the raw reading. Use a weighted average of the raw reading and the population mean, where the weight depends on how noisy your particular scale is." A very noisy scale → trust the population mean more. A precise scale → trust the reading more.
+</div>
+
+<div class="orange">
+<div class="t">Worked Example (Continuing from Section 18)</div>
+<p>Patient has $W_i = 0.65$, population mean $\hat{\mu}_W = 0.50$, $\hat{\sigma}_X^2 = 0.04$, $\hat{\sigma}_i^2 = 0.06$.</p>
+$$\hat{\lambda}_i = \frac{0.04}{0.04 + 0.06} = 0.40$$
+$$\hat{X}_i = 0.50 + 0.40 \times (0.65 - 0.50) = 0.50 + 0.06 = 0.56$$
+<p>The raw score of 0.65 is "shrunk" toward the mean (0.50) to 0.56. This shrinkage corrects for the noise. A patient with a very noisy measurement ($\hat{\lambda}_i$ small) gets shrunk more. A patient with a precise measurement ($\hat{\lambda}_i$ close to 1) keeps most of their original score.</p>
+</div>
+
+<!-- ===== SECTION 20 ===== -->
+<h2 id="s20">20. SIMEX (Simulation-Extrapolation)</h2>
+
+<div class="blue">
+<div class="t">The Idea</div>
+<p>Instead of trying to correct the bias directly, SIMEX <strong>adds more noise</strong> to see how bias gets worse, then <strong>extrapolates back</strong> to what the estimate would be with zero noise.</p>
+<ol>
+<li>Add extra noise: $W_i^{(\zeta)} = W_i + \sqrt{\zeta} \cdot U_i^*$ where $U_i^* \sim N(0, \hat{\sigma}_i^2)$</li>
+<li>For each noise level $\zeta \in \{0.5, 1.0, 1.5, 2.0\}$, fit the Cox model and record $\hat{\beta}(\zeta)$</li>
+<li>As $\zeta$ increases, $\hat{\beta}(\zeta)$ shrinks toward zero (more noise → more attenuation)</li>
+<li>Fit a curve $\hat{\beta}(\zeta)$ and extrapolate to $\zeta = -1$ (hypothetical zero noise)</li>
+</ol>
+$$\hat{\beta}_{\text{SIMEX}} = \hat{\beta}(\zeta = -1)$$
+</div>
+
+<div class="analogy">
+<strong>Analogy:</strong> You're trying to read a sign through fog. You can't remove the fog, but you can add more fog and see how the text gets blurrier. With enough data points (fog level vs readability), you can extrapolate what the sign would look like with no fog at all.
+</div>
+
+<!-- ===== SECTION 21 ===== -->
+<h2 id="s21">21. Heteroscedastic Measurement Error</h2>
+
+<div class="red">
+<div class="t">Why Your Problem Is Harder Than Classical</div>
+<p>In classical measurement error, all patients have the same noise level: $\sigma_U^2$ is constant.</p>
+<p>In your problem, each patient has a <strong>different noise level</strong>:</p>
+$$\sigma_i^2 = \alpha_0 + \frac{\alpha_1}{m_i} + \alpha_2 \rho_i$$
+<p>This means:</p>
+<ul>
+<li>Patient with 5000 spots and low autocorrelation: very precise measurement ($\sigma_i^2$ small, $\lambda_i$ close to 1)</li>
+<li>Patient with 200 spots and high autocorrelation: noisy measurement ($\sigma_i^2$ large, $\lambda_i$ close to 0)</li>
+</ul>
+<p>Standard regression calibration assumes one $\lambda$ for everyone. Your generalized version uses <strong>patient-specific $\lambda_i$</strong>.</p>
+</div>
+
+<!-- ===== SECTION 22 ===== -->
+<h2 id="s22">22. Your Paper 2: The Complete Statistical Setup</h2>
+
+<div class="green">
+<div class="t">Everything Assembled</div>
+$$\boxed{\begin{aligned}
+&X_i \sim N(\mu_X, \sigma_X^2) && \text{— latent biomarker (structural, graph-conditional)} \\
+&W_i = X_i + U_i && \text{— observed score} \\
+&U_i \mid X_i, m_i, \rho_i \sim N(0, \sigma_i^2) && \text{— non-differential, heteroscedastic error} \\
+&\sigma_i^2 = \alpha_0 + \alpha_1/m_i + \alpha_2 \rho_i && \text{— patient-specific variance} \\
+&\hat{\sigma}_X^2 = \max\{\widehat{\text{Var}}(W_i) - \tfrac{1}{n}\textstyle\sum \hat{\sigma}_i^2, \; 0\} && \text{— identification via moments} \\
+&h(t \mid X_i) = h_0(t)\exp(\beta X_i) && \text{— true Cox model} \\
+&h(t \mid W_i) = h_0(t)\exp(\tilde{\beta} W_i) && \text{— naive (biased) Cox model} \\
+&\lambda_i = \sigma_X^2 / (\sigma_X^2 + \sigma_i^2) && \text{— patient-specific reliability ratio} \\
+&\hat{X}_i = \hat{\mu}_X + \hat{\lambda}_i(W_i - \hat{\mu}_W) && \text{— calibrated covariate}
+\end{aligned}}$$
+</div>
+
+<!-- ===== SECTION 23 ===== -->
+<h2 id="s23">23. Simulation Study Design</h2>
+
+<div class="blue">
+<div class="t">Data-Generating Mechanism (DGM)</div>
+<p>This is the recipe for creating fake data where you know the truth:</p>
+<ol>
+<li><strong>Generate $X_i$:</strong> $X_i \sim N(0.5, 0.04)$, $i = 1, \ldots, n$</li>
+<li><strong>Generate tissue characteristics:</strong> $m_i \sim \text{Uniform}(200, 5000)$, $\rho_i \sim \text{Beta}(2, 5)$</li>
+<li><strong>Generate error:</strong> $\sigma_i^2 = 0.01 + 0.5/m_i + 0.03\rho_i$; $U_i \sim N(0, \sigma_i^2)$</li>
+<li><strong>Generate observed score:</strong> $W_i = X_i + U_i$</li>
+<li><strong>Generate survival:</strong> $T_i \sim \text{Weibull}(k=1.5, \lambda_i = \exp(-\beta X_i)/2)$, $\beta = \log(2) = 0.693$</li>
+<li><strong>Generate censoring:</strong> $C_i \sim \text{Uniform}(0, \tau)$ where $\tau$ is chosen to give ~30% censoring</li>
+<li><strong>Observe:</strong> $(\min(T_i, C_i), \mathbb{1}[T_i \leq C_i])$</li>
+</ol>
+</div>
+
+<div class="green">
+<div class="t">Performance Metrics</div>
+<table>
+<tr><th>Metric</th><th>Formula</th><th>What It Measures</th></tr>
+<tr><td>Bias</td><td>$\frac{1}{R}\sum_r \hat{\beta}^{(r)} - \beta$</td><td>Systematic error</td></tr>
+<tr><td>Variance</td><td>$\frac{1}{R}\sum_r (\hat{\beta}^{(r)} - \bar{\hat{\beta}})^2$</td><td>Random fluctuation</td></tr>
+<tr><td>MSE</td><td>Bias² + Variance</td><td>Total error</td></tr>
+<tr><td>Coverage</td><td>$\frac{1}{R}\sum_r \mathbb{1}[\beta \in \text{CI}^{(r)}]$</td><td>CI validity (target: 95%)</td></tr>
+<tr><td>Type I Error</td><td>Rejection rate under $H_0$: $\beta = 0$</td><td>False positive rate (target: 5%)</td></tr>
+<tr><td>Power</td><td>Rejection rate under $H_1$: $\beta \neq 0$</td><td>Ability to detect true effects</td></tr>
+</table>
+</div>
+
+<!-- ===== SECTION 24 ===== -->
+<h2 id="s24">24. Bias, Variance, and MSE of Estimators</h2>
+
+<div class="blue">
+<div class="t">The MSE Decomposition</div>
+$$\boxed{\text{MSE}(\hat{\beta}) = \underbrace{[\mathbb{E}(\hat{\beta}) - \beta]^2}_{\text{Bias}^2} + \underbrace{\text{Var}(\hat{\beta})}_{\text{Variance}}}$$
+</div>
+
+<div class="orange">
+<div class="t">Worked Example — Naive vs Corrected</div>
+<p>True $\beta = 0.693$. From 1000 simulations:</p>
+<table>
+<tr><th>Metric</th><th>Naive</th><th>Corrected</th></tr>
+<tr><td>Mean $\hat{\beta}$</td><td>0.285</td><td>0.665</td></tr>
+<tr><td>Bias</td><td>$0.285 - 0.693 = -0.408$</td><td>$0.665 - 0.693 = -0.028$</td></tr>
+<tr><td>Bias²</td><td>0.166</td><td>0.001</td></tr>
+<tr><td>Variance</td><td>0.015</td><td>0.022</td></tr>
+<tr><td><strong>MSE</strong></td><td><strong>0.181</strong></td><td><strong>0.023</strong></td></tr>
+<tr><td>RMSE</td><td>0.425</td><td>0.152</td></tr>
+</table>
+<p>The corrected estimator has slightly higher variance (0.022 vs 0.015) but <strong>massively lower bias</strong>. MSE drops by <strong>87%</strong>. The correction is overwhelmingly worth it.</p>
+</div>
+
+<!-- ===== SECTION 25 ===== -->
+<h2 id="s25">25. Coverage Probability</h2>
+
+<div class="blue">
+<div class="t">What It Is</div>
+<p>If you compute a 95% CI in each of 1000 simulations, <strong>coverage</strong> = fraction that contain the true $\beta$. Target: 95%.</p>
+$$\text{Coverage} = \frac{1}{R}\sum_{r=1}^R \mathbb{1}[\beta \in \text{CI}^{(r)}]$$
+</div>
+
+<div class="orange">
+<div class="t">Worked Example</div>
+<table>
+<tr><th></th><th>Naive</th><th>Corrected</th></tr>
+<tr><td>Nominal level</td><td>95%</td><td>95%</td></tr>
+<tr><td>Actual coverage</td><td><strong>31%</strong></td><td><strong>93%</strong></td></tr>
+</table>
+<p>The naive CI has catastrophic under-coverage. Why? The CI is centered on $\hat{\beta}_{\text{naive}} \approx 0.285$, but the truth is $\beta = 0.693$. The true value is far outside most naive CIs. The corrected CI is centered near 0.665 — close to the truth — so most CIs contain $\beta$.</p>
+</div>
+
+<!-- ===== SECTION 26 ===== -->
+<h2 id="s26">26. Type I Error and Power</h2>
+
+<div class="blue">
+<div class="t">The Four Outcomes of Hypothesis Testing</div>
+<table>
+<tr><th></th><th>$H_0$ true (no effect)</th><th>$H_0$ false (real effect)</th></tr>
+<tr><td><strong>Reject $H_0$</strong></td><td style="background:#fde8e8">Type I Error (false positive)</td><td style="background:#e8fde8">Correct (true positive, power)</td></tr>
+<tr><td><strong>Fail to reject</strong></td><td style="background:#e8fde8">Correct (true negative)</td><td style="background:#fde8e8">Type II Error (miss)</td></tr>
+</table>
+</div>
+
+<div class="orange">
+<div class="t">Worked Example</div>
+<p>Under $H_0$ ($\beta = 0$, no prognostic effect), 1000 simulations:</p>
+<table>
+<tr><th>Estimator</th><th>Rejections at $p &lt; 0.05$</th><th>Type I Error</th><th>Status</th></tr>
+<tr><td>Naive</td><td>48/1000</td><td>4.8%</td><td>OK (near 5%)</td></tr>
+<tr><td>Corrected</td><td>53/1000</td><td>5.3%</td><td>OK</td></tr>
+</table>
+<p>Under $H_1$ ($\beta = 0.693$, true HR = 2.0), 1000 simulations:</p>
+<table>
+<tr><th>Estimator</th><th>Rejections</th><th>Power</th></tr>
+<tr><td>Naive</td><td>380/1000</td><td>38% (low — attenuation kills power)</td></tr>
+<tr><td>Corrected</td><td>720/1000</td><td>72% (much better)</td></tr>
+<tr><td>Oracle (knows $X_i$)</td><td>780/1000</td><td>78% (upper bound)</td></tr>
+</table>
+<p>The naive estimator attenuates $\beta$ so much that it can barely detect a real effect. The corrected estimator recovers most of the power.</p>
+</div>
+
+<!-- ===== SECTION 27 ===== -->
+<h2 id="s27">27. Transportability</h2>
+
+<div class="blue">
+<div class="t">The Problem</div>
+<p>A biomarker developed on Visium data at Hospital A must work on CosMx data at Hospital B. <strong>Transportability</strong> asks: under what conditions can we validly transport a statistical result from one population/platform to another?</p>
+$$\text{ATE}_{\text{target}} = \sum_{\mathbf{x}} \text{ATE}(\mathbf{x}) \cdot P_{\text{target}}(\mathbf{x})$$
+<p>If the source and target populations differ in covariate distribution $P(\mathbf{x})$, you must <strong>reweight</strong>:</p>
+$$\hat{\text{ATE}}_{\text{target}} = \frac{1}{n}\sum_{i \in \text{source}} Y_i \cdot \frac{P_{\text{target}}(\mathbf{x}_i)}{P_{\text{source}}(\mathbf{x}_i)}$$
+</div>
+
+<div class="red">
+<div class="t">Unique Challenge for Spatial Omics</div>
+<p>Platforms differ in: resolution (Visium: 55μm spots; Xenium: subcellular), gene panel (Visium: whole-transcriptome; Xenium: 313 genes), noise structure (PCR amplification vs direct detection). A biomarker $W_i$ computed from Visium is a <em>fundamentally different statistical object</em> than the "same" biomarker from Xenium. Transportability requires accounting for this platform-as-confounder effect. <strong>This is Paper 3.</strong></p>
+</div>
+
+<hr>
+
+<div class="green">
+<div class="t">Your Dissertation in One Box</div>
+<p><strong>Paper 1:</strong> Formalize prognostic vs predictive distinction for spatial biomarkers. Apply calibration + discrimination + net benefit. <em>Target: Stat Med.</em></p>
+<p><strong>Paper 2:</strong> Measurement error correction for Cox models with spatially-derived covariates. Heteroscedastic RC with patient-specific $\lambda_i$. Simulation + real data. <em>Target: Biostatistics.</em></p>
+<p><strong>Paper 3:</strong> Transportability of spatial biomarker signatures across platforms. IPW reweighting + diagnostics. <em>Target: Biometrics.</em></p>
+<p><strong>Dissertation identity:</strong> "Survival analysis methods for spatially-derived biomarkers: handling measurement error, validating performance, and assessing transportability in the presence of spatial autocorrelation."</p>
+</div>
+
+<p style="text-align:center;color:var(--dim);font-size:12px;margin-top:40px;">
+PhD Biostatistics Complete Guide — 27 Sections<br>
+All concepts from your MPCRLab Weeks 1–3 supervision, explained from basics with worked examples
+</p>
+
+</body>
+</html>
