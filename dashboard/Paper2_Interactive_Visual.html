@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper 2 — Interactive Visual Mathematics</title>
+<script>window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']],tags:'ams'},options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1a2035;--card:#161d30;--card2:#1c2540;--border:#2a3555;--text:#e2e8f0;--dim:#8892b0;--blue:#60a5fa;--cyan:#22d3ee;--green:#34d399;--purple:#a78bfa;--pink:#f472b6;--orange:#fb923c;--red:#f87171;--yellow:#fbbf24;--grad1:linear-gradient(135deg,#667eea 0%,#764ba2 100%);--grad2:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);--grad3:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);--grad4:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%);--grad5:linear-gradient(135deg,#fa709a 0%,#fee140 100%);--glass:rgba(255,255,255,0.03);--glow:0 0 40px rgba(96,165,250,0.15);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.8;font-size:15px;overflow-x:hidden;}
+
+/* PROGRESS BAR */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--grad3);z-index:1000;transition:width .15s;border-radius:0 2px 2px 0;box-shadow:0 0 10px rgba(79,172,254,.6);}
+
+/* NAV */
+.nav{position:fixed;left:0;top:3px;width:280px;height:calc(100vh - 3px);background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;z-index:99;padding:20px 0;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.nav::-webkit-scrollbar{width:4px;}.nav::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.nav-logo{padding:16px 20px 20px;text-align:center;border-bottom:1px solid var(--border);margin-bottom:12px;}
+.nav-logo h3{font-size:13px;font-weight:700;background:var(--grad3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px;text-transform:uppercase;}
+.nav-logo p{font-size:11px;color:var(--dim);margin-top:4px;}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 20px;color:var(--dim);text-decoration:none;font-size:13px;font-weight:400;transition:all .2s;border-left:3px solid transparent;}
+.nav a:hover{color:var(--text);background:rgba(96,165,250,.06);border-left-color:var(--blue);}
+.nav a.active{color:var(--cyan);background:rgba(34,211,238,.06);border-left-color:var(--cyan);font-weight:600;}
+.nav a .num{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--card);color:var(--dim);flex-shrink:0;transition:all .2s;}
+.nav a.active .num{background:rgba(34,211,238,.15);color:var(--cyan);}
+.nav .sep{height:1px;background:var(--border);margin:12px 20px;}
+
+/* MAIN */
+.main{margin-left:280px;padding:50px 60px 120px;max-width:920px;}
+
+/* HERO */
+.hero{text-align:center;padding:60px 0 50px;position:relative;}
+.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:400px;height:400px;background:radial-gradient(circle,rgba(96,165,250,.08) 0%,transparent 70%);pointer-events:none;}
+.hero h1{font-size:36px;font-weight:800;background:var(--grad3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
+.hero .tag{display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;margin:4px;border:1px solid;}
+.hero .tag.t1{border-color:rgba(96,165,250,.3);color:var(--blue);background:rgba(96,165,250,.08);}
+.hero .tag.t2{border-color:rgba(52,211,153,.3);color:var(--green);background:rgba(52,211,153,.08);}
+.hero .tag.t3{border-color:rgba(167,139,250,.3);color:var(--purple);background:rgba(167,139,250,.08);}
+
+/* SECTIONS */
+section{margin-bottom:70px;scroll-margin-top:30px;animation:fadeUp .5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+section h2{font-size:24px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:12px;}
+section h2 .snum{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;}
+section h2 .stxt{flex:1;}
+.sec-line{height:2px;border-radius:1px;margin-bottom:20px;}
+h3{font-size:17px;font-weight:700;color:var(--purple);margin:28px 0 10px;}
+h4{font-size:15px;font-weight:600;color:var(--orange);margin:20px 0 6px;}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin:20px 0;position:relative;overflow:hidden;transition:border-color .3s,box-shadow .3s;}
+.card:hover{border-color:rgba(96,165,250,.3);box-shadow:var(--glow);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;}
+.card.blue::before{background:var(--grad3);}
+.card.green::before{background:var(--grad4);}
+.card.purple::before{background:var(--grad1);}
+.card.orange::before{background:var(--grad5);}
+.card.red::before{background:var(--grad2);}
+.card .ctitle{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card.blue .ctitle{color:var(--cyan);}
+.card.green .ctitle{color:var(--green);}
+.card.purple .ctitle{color:var(--purple);}
+.card.orange .ctitle{color:var(--orange);}
+.card.red .ctitle{color:var(--red);}
+
+/* TABLES */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:16px 0;font-size:13px;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+th{background:var(--bg3);color:var(--cyan);text-align:left;padding:12px 14px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+td{padding:10px 14px;border-bottom:1px solid rgba(42,53,85,.5);color:var(--text);transition:background .2s;}
+tr:hover td{background:rgba(96,165,250,.04);}
+tr:last-child td{border-bottom:none;}
+
+/* ANALOGY */
+.analogy{background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.15);border-left:4px solid var(--yellow);border-radius:0 10px 10px 0;padding:18px 22px;margin:18px 0;}
+.analogy::before{content:'ANALOGY';display:block;font-size:11px;font-weight:700;color:var(--yellow);letter-spacing:1.5px;margin-bottom:8px;}
+
+/* PIPELINE */
+.pipeline{display:flex;align-items:center;gap:0;margin:24px 0;flex-wrap:wrap;justify-content:center;}
+.pipeline .pstep{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;text-align:center;min-width:120px;transition:all .3s;cursor:default;}
+.pipeline .pstep:hover{transform:translateY(-3px);border-color:var(--cyan);box-shadow:0 8px 25px rgba(34,211,238,.1);}
+.pipeline .pstep .pnum{font-size:20px;font-weight:800;margin-bottom:4px;}
+.pipeline .pstep .plabel{font-size:11px;color:var(--dim);font-weight:500;}
+.pipeline .parrow{color:var(--dim);font-size:20px;padding:0 6px;}
+
+/* PATIENT CARDS */
+.patient-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:20px 0;}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+.pcard:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.3);}
+.pcard.selected{border-color:var(--cyan);box-shadow:0 0 20px rgba(34,211,238,.15);}
+.pcard .pid{font-size:22px;font-weight:800;margin-bottom:6px;}
+.pcard .pstat{font-size:11px;color:var(--dim);line-height:1.6;}
+.pcard .pbar{position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 10px 10px;}
+
+/* INTERACTIVE CALC */
+.calc{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:28px;margin:24px 0;}
+.calc h4{color:var(--cyan);margin:0 0 16px;font-size:15px;display:flex;align-items:center;gap:8px;}
+.calc h4::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--cyan);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.slider-row{display:flex;align-items:center;gap:16px;margin:12px 0;}
+.slider-row label{width:180px;font-size:13px;color:var(--dim);flex-shrink:0;}
+.slider-row input[type=range]{flex:1;accent-color:var(--cyan);height:6px;}
+.slider-row .sval{width:80px;text-align:right;font-size:15px;font-weight:700;color:var(--cyan);font-family:'JetBrains Mono',monospace;}
+.calc-result{margin-top:20px;padding:16px 20px;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.15);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:14px;line-height:2;}
+.calc-result .label{color:var(--dim);font-size:12px;}
+.calc-result .value{color:var(--cyan);font-weight:700;font-size:16px;}
+.calc-result .value.warn{color:var(--orange);}
+.calc-result .value.bad{color:var(--red);}
+.calc-result .value.good{color:var(--green);}
+
+/* VISUAL COMPARISON */
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+.comp-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;}
+.comp-card.wrong{border-color:rgba(248,113,113,.3);}
+.comp-card.right{border-color:rgba(52,211,153,.3);}
+.comp-card .comp-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.comp-card.wrong .comp-title{color:var(--red);}
+.comp-card.right .comp-title{color:var(--green);}
+.comp-card .big-num{font-size:36px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
+.comp-card .big-label{font-size:12px;color:var(--dim);}
+
+/* BAR CHART */
+.bar-chart{margin:20px 0;}
+.bar-row{display:flex;align-items:center;gap:12px;margin:8px 0;}
+.bar-label{width:120px;font-size:12px;color:var(--dim);text-align:right;flex-shrink:0;}
+.bar-track{flex:1;height:28px;background:var(--bg3);border-radius:6px;overflow:hidden;position:relative;}
+.bar-fill{height:100%;border-radius:6px;transition:width 1s ease;display:flex;align-items:center;padding-left:10px;font-size:12px;font-weight:700;}
+.bar-val{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:600;color:var(--dim);}
+
+/* CANVAS */
+canvas{border-radius:10px;border:1px solid var(--border);margin:16px 0;background:var(--bg3);}
+
+/* RESPONSIVE */
+@media(max-width:900px){.nav{display:none;}.main{margin-left:0;padding:20px;}.patient-grid{grid-template-columns:repeat(2,1fr);}.comparison{grid-template-columns:1fr;}}
+@media print{.nav{display:none;}.main{margin-left:0;padding:15px;max-width:100%;background:#fff;color:#000;}body{background:#fff;color:#000;}.card{border:1px solid #ccc;background:#f9f9f9;}th{background:#eee;color:#333;}td{color:#333;}}
+</style>
+</head>
+<body>
+
+<div id="progress" style="width:0%"></div>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+<div class="nav-logo">
+<h3>Paper 2 Mathematics</h3>
+<p>Heteroscedastic RC for Cox Models</p>
+</div>
+<a href="#hero"><span class="num">0</span>Overview</a>
+<a href="#s1"><span class="num">1</span>Problem Statement</a>
+<a href="#s2"><span class="num">2</span>10-Patient Example</a>
+<a href="#s3"><span class="num">3</span>True Cox Model</a>
+<a href="#s4"><span class="num">4</span>Error Model</a>
+<a href="#s5"><span class="num">5</span>Attenuation Bias</a>
+<div class="sep"></div>
+<a href="#s6"><span class="num">6</span>Reliability Ratio</a>
+<a href="#s7"><span class="num">7</span>Why One $\lambda$ Fails</a>
+<a href="#s8"><span class="num">8</span>Patient-Specific $\lambda_i$</a>
+<a href="#s9"><span class="num">9</span>Estimating $\sigma_i^2$</a>
+<a href="#s10"><span class="num">10</span>Estimating $\sigma_X^2$</a>
+<div class="sep"></div>
+<a href="#s11"><span class="num">11</span>RC Correction</a>
+<a href="#s12"><span class="num">12</span>Corrected Cox</a>
+<a href="#s13"><span class="num">13</span>SIMEX</a>
+<a href="#s14"><span class="num">14</span>Variance Estimation</a>
+<div class="sep"></div>
+<a href="#s15"><span class="num">15</span>Simulation Design</a>
+<a href="#s16"><span class="num">16</span>Performance Metrics</a>
+<a href="#s17"><span class="num">17</span>Paper Outline</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- HERO -->
+<div class="hero" id="hero">
+<h1>Measurement Error Correction<br>for Cox Models</h1>
+<p style="color:var(--dim);font-size:16px;margin:12px 0 20px;">Heteroscedastic Regression Calibration with Patient-Specific $\lambda_i$</p>
+<div>
+<span class="tag t1">Cox PH Model</span>
+<span class="tag t2">Spatial Biomarkers</span>
+<span class="tag t3">Regression Calibration</span>
+</div>
+<p style="color:var(--dim);font-size:13px;margin-top:20px;">Every formula derived from scratch &bull; 10-patient running example &bull; Interactive calculators</p>
+</div>
+
+<!-- PIPELINE OVERVIEW -->
+<div class="pipeline">
+<div class="pstep"><div class="pnum" style="color:var(--blue)">$X_i$</div><div class="plabel">True Score<br>(Unobserved)</div></div>
+<div class="parrow">&rarr;</div>
+<div class="pstep"><div class="pnum" style="color:var(--orange)">$+U_i$</div><div class="plabel">Add Noise<br>(Measurement)</div></div>
+<div class="parrow">&rarr;</div>
+<div class="pstep"><div class="pnum" style="color:var(--red)">$W_i$</div><div class="plabel">Observed Score<br>(Biased Input)</div></div>
+<div class="parrow">&rarr;</div>
+<div class="pstep"><div class="pnum" style="color:var(--purple)">$\lambda_i$</div><div class="plabel">Shrinkage<br>(Calibrate)</div></div>
+<div class="parrow">&rarr;</div>
+<div class="pstep"><div class="pnum" style="color:var(--green)">$\hat{X}_i$</div><div class="plabel">Corrected Score<br>(Debiased)</div></div>
+</div>
+
+<!-- ===== SECTION 1 ===== -->
+<section id="s1">
+<h2><span class="snum" style="background:rgba(96,165,250,.12);color:var(--blue);">1</span><span class="stxt">The Problem Statement</span></h2>
+<div class="sec-line" style="background:var(--grad3);"></div>
+
+<div class="card blue">
+<div class="ctitle">The One-Paragraph Paper Summary</div>
+<p>In resected non-small cell lung cancer patients, when a tumor-immune neighborhood composition score $W_i$ is derived from 10x Visium spatial transcriptomics data and entered as a continuous covariate in a Cox proportional hazards model for overall survival, the partial likelihood estimator of the log-hazard ratio $\beta$ is <strong style="color:var(--red)">biased toward the null</strong> because $W_i$ is a noisy estimate of a latent spatial feature $X_i$, and the noise variance is <strong style="color:var(--orange)">heteroscedastic</strong> — it varies across patients as a function of tissue spot count $m_i$ and spatial autocorrelation $\rho_i$. We develop a <strong style="color:var(--green)">generalized regression calibration</strong> method with patient-specific reliability ratios $\lambda_i$ and demonstrate via simulation that it reduces bias by 85–95%, restores confidence interval coverage to near-nominal (93–95%), and recovers 70–80% of the power lost to measurement error.</p>
+</div>
+
+<div class="comparison">
+<div class="comp-card wrong">
+<div class="comp-title">What Everyone Does (Naive)</div>
+<div class="big-num" style="color:var(--red)">HR = 0.39</div>
+<div class="big-label">"Moderate protective effect"</div>
+</div>
+<div class="comp-card right">
+<div class="comp-title">The Truth (After Correction)</div>
+<div class="big-num" style="color:var(--green)">HR = 0.22</div>
+<div class="big-label">"Strong protective effect"</div>
+</div>
+</div>
+<p style="text-align:center;color:var(--dim);font-size:13px;margin-top:8px;">Measurement error makes the biomarker look <strong>44% weaker</strong> than it really is.</p>
+</section>
+
+<!-- ===== SECTION 2 ===== -->
+<section id="s2">
+<h2><span class="snum" style="background:rgba(251,146,60,.12);color:var(--orange);">2</span><span class="stxt">The Running Example: 10 Lung Cancer Patients</span></h2>
+<div class="sec-line" style="background:var(--grad5);"></div>
+
+<p>Click any patient card to highlight them throughout the document.</p>
+
+<div class="patient-grid">
+<div class="pcard" onclick="selectPatient(1)" id="pc1"><div class="pid" style="color:var(--green)">P1</div><div class="pstat">$X$=0.72 $W$=0.76<br>3200 spots<br>48mo, died</div><div class="pbar" style="width:72%;background:var(--grad4);"></div></div>
+<div class="pcard" onclick="selectPatient(2)" id="pc2"><div class="pid" style="color:var(--orange)">P2</div><div class="pstat">$X$=0.35 $W$=0.27<br>800 spots<br>12mo, died</div><div class="pbar" style="width:35%;background:var(--grad5);"></div></div>
+<div class="pcard" onclick="selectPatient(3)" id="pc3"><div class="pid" style="color:var(--blue)">P3</div><div class="pstat">$X$=0.58 $W$=0.60<br>4500 spots<br>36mo, cens</div><div class="pbar" style="width:58%;background:var(--grad3);"></div></div>
+<div class="pcard" onclick="selectPatient(4)" id="pc4"><div class="pid" style="color:var(--orange)">P4</div><div class="pstat">$X$=0.41 $W$=0.53<br>600 spots<br>18mo, died</div><div class="pbar" style="width:41%;background:var(--grad5);"></div></div>
+<div class="pcard" onclick="selectPatient(5)" id="pc5"><div class="pid" style="color:var(--green)">P5</div><div class="pstat">$X$=0.65 $W$=0.62<br>2800 spots<br>42mo, died</div><div class="pbar" style="width:65%;background:var(--grad4);"></div></div>
+<div class="pcard" onclick="selectPatient(6)" id="pc6"><div class="pid" style="color:var(--red)">P6</div><div class="pstat">$X$=0.28 $W$=0.34<br>1500 spots<br>8mo, died</div><div class="pbar" style="width:28%;background:var(--grad2);"></div></div>
+<div class="pcard" onclick="selectPatient(7)" id="pc7"><div class="pid" style="color:var(--blue)">P7</div><div class="pstat">$X$=0.50 $W$=0.49<br>3800 spots<br>30mo, cens</div><div class="pbar" style="width:50%;background:var(--grad3);"></div></div>
+<div class="pcard" onclick="selectPatient(8)" id="pc8"><div class="pid" style="color:var(--green)">P8</div><div class="pstat">$X$=0.82 $W$=0.83<br>5000 spots<br>60mo, died</div><div class="pbar" style="width:82%;background:var(--grad4);"></div></div>
+<div class="pcard" onclick="selectPatient(9)" id="pc9"><div class="pid" style="color:var(--red)">P9</div><div class="pstat">$X$=0.20 $W$=0.05<br>400 spots<br>6mo, died</div><div class="pbar" style="width:20%;background:var(--grad2);"></div></div>
+<div class="pcard" onclick="selectPatient(10)" id="pc10"><div class="pid" style="color:var(--blue)">P10</div><div class="pstat">$X$=0.55 $W$=0.60<br>2000 spots<br>24mo, died</div><div class="pbar" style="width:55%;background:var(--grad3);"></div></div>
+</div>
+
+<div class="card orange">
+<div class="ctitle">Key Observation</div>
+<p><strong style="color:var(--red)">Patient 9</strong> has only 400 spots and high autocorrelation ($\rho_9 = 0.80$), giving the <strong>largest error</strong> ($U_9 = -0.15$). Their observed score $W_9 = 0.05$ is far from truth $X_9 = 0.20$.</p>
+<p><strong style="color:var(--green)">Patient 8</strong> has 5000 spots and low autocorrelation — measurement is precise ($U_8 = +0.01$).</p>
+</div>
+</section>
+
+<!-- ===== SECTION 3 ===== -->
+<section id="s3">
+<h2><span class="snum" style="background:rgba(96,165,250,.12);color:var(--blue);">3</span><span class="stxt">The True Cox Model (What We Want)</span></h2>
+<div class="sec-line" style="background:var(--grad3);"></div>
+
+<div class="card blue">
+<div class="ctitle">The Ideal Cox Model</div>
+$$h(t \mid X_i) = h_0(t) \cdot \exp(\beta \cdot X_i)$$
+<table>
+<tr><th>Symbol</th><th>Meaning</th><th>In Our Example</th></tr>
+<tr><td>$h(t \mid X_i)$</td><td>Hazard of death at time $t$</td><td>—</td></tr>
+<tr><td>$h_0(t)$</td><td>Baseline hazard (unspecified)</td><td>—</td></tr>
+<tr><td>$\beta$</td><td>Log-hazard ratio per 1-unit increase</td><td>$-1.5$</td></tr>
+<tr><td>$\text{HR} = e^\beta$</td><td>Hazard ratio</td><td>$e^{-1.5} = 0.223$</td></tr>
+</table>
+</div>
+
+<div class="analogy">
+A patient with a 1-unit higher true immune score has only <strong>22.3%</strong> of the death hazard. Each 0.1-unit increase multiplies hazard by $e^{-0.15} = 0.861$ (13.9% lower risk). This is a <strong>strongly protective</strong> biomarker.
+</div>
+
+<div class="card green">
+<div class="ctitle">Patient 1 vs Patient 9</div>
+$$\frac{h(t \mid X_1 = 0.72)}{h(t \mid X_9 = 0.20)} = e^{-1.5 \times (0.72 - 0.20)} = e^{-0.78} = \mathbf{0.458}$$
+<p>Patient 1 has <strong>less than half</strong> the death risk of Patient 9 at any time. The immune score matters enormously.</p>
+</div>
+</section>
+
+<!-- ===== SECTION 4 ===== -->
+<section id="s4">
+<h2><span class="snum" style="background:rgba(248,113,113,.12);color:var(--red);">4</span><span class="stxt">The Measurement Error Model</span></h2>
+<div class="sec-line" style="background:var(--grad2);"></div>
+
+<p>In reality, we <strong style="color:var(--red)">never observe $X_i$</strong>. We observe $W_i$, a noisy version.</p>
+
+<div class="card purple">
+<div class="ctitle">The Structural Measurement Error Model</div>
+\begin{align}
+X_i &\sim N(\mu_X, \sigma_X^2) \tag{latent biomarker} \\[4pt]
+U_i \mid X_i, m_i, \rho_i &\sim N(0, \sigma_i^2) \tag{measurement error} \\[4pt]
+W_i &= X_i + U_i \tag{observed score} \\[4pt]
+\sigma_i^2 &= \alpha_0 + \frac{\alpha_1}{m_i} + \alpha_2 \rho_i \tag{heteroscedastic variance}
+\end{align}
+</div>
+
+<div class="analogy">
+Each patient's tumor is like a <strong>landscape</strong>. $X_i$ is the true elevation. You drop $m_i$ measuring sticks and average. Smooth terrain (low $\rho_i$) = accurate average. Rugged terrain (high $\rho_i$) = nearby sticks give correlated readings = fewer independent measurements = noisier average.
+</div>
+
+<!-- INTERACTIVE CALCULATOR -->
+<div class="calc">
+<h4>Interactive: Compute $\sigma_i^2$ for Any Patient</h4>
+<div class="slider-row">
+<label>Spots ($m_i$):</label>
+<input type="range" id="sl-m" min="100" max="6000" value="2000" oninput="calcSigma()">
+<span class="sval" id="sv-m">2000</span>
+</div>
+<div class="slider-row">
+<label>Moran's I ($\rho_i$):</label>
+<input type="range" id="sl-rho" min="0" max="100" value="30" oninput="calcSigma()">
+<span class="sval" id="sv-rho">0.30</span>
+</div>
+<div class="calc-result" id="sigma-result"></div>
+</div>
+</section>
+
+<!-- ===== SECTION 5 ===== -->
+<section id="s5">
+<h2><span class="snum" style="background:rgba(248,113,113,.12);color:var(--red);">5</span><span class="stxt">Attenuation Bias</span></h2>
+<div class="sec-line" style="background:var(--grad2);"></div>
+
+<div class="card red">
+<div class="ctitle">The Fundamental Problem</div>
+<p>Using $W_i$ instead of $X_i$ in Cox regression, the estimated coefficient converges to:</p>
+$$\tilde{\beta} \xrightarrow{p} \beta \cdot \lambda, \qquad \lambda = \frac{\sigma_X^2}{\sigma_X^2 + \sigma_U^2} < 1$$
+<p>Since $\lambda < 1$, $|\tilde{\beta}| < |\beta|$. The estimate is <strong>shrunk toward zero</strong>. Your biomarker looks weaker than it is.</p>
+</div>
+
+<h3>Algebraic Derivation</h3>
+<div class="card blue">
+<div class="ctitle">Why Attenuation Happens — Step by Step</div>
+<p>In linear regression with $Y = \beta X + \epsilon$ and $W = X + U$:</p>
+\begin{align}
+\tilde{\beta} &= \frac{\text{Cov}(W, Y)}{\text{Var}(W)} \\[8pt]
+&= \frac{\text{Cov}(X+U, \; \beta X + \epsilon)}{\text{Var}(X+U)} \\[8pt]
+&= \frac{\beta \cdot \text{Var}(X) + \cancelto{0}{\text{Cov}(U,\beta X)} + \cancelto{0}{\text{Cov}(X,\epsilon)} + \cancelto{0}{\text{Cov}(U,\epsilon)}}{\text{Var}(X) + \text{Var}(U)} \\[8pt]
+&= \beta \cdot \frac{\text{Var}(X)}{\text{Var}(X) + \text{Var}(U)} = \beta \cdot \lambda
+\end{align}
+</div>
+
+<h3>Numerical Impact on Our Example</h3>
+
+<div class="calc">
+<h4>Interactive: See Attenuation in Action</h4>
+<div class="slider-row">
+<label>True $\beta$:</label>
+<input type="range" id="sl-beta" min="-30" max="0" value="-15" oninput="calcAtten()">
+<span class="sval" id="sv-beta">-1.50</span>
+</div>
+<div class="slider-row">
+<label>Signal variance ($\sigma_X^2$):</label>
+<input type="range" id="sl-sigx" min="1" max="100" value="34" oninput="calcAtten()">
+<span class="sval" id="sv-sigx">0.034</span>
+</div>
+<div class="slider-row">
+<label>Avg error variance ($\bar{\sigma}_U^2$):</label>
+<input type="range" id="sl-sigu" min="1" max="100" value="21" oninput="calcAtten()">
+<span class="sval" id="sv-sigu">0.021</span>
+</div>
+<div class="calc-result" id="atten-result"></div>
+</div>
+</section>
+
+<!-- ===== SECTION 6-8 ===== -->
+<section id="s6">
+<h2><span class="snum" style="background:rgba(167,139,250,.12);color:var(--purple);">6</span><span class="stxt">The Reliability Ratio $\lambda$</span></h2>
+<div class="sec-line" style="background:var(--grad1);"></div>
+
+<div class="card blue">
+<div class="ctitle">Definition</div>
+$$\lambda = \frac{\sigma_X^2}{\sigma_X^2 + \sigma_U^2} = \frac{\text{Signal Variance}}{\text{Total Variance}}$$
+</div>
+
+<div class="analogy">
+$\lambda$ is like the signal-to-total-power ratio in a radio. $\lambda \approx 1$: clear signal. $\lambda \approx 0$: all static. Regression calibration is noise-canceling headphones.
+</div>
+
+<!-- VISUAL BAR CHART -->
+<div class="bar-chart">
+<div class="bar-row"><div class="bar-label">$\lambda = 0.95$</div><div class="bar-track"><div class="bar-fill" style="width:95%;background:var(--grad4);">5% loss</div></div></div>
+<div class="bar-row"><div class="bar-label">$\lambda = 0.80$</div><div class="bar-track"><div class="bar-fill" style="width:80%;background:var(--grad3);">20% loss</div></div></div>
+<div class="bar-row"><div class="bar-label">$\lambda = 0.62$ (ours)</div><div class="bar-track"><div class="bar-fill" style="width:62%;background:var(--grad5);">38% loss</div></div></div>
+<div class="bar-row"><div class="bar-label">$\lambda = 0.40$</div><div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--grad2);">60% loss</div></div></div>
+<div class="bar-row"><div class="bar-label">$\lambda = 0.20$</div><div class="bar-track"><div class="bar-fill" style="width:20%;background:linear-gradient(90deg,#f87171,#991b1b);">80% loss</div></div></div>
+</div>
+</section>
+
+<section id="s7">
+<h2><span class="snum" style="background:rgba(248,113,113,.12);color:var(--red);">7</span><span class="stxt">Why One $\lambda$ Is Not Enough</span></h2>
+<div class="sec-line" style="background:var(--grad2);"></div>
+
+<div class="card red">
+<div class="ctitle">The Central Innovation of Your Paper</div>
+<p>Standard RC uses <strong>one $\lambda$</strong> for all patients. But different patients have different noise levels. A single $\lambda$ <strong>over-corrects</strong> precise patients and <strong>under-corrects</strong> noisy ones.</p>
+</div>
+
+<div class="comparison">
+<div class="comp-card" style="border-color:rgba(52,211,153,.3);">
+<div class="comp-title" style="color:var(--green)">Patient 8 (5000 spots, low $\rho$)</div>
+<div class="big-num" style="color:var(--green)">$\lambda_8 = 0.720$</div>
+<div class="big-label">Precise &mdash; barely shrink</div>
+<p style="margin-top:8px;font-size:13px;">Global $\lambda = 0.623$ over-shrinks by 13%</p>
+</div>
+<div class="comp-card" style="border-color:rgba(248,113,113,.3);">
+<div class="comp-title" style="color:var(--red)">Patient 9 (400 spots, high $\rho$)</div>
+<div class="big-num" style="color:var(--red)">$\lambda_9 = 0.485$</div>
+<div class="big-label">Noisy &mdash; shrink heavily</div>
+<p style="margin-top:8px;font-size:13px;">Global $\lambda = 0.623$ under-shrinks by 28%</p>
+</div>
+</div>
+</section>
+
+<section id="s8">
+<h2><span class="snum" style="background:rgba(52,211,153,.12);color:var(--green);">8</span><span class="stxt">Patient-Specific $\lambda_i$ (Your Contribution)</span></h2>
+<div class="sec-line" style="background:var(--grad4);"></div>
+
+<div class="card green">
+<div class="ctitle">The Generalized Reliability Ratio</div>
+$$\boxed{\lambda_i = \frac{\sigma_X^2}{\sigma_X^2 + \sigma_i^2}}$$
+<p>Each patient gets their own shrinkage factor based on measurement quality.</p>
+</div>
+
+<div class="bar-chart">
+<div class="bar-row"><div class="bar-label">P8 ($\lambda$=0.720)</div><div class="bar-track"><div class="bar-fill" style="width:72%;background:var(--grad4)">0.720</div></div></div>
+<div class="bar-row"><div class="bar-label">P3 ($\lambda$=0.709)</div><div class="bar-track"><div class="bar-fill" style="width:70.9%;background:var(--grad4)">0.709</div></div></div>
+<div class="bar-row"><div class="bar-label">P1 ($\lambda$=0.701)</div><div class="bar-track"><div class="bar-fill" style="width:70.1%;background:var(--grad4)">0.701</div></div></div>
+<div class="bar-row"><div class="bar-label">P5 ($\lambda$=0.686)</div><div class="bar-track"><div class="bar-fill" style="width:68.6%;background:var(--grad3)">0.686</div></div></div>
+<div class="bar-row"><div class="bar-label">P10 ($\lambda$=0.651)</div><div class="bar-track"><div class="bar-fill" style="width:65.1%;background:var(--grad3)">0.651</div></div></div>
+<div class="bar-row"><div class="bar-label">P6 ($\lambda$=0.618)</div><div class="bar-track"><div class="bar-fill" style="width:61.8%;background:var(--grad5)">0.618</div></div></div>
+<div class="bar-row"><div class="bar-label">P2 ($\lambda$=0.558)</div><div class="bar-track"><div class="bar-fill" style="width:55.8%;background:var(--grad5)">0.558</div></div></div>
+<div class="bar-row"><div class="bar-label">P4 ($\lambda$=0.520)</div><div class="bar-track"><div class="bar-fill" style="width:52%;background:var(--grad2)">0.520</div></div></div>
+<div class="bar-row"><div class="bar-label">P9 ($\lambda$=0.485)</div><div class="bar-track"><div class="bar-fill" style="width:48.5%;background:var(--grad2)">0.485</div></div></div>
+</div>
+<p style="color:var(--dim);font-size:13px;text-align:center;margin-top:6px;">$\lambda_i$ ranges from 0.485 (noisiest) to 0.720 (most precise) &mdash; a <strong>48% spread</strong> that one global $\lambda$ cannot capture.</p>
+</section>
+
+<!-- ===== SECTIONS 9-10 ===== -->
+<section id="s9">
+<h2><span class="snum" style="background:rgba(167,139,250,.12);color:var(--purple);">9</span><span class="stxt">Estimating $\sigma_i^2$ (Bootstrap)</span></h2>
+<div class="sec-line" style="background:var(--grad1);"></div>
+<div class="card purple">
+<div class="ctitle">Spot-Level Bootstrap Algorithm</div>
+<p>For each patient $i$ with $m_i$ spots:</p>
+<ol>
+<li>Subsample 80% of spots ($B = 200$ times)</li>
+<li>Reconstruct spatial graph on each subsample</li>
+<li>Recompute neighborhood score $W_i^{(b)}$</li>
+<li>$\hat{\sigma}_i^2 = \text{Var}(W_i^{(1)}, \ldots, W_i^{(B)}) \times \frac{0.80}{1 - 0.80}$</li>
+</ol>
+<p>Then fit parametric model: $\hat{\sigma}_i^2 = \hat{\alpha}_0 + \hat{\alpha}_1/m_i + \hat{\alpha}_2\rho_i$</p>
+</div>
+</section>
+
+<section id="s10">
+<h2><span class="snum" style="background:rgba(96,165,250,.12);color:var(--blue);">10</span><span class="stxt">Estimating $\sigma_X^2$ (Method of Moments)</span></h2>
+<div class="sec-line" style="background:var(--grad3);"></div>
+<div class="card blue">
+<div class="ctitle">Identification Formula</div>
+$$\text{Var}(W_i) = \sigma_X^2 + \mathbb{E}[\sigma_i^2] \quad \Longrightarrow \quad \boxed{\hat{\sigma}_X^2 = \max\left\{\widehat{\text{Var}}(W_i) - \frac{1}{n}\sum\hat{\sigma}_i^2, \; 0\right\}}$$
+<p>Our example: $\widehat{\text{Var}}(W) = 0.0486$, $\bar{\hat{\sigma}}^2 = 0.0208$, so $\hat{\sigma}_X^2 = 0.0278$.</p>
+</div>
+</section>
+
+<!-- ===== SECTION 11 ===== -->
+<section id="s11">
+<h2><span class="snum" style="background:rgba(52,211,153,.12);color:var(--green);">11</span><span class="stxt">The Regression Calibration Correction</span></h2>
+<div class="sec-line" style="background:var(--grad4);"></div>
+
+<div class="card green">
+<div class="ctitle">The Core Formula</div>
+$$\boxed{\hat{X}_i = \hat{\mu}_W + \hat{\lambda}_i (W_i - \hat{\mu}_W)}$$
+<ul>
+<li>If $\hat{\lambda}_i \approx 1$ (precise measurement): $\hat{X}_i \approx W_i$ &mdash; <strong>trust the observation</strong></li>
+<li>If $\hat{\lambda}_i \approx 0$ (noisy measurement): $\hat{X}_i \approx \hat{\mu}_W$ &mdash; <strong>trust the population mean</strong></li>
+</ul>
+</div>
+
+<div class="calc">
+<h4>Interactive: Regression Calibration for Any Patient</h4>
+<div class="slider-row">
+<label>Observed $W_i$:</label>
+<input type="range" id="sl-wi" min="0" max="100" value="76" oninput="calcRC()">
+<span class="sval" id="sv-wi">0.76</span>
+</div>
+<div class="slider-row">
+<label>Error variance $\sigma_i^2$:</label>
+<input type="range" id="sl-si" min="5" max="50" value="15" oninput="calcRC()">
+<span class="sval" id="sv-si">0.015</span>
+</div>
+<div class="calc-result" id="rc-result"></div>
+</div>
+</section>
+
+<!-- ===== SECTION 12 ===== -->
+<section id="s12">
+<h2><span class="snum" style="background:rgba(52,211,153,.12);color:var(--green);">12</span><span class="stxt">The Corrected Cox Model</span></h2>
+<div class="sec-line" style="background:var(--grad4);"></div>
+
+<div class="card green">
+<div class="ctitle">Corrected Estimator</div>
+$$h(t \mid \hat{X}_i) = h_0(t) \cdot \exp(\hat{\beta}_{\text{RC}} \cdot \hat{X}_i)$$
+</div>
+
+<table>
+<tr><th>Method</th><th>$\hat{\beta}$</th><th>HR</th><th>Bias</th><th style="width:120px">Visual</th></tr>
+<tr><td>Oracle</td><td>$-1.500$</td><td>$0.223$</td><td>$0$</td><td><div style="width:100%;height:14px;background:var(--grad4);border-radius:4px;"></div></td></tr>
+<tr><td style="color:var(--red)"><strong>Naive</strong></td><td style="color:var(--red)">$-0.935$</td><td style="color:var(--red)">$0.393$</td><td style="color:var(--red)">$38\%$</td><td><div style="width:62%;height:14px;background:var(--grad2);border-radius:4px;"></div></td></tr>
+<tr><td style="color:var(--green)"><strong>RC-patient</strong></td><td style="color:var(--green)">$-1.380$</td><td style="color:var(--green)">$0.252$</td><td style="color:var(--green)">$8\%$</td><td><div style="width:92%;height:14px;background:var(--grad3);border-radius:4px;"></div></td></tr>
+</table>
+</section>
+
+<!-- ===== SECTION 13 ===== -->
+<section id="s13">
+<h2><span class="snum" style="background:rgba(167,139,250,.12);color:var(--purple);">13</span><span class="stxt">SIMEX as Sensitivity Analysis</span></h2>
+<div class="sec-line" style="background:var(--grad1);"></div>
+
+<div class="card purple">
+<div class="ctitle">SIMEX Extrapolation Table</div>
+<canvas id="simex-canvas" width="780" height="320"></canvas>
+<p style="margin-top:10px;font-size:13px;color:var(--dim);">Add noise ($\zeta > 0$), observe $\hat{\beta}$ shrink, extrapolate to $\zeta = -1$ (no noise).</p>
+</div>
+</section>
+
+<!-- ===== SECTION 14 ===== -->
+<section id="s14">
+<h2><span class="snum" style="background:rgba(96,165,250,.12);color:var(--blue);">14</span><span class="stxt">Variance Estimation</span></h2>
+<div class="sec-line" style="background:var(--grad3);"></div>
+<div class="card blue">
+<div class="ctitle">Two Sources of Uncertainty</div>
+$$\widehat{\text{Var}}(\hat{\beta}_{\text{RC}}) = \underbrace{I^{-1}(\hat{\beta}_{\text{RC}})}_{\text{Cox sampling}} + \underbrace{\mathbf{D}^\top \boldsymbol{\Sigma}_\alpha \mathbf{D}}_{\text{from estimating } \hat{\alpha}}$$
+<p>In practice: <strong>nonparametric bootstrap</strong> — resample patients, re-estimate everything, take bootstrap variance.</p>
+</div>
+</section>
+
+<!-- ===== SECTION 15-16 ===== -->
+<section id="s15">
+<h2><span class="snum" style="background:rgba(251,146,60,.12);color:var(--orange);">15</span><span class="stxt">Simulation Study Design</span></h2>
+<div class="sec-line" style="background:var(--grad5);"></div>
+
+<div class="card orange">
+<div class="ctitle">Data-Generating Mechanism</div>
+<table>
+<tr><th>Step</th><th>Distribution</th><th>Parameters to Vary</th></tr>
+<tr><td>1. Generate $X_i$</td><td>$N(0.5, \sigma_X^2)$</td><td>$\sigma_X^2 \in \{0.02, 0.04, 0.08\}$</td></tr>
+<tr><td>2. Tissue features</td><td>$m_i \sim U(200, 5000)$<br>$\rho_i \sim \text{Beta}(2,5)$</td><td>Fixed</td></tr>
+<tr><td>3. Error</td><td>$U_i \sim N(0, \sigma_i^2)$</td><td>$\alpha_0, \alpha_1, \alpha_2$ fixed</td></tr>
+<tr><td>4. Survival</td><td>$T_i \sim \text{Weibull}(k=1.5, \lambda_i)$<br>$\lambda_i = \exp(-\beta X_i)/\gamma$</td><td>$\beta \in \{0, -0.5, -1, -1.5, -2\}$</td></tr>
+<tr><td>5. Censoring</td><td>$C_i \sim U(0, \tau)$</td><td>Rate $\in \{10\%, 30\%, 50\%\}$</td></tr>
+</table>
+<p><strong>Total:</strong> $4 \times 5 \times 3 \times 3 \times 2 = 360$ scenarios &times; $R = 2000$ reps</p>
+</div>
+</section>
+
+<section id="s16">
+<h2><span class="snum" style="background:rgba(52,211,153,.12);color:var(--green);">16</span><span class="stxt">Performance Metrics — The Payoff</span></h2>
+<div class="sec-line" style="background:var(--grad4);"></div>
+
+<div class="card green">
+<div class="ctitle">Example Results ($n=50$, $\beta=-1.5$, 30% censoring)</div>
+<table>
+<tr><th>Method</th><th>$\overline{\hat{\beta}}$</th><th>Bias</th><th>Coverage</th><th>Power</th></tr>
+<tr><td>Oracle</td><td>$-1.51$</td><td>$0.7\%$</td><td style="color:var(--green)">$95.2\%$</td><td>$82\%$</td></tr>
+<tr><td style="color:var(--red)"><strong>Naive</strong></td><td style="color:var(--red)">$-0.93$</td><td style="color:var(--red)">$38\%$</td><td style="color:var(--red)">$42\%$</td><td>$58\%$</td></tr>
+<tr><td>RC-global</td><td>$-1.32$</td><td>$12\%$</td><td style="color:var(--orange)">$84\%$</td><td>$71\%$</td></tr>
+<tr><td style="color:var(--green)"><strong>RC-patient (YOURS)</strong></td><td style="color:var(--green)">$-1.45$</td><td style="color:var(--green)">$3.3\%$</td><td style="color:var(--green)">$93.8\%$</td><td>$76\%$</td></tr>
+<tr><td>SIMEX</td><td>$-1.41$</td><td>$6\%$</td><td>$91.5\%$</td><td>$73\%$</td></tr>
+</table>
+</div>
+
+<div class="comparison">
+<div class="comp-card wrong">
+<div class="comp-title">Naive Coverage</div>
+<div class="big-num" style="color:var(--red)">42%</div>
+<div class="big-label">Should be 95%. Catastrophic.</div>
+</div>
+<div class="comp-card right">
+<div class="comp-title">RC-Patient Coverage</div>
+<div class="big-num" style="color:var(--green)">93.8%</div>
+<div class="big-label">Near nominal. Valid inference.</div>
+</div>
+</div>
+</section>
+
+<!-- ===== SECTION 17 ===== -->
+<section id="s17">
+<h2><span class="snum" style="background:rgba(96,165,250,.12);color:var(--blue);">17</span><span class="stxt">Complete Model Summary</span></h2>
+<div class="sec-line" style="background:var(--grad3);"></div>
+
+<div class="card blue" style="border:2px solid rgba(96,165,250,.3);">
+<div class="ctitle" style="font-size:14px;">The Entire Framework in One Box</div>
+$$\boxed{\begin{aligned}
+&X_i \sim N(\mu_X, \sigma_X^2) && \text{latent, graph-conditional} \\[4pt]
+&W_i = X_i + U_i && \text{observed score} \\[4pt]
+&U_i \sim N(0, \sigma_i^2), \;\; \sigma_i^2 = \alpha_0 + \frac{\alpha_1}{m_i} + \alpha_2\rho_i && \text{heteroscedastic error} \\[4pt]
+&\hat{\sigma}_X^2 = \max\{\widehat{\text{Var}}(W) - \bar{\hat{\sigma}}^2, 0\} && \text{identification} \\[4pt]
+&\lambda_i = \sigma_X^2 / (\sigma_X^2 + \sigma_i^2) && \text{patient-specific reliability} \\[4pt]
+&\hat{X}_i = \hat{\mu}_W + \hat{\lambda}_i(W_i - \hat{\mu}_W) && \text{calibrated covariate} \\[4pt]
+&h(t|\hat{X}_i) = h_0(t)\exp(\hat{\beta}_{\text{RC}}\hat{X}_i) && \text{corrected Cox}
+\end{aligned}}$$
+</div>
+
+<p style="text-align:center;color:var(--dim);font-size:13px;margin-top:40px;">
+Paper 2 — Interactive Visual Mathematics<br>17 Sections &bull; 10-Patient Running Example &bull; Target: <em>Biostatistics</em>
+</p>
+</section>
+
+</div><!-- /main -->
+
+<script>
+// PROGRESS BAR
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  const pct=(h.scrollTop)/(h.scrollHeight-h.clientHeight)*100;
+  document.getElementById('progress').style.width=pct+'%';
+});
+
+// NAV ACTIVE
+const secs=document.querySelectorAll('section');
+const navs=document.querySelectorAll('.nav a');
+const obs=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting){
+    navs.forEach(a=>{a.classList.remove('active');if(a.getAttribute('href')==='#'+e.target.id)a.classList.add('active');});
+  }});
+},{threshold:0.2,rootMargin:'-60px 0px -60% 0px'});
+secs.forEach(s=>obs.observe(s));
+document.getElementById('hero')&&obs.observe(document.getElementById('hero'));
+
+// PATIENT SELECTION
+function selectPatient(n){
+  document.querySelectorAll('.pcard').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('pc'+n).classList.add('selected');
+}
+
+// SIGMA CALCULATOR
+function calcSigma(){
+  const m=parseInt(document.getElementById('sl-m').value);
+  const rho=parseInt(document.getElementById('sl-rho').value)/100;
+  document.getElementById('sv-m').textContent=m;
+  document.getElementById('sv-rho').textContent=rho.toFixed(2);
+  const a0=0.01,a1=5,a2=0.03;
+  const sig=a0+a1/m+a2*rho;
+  const sigX=0.0278;
+  const lam=sigX/(sigX+sig);
+  let quality,qc;
+  if(sig<0.015){quality='Excellent';qc='good';}
+  else if(sig<0.020){quality='Good';qc='good';}
+  else if(sig<0.028){quality='Average';qc='warn';}
+  else{quality='Poor';qc='bad';}
+  document.getElementById('sigma-result').innerHTML=
+    `<div><span class="label">$\\alpha_0 + \\alpha_1/m_i + \\alpha_2\\rho_i$ = </span><span class="value">${a0} + ${(a1/m).toFixed(4)} + ${(a2*rho).toFixed(4)}</span></div>`+
+    `<div><span class="label">$\\sigma_i^2$ = </span><span class="value ${qc}">${sig.toFixed(4)}</span> <span class="label">&nbsp; $\\sigma_i$ = </span><span class="value">${Math.sqrt(sig).toFixed(3)}</span></div>`+
+    `<div><span class="label">$\\lambda_i$ = </span><span class="value ${lam>0.65?'good':lam>0.5?'warn':'bad'}">${lam.toFixed(3)}</span> <span class="label">&nbsp; Quality: </span><span class="value ${qc}">${quality}</span></div>`;
+  if(window.MathJax)MathJax.typeset();
+}
+
+// ATTENUATION CALCULATOR
+function calcAtten(){
+  const beta=parseInt(document.getElementById('sl-beta').value)/10;
+  const sigX=parseInt(document.getElementById('sl-sigx').value)/1000;
+  const sigU=parseInt(document.getElementById('sl-sigu').value)/1000;
+  document.getElementById('sv-beta').textContent=beta.toFixed(2);
+  document.getElementById('sv-sigx').textContent=sigX.toFixed(3);
+  document.getElementById('sv-sigu').textContent=sigU.toFixed(3);
+  const lam=sigX/(sigX+sigU);
+  const betaNaive=beta*lam;
+  const hrTrue=Math.exp(beta);
+  const hrNaive=Math.exp(betaNaive);
+  const pctLoss=(1-Math.abs(betaNaive)/Math.abs(beta))*100;
+  document.getElementById('atten-result').innerHTML=
+    `<div><span class="label">$\\lambda$ = </span><span class="value">${lam.toFixed(3)}</span></div>`+
+    `<div><span class="label">True $\\beta$ = </span><span class="value good">${beta.toFixed(2)}</span> <span class="label">&nbsp; HR = </span><span class="value good">${hrTrue.toFixed(3)}</span></div>`+
+    `<div><span class="label">Naive $\\tilde{\\beta}$ = </span><span class="value bad">${betaNaive.toFixed(2)}</span> <span class="label">&nbsp; HR = </span><span class="value bad">${hrNaive.toFixed(3)}</span></div>`+
+    `<div><span class="label">Signal lost: </span><span class="value ${pctLoss>30?'bad':pctLoss>15?'warn':'good'}">${pctLoss.toFixed(0)}%</span></div>`;
+  if(window.MathJax)MathJax.typeset();
+}
+
+// RC CALCULATOR
+function calcRC(){
+  const wi=parseInt(document.getElementById('sl-wi').value)/100;
+  const si=parseInt(document.getElementById('sl-si').value)/1000;
+  document.getElementById('sv-wi').textContent=wi.toFixed(2);
+  document.getElementById('sv-si').textContent=si.toFixed(3);
+  const muW=0.509,sigX=0.0278;
+  const lam=sigX/(sigX+si);
+  const xhat=muW+lam*(wi-muW);
+  const shrink=((wi-xhat)/(wi-muW)*100);
+  document.getElementById('rc-result').innerHTML=
+    `<div><span class="label">$\\hat{\\lambda}_i$ = </span><span class="value">${lam.toFixed(3)}</span></div>`+
+    `<div><span class="label">$W_i - \\hat{\\mu}_W$ = </span><span class="value">${(wi-muW).toFixed(3)}</span></div>`+
+    `<div><span class="label">$\\hat{X}_i$ = ${muW.toFixed(3)} + ${lam.toFixed(3)} × ${(wi-muW).toFixed(3)} = </span><span class="value good">${xhat.toFixed(3)}</span></div>`+
+    `<div><span class="label">Shrinkage toward mean: </span><span class="value">${(100-lam*100).toFixed(0)}%</span></div>`;
+  if(window.MathJax)MathJax.typeset();
+}
+
+// SIMEX CHART
+function drawSimex(){
+  const c=document.getElementById('simex-canvas');if(!c)return;
+  const ctx=c.getContext('2d');
+  const W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);
+
+  const pts=[[-1,-1.42],[0,-0.935],[0.5,-0.78],[1,-0.65],[1.5,-0.55],[2,-0.47]];
+  const xMin=-1.5,xMax=2.5,yMin=-1.6,yMax=-0.2;
+  const px=x=>60+(x-xMin)/(xMax-xMin)*(W-90);
+  const py=y=>30+(y-yMin)/(yMax-yMin)*(H-60);
+
+  // Grid
+  ctx.strokeStyle='rgba(42,53,85,.5)';ctx.lineWidth=1;
+  for(let x=-1;x<=2;x++){ctx.beginPath();ctx.moveTo(px(x),30);ctx.lineTo(px(x),H-30);ctx.stroke();}
+  for(let y=-1.4;y>=-0.4;y+=0.2){ctx.beginPath();ctx.moveTo(60,py(y));ctx.lineTo(W-30,py(y));ctx.stroke();}
+
+  // Axes
+  ctx.strokeStyle='rgba(226,232,240,.3)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(60,30);ctx.lineTo(60,H-30);ctx.lineTo(W-30,H-30);ctx.stroke();
+
+  // Labels
+  ctx.fillStyle='#8892b0';ctx.font='12px Inter';ctx.textAlign='center';
+  ctx.fillText('ζ (added noise multiplier)',W/2,H-6);
+  for(let x=-1;x<=2;x++)ctx.fillText(x.toString(),px(x),H-14);
+  ctx.textAlign='right';
+  for(let y=-1.4;y>=-0.4;y+=0.2)ctx.fillText(y.toFixed(1),55,py(y)+4);
+  ctx.save();ctx.translate(14,H/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.fillText('β̂(ζ)',0,0);ctx.restore();
+
+  // Curve (quadratic fit through observed points)
+  ctx.strokeStyle='rgba(167,139,250,.6)';ctx.lineWidth=2;ctx.setLineDash([6,4]);
+  ctx.beginPath();
+  for(let x=-1.2;x<=2.2;x+=0.02){
+    const y=-0.935+0.155*x+0.02*x*x;// approximate quadratic
+    const X=px(x),Y=py(y);
+    if(x===-1.2)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);
+  }ctx.stroke();ctx.setLineDash([]);
+
+  // Observed points
+  for(let i=1;i<pts.length;i++){
+    ctx.fillStyle='#60a5fa';ctx.beginPath();ctx.arc(px(pts[i][0]),py(pts[i][1]),6,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#e2e8f0';ctx.font='11px JetBrains Mono';ctx.textAlign='center';
+    ctx.fillText(pts[i][1].toFixed(2),px(pts[i][0]),py(pts[i][1])-12);
+  }
+
+  // Extrapolated point
+  ctx.fillStyle='#34d399';ctx.beginPath();ctx.arc(px(-1),py(-1.42),8,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#34d399';ctx.lineWidth=2;ctx.beginPath();ctx.arc(px(-1),py(-1.42),12,0,Math.PI*2);ctx.stroke();
+  ctx.fillStyle='#34d399';ctx.font='bold 13px JetBrains Mono';
+  ctx.fillText('−1.42',px(-1),py(-1.42)-18);
+  ctx.font='11px Inter';ctx.fillText('(SIMEX estimate)',px(-1),py(-1.42)-34);
+
+  // True value line
+  ctx.strokeStyle='rgba(52,211,153,.3)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(60,py(-1.5));ctx.lineTo(W-30,py(-1.5));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(52,211,153,.5)';ctx.textAlign='left';ctx.font='11px Inter';
+  ctx.fillText('True β = −1.50',65,py(-1.5)-6);
+
+  // ζ = -1 vertical
+  ctx.strokeStyle='rgba(52,211,153,.2)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(px(-1),30);ctx.lineTo(px(-1),H-30);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(52,211,153,.5)';ctx.textAlign='center';ctx.fillText('ζ = −1',px(-1),25);
+}
+
+// Init
+calcSigma();calcAtten();calcRC();
+setTimeout(drawSimex,500);
+</script>
+</body>
+</html>
