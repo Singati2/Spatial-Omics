@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biostatistics Formulations — Spatial Omics Measurement Error Framework</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+:root {
+  --bg: #0d1117;
+  --card: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --accent: #58a6ff;
+  --accent2: #7ee787;
+  --accent3: #d2a8ff;
+  --accent4: #ffa657;
+  --accent5: #ff7b72;
+  --accent6: #79c0ff;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height:1.7; }
+
+/* NAV */
+.nav { position:fixed; top:0; left:0; width:280px; height:100vh; background:var(--card); border-right:1px solid var(--border); overflow-y:auto; z-index:100; padding:20px 0; }
+.nav-title { padding:0 20px 20px; font-size:14px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border); margin-bottom:10px; }
+.nav a { display:block; padding:8px 20px; color:var(--text-dim); text-decoration:none; font-size:13px; transition:all 0.2s; border-left:3px solid transparent; }
+.nav a:hover, .nav a.active { color:var(--text); background:rgba(88,166,255,0.08); border-left-color:var(--accent); }
+.nav .nav-section { padding:12px 20px 6px; font-size:11px; font-weight:700; color:var(--accent3); text-transform:uppercase; letter-spacing:1.5px; }
+
+/* MAIN */
+.main { margin-left:280px; padding:40px 60px 100px; max-width:1000px; }
+.main h1 { font-size:32px; margin-bottom:8px; color:var(--text); }
+.main .subtitle { color:var(--text-dim); font-size:16px; margin-bottom:40px; }
+
+/* SECTIONS */
+section { margin-bottom:60px; scroll-margin-top:20px; }
+section h2 { font-size:22px; color:var(--accent); margin-bottom:6px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+section h3 { font-size:17px; color:var(--accent3); margin:20px 0 8px; }
+section h4 { font-size:15px; color:var(--accent4); margin:16px 0 6px; }
+
+/* FORMULA CARDS */
+.formula-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px 28px;
+  margin: 16px 0;
+  border-left: 4px solid var(--accent);
+}
+.formula-card.green { border-left-color: var(--accent2); }
+.formula-card.purple { border-left-color: var(--accent3); }
+.formula-card.orange { border-left-color: var(--accent4); }
+.formula-card.red { border-left-color: var(--accent5); }
+.formula-card .formula-title { font-size:14px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+.formula-card.green .formula-title { color:var(--accent2); }
+.formula-card.purple .formula-title { color:var(--accent3); }
+.formula-card.orange .formula-title { color:var(--accent4); }
+.formula-card.red .formula-title { color:var(--accent5); }
+
+/* TABLES */
+table { width:100%; border-collapse:collapse; margin:16px 0; font-size:14px; }
+th { background:rgba(88,166,255,0.1); color:var(--accent); text-align:left; padding:10px 14px; border-bottom:2px solid var(--border); font-weight:600; }
+td { padding:9px 14px; border-bottom:1px solid var(--border); color:var(--text); }
+tr:hover td { background:rgba(88,166,255,0.04); }
+
+/* GRID */
+.example-grid { display:grid; grid-template-columns:repeat(3,60px); gap:4px; margin:12px 0; }
+.example-grid .cell { width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-radius:6px; font-weight:700; font-size:16px; }
+
+/* TAGS */
+.tag { display:inline-block; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; margin:2px 4px 2px 0; }
+.tag-blue { background:rgba(88,166,255,0.15); color:var(--accent); }
+.tag-green { background:rgba(126,231,135,0.15); color:var(--accent2); }
+.tag-purple { background:rgba(210,168,255,0.15); color:var(--accent3); }
+.tag-orange { background:rgba(255,166,87,0.15); color:var(--accent4); }
+.tag-red { background:rgba(255,123,114,0.15); color:var(--accent5); }
+
+/* PIPELINE */
+.pipeline { display:flex; align-items:center; gap:0; margin:20px 0; flex-wrap:wrap; }
+.pipeline .step { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 18px; font-size:13px; text-align:center; min-width:130px; }
+.pipeline .arrow { color:var(--accent); font-size:22px; padding:0 6px; }
+
+/* INTERPRETATION BOX */
+.interp { background:rgba(126,231,135,0.06); border:1px solid rgba(126,231,135,0.2); border-radius:8px; padding:16px 20px; margin:14px 0; font-size:14px; }
+.interp strong { color:var(--accent2); }
+
+/* WARNING BOX */
+.warning { background:rgba(255,123,114,0.06); border:1px solid rgba(255,123,114,0.2); border-radius:8px; padding:16px 20px; margin:14px 0; font-size:14px; }
+.warning strong { color:var(--accent5); }
+
+/* CODE */
+code { background:rgba(110,118,129,0.15); padding:2px 6px; border-radius:4px; font-size:13px; font-family:'SF Mono','Fira Code',monospace; }
+pre { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:13px; line-height:1.6; font-family:'SF Mono','Fira Code',monospace; margin:12px 0; }
+
+/* INTERACTIVE */
+.slider-container { margin:14px 0; }
+.slider-container label { font-size:13px; color:var(--text-dim); }
+.slider-container input[type=range] { width:100%; margin:6px 0; accent-color:var(--accent); }
+.slider-output { font-size:15px; font-weight:700; color:var(--accent); }
+canvas { border-radius:8px; margin:12px 0; background:#0d1117; border:1px solid var(--border); }
+
+/* RESPONSIVE */
+@media(max-width:900px) {
+  .nav { display:none; }
+  .main { margin-left:0; padding:20px; }
+}
+
+/* PRINT */
+@media print {
+  .nav { display:none; }
+  .main { margin-left:0; padding:20px; max-width:100%; }
+  body { background:#fff; color:#000; }
+  .formula-card { border:1px solid #ccc; background:#f9f9f9; }
+  th { background:#eee; color:#333; }
+  td { color:#333; }
+  .interp { background:#f0fff0; border-color:#090; }
+  .warning { background:#fff0f0; border-color:#c00; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-title">Biostatistics Dashboard</div>
+
+  <div class="nav-section">Foundation</div>
+  <a href="#overview">Framework Overview</a>
+  <a href="#poisson">Poisson Measurement Model</a>
+  <a href="#lowrank">Low-Rank Structure</a>
+  <a href="#recovery">Recovery Guarantees</a>
+  <a href="#genemse">Per-Gene MSE</a>
+
+  <div class="nav-section">Spatial Statistics</div>
+  <a href="#morans">Moran's I</a>
+  <a href="#gearys">Geary's C</a>
+  <a href="#ne">Neighborhood Enrichment</a>
+  <a href="#comparison">Comparison Table</a>
+
+  <div class="nav-section">Core Contribution</div>
+  <a href="#cci">CCI Test Statistic</a>
+  <a href="#bias">Bias Decomposition</a>
+  <a href="#regcal">Regression Calibration</a>
+  <a href="#corrected">Corrected Inference</a>
+
+  <div class="nav-section">Error Propagation</div>
+  <a href="#celltype">Cell Type Classification</a>
+  <a href="#cci-fpr">CCI False Positive Rate</a>
+  <a href="#spatial-domain">Spatial Domain Detection</a>
+
+  <div class="nav-section">Reliability</div>
+  <a href="#stability">Panel Perturbation Stability</a>
+  <a href="#calibration">Calibration Analysis</a>
+  <a href="#reliability-cert">Reliability Certificate</a>
+
+  <div class="nav-section">Interactive</div>
+  <a href="#simulator">Error Simulator</a>
+  <a href="#gonogo">Go/No-Go Criteria</a>
+
+  <div class="nav-section">Reference</div>
+  <a href="#notation">Notation Table</a>
+  <a href="#fullmodel">Complete Model Summary</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<h1>Biostatistics Formulations</h1>
+<p class="subtitle">Measurement Error Framework for Spatial Omics Inference &mdash; Complete Mathematical Reference</p>
+
+<!-- ============================================ -->
+<!-- SECTION: OVERVIEW -->
+<!-- ============================================ -->
+<section id="overview">
+<h2>Framework Overview</h2>
+
+<div class="pipeline">
+  <div class="step" style="border-color:var(--accent)"><strong style="color:var(--accent)">Poisson Model</strong><br><small>Data generation</small></div>
+  <div class="arrow">&rarr;</div>
+  <div class="step" style="border-color:var(--accent4)"><strong style="color:var(--accent4)">Imputation</strong><br><small>Recover missing genes</small></div>
+  <div class="arrow">&rarr;</div>
+  <div class="step" style="border-color:var(--accent5)"><strong style="color:var(--accent5)">Bias Estimation</strong><br><small>Quantify CCI inflation</small></div>
+  <div class="arrow">&rarr;</div>
+  <div class="step" style="border-color:var(--accent2)"><strong style="color:var(--accent2)">Calibration</strong><br><small>Correct bias</small></div>
+  <div class="arrow">&rarr;</div>
+  <div class="step" style="border-color:var(--accent3)"><strong style="color:var(--accent3)">Reliability</strong><br><small>Stability analysis</small></div>
+</div>
+
+<p style="margin-top:20px"><strong>Core thesis:</strong> Spatial imputation methods introduce spatially correlated reconstruction errors that inflate cell&ndash;cell interaction statistics, generating false biological interactions. This framework detects, corrects, and quantifies this artifact.</p>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: POISSON MODEL -->
+<!-- ============================================ -->
+<section id="poisson">
+<h2>1. Poisson Measurement Model</h2>
+
+<div class="formula-card">
+<div class="formula-title">Single-Cell Observation Model</div>
+<p>For cell $i$ at spatial location $\mathbf{s}_i \in \mathbb{R}^2$ and gene $g$:</p>
+$$y_{ig} \sim \text{Poisson}(\delta_g \cdot \lambda_{ig}), \quad g \in S \subset \{1, \dots, G\}$$
+<table>
+<tr><th>Symbol</th><th>Meaning</th><th>Typical Value</th></tr>
+<tr><td>$y_{ig}$</td><td>Observed transcript count</td><td>$\{0, 1, 2, \dots\}$</td></tr>
+<tr><td>$\lambda_{ig}$</td><td>True expression rate</td><td>$> 0$</td></tr>
+<tr><td>$\delta_g$</td><td>Detection efficiency (probe-specific)</td><td>$(0, 1]$</td></tr>
+<tr><td>$S$</td><td>Measured gene panel</td><td>$|S| = m \ll G$</td></tr>
+<tr><td>$G$</td><td>Total genes in genome</td><td>$\approx 20{,}000$</td></tr>
+</table>
+</div>
+
+<h3>Key Properties</h3>
+
+<div class="formula-card green">
+<div class="formula-title">Mean-Variance Relationship</div>
+$$\mathbb{E}[y_{ig}] = \text{Var}(y_{ig}) = \delta_g \lambda_{ig}$$
+<p>Signal-to-noise ratio:</p>
+$$\text{SNR}_{ig} = \frac{(\delta_g \lambda_{ig})^2}{\delta_g \lambda_{ig}} = \delta_g \lambda_{ig}$$
+</div>
+
+<div class="interp">
+<strong>Biological implication:</strong> SNR scales linearly with expression level. Low-expression genes (e.g., transcription factors, rare cytokines) have inherently worse SNR &mdash; this is physics, not a platform defect.
+</div>
+
+<h3>The Selection Matrix</h3>
+
+<div class="formula-card">
+<div class="formula-title">Panel Observation Operator</div>
+$$\mathbf{y}_{i,\text{obs}} = A_S \, \mathbf{y}_i \in \mathbb{Z}_+^m$$
+<p>where $A_S \in \{0,1\}^{m \times G}$ selects rows of the identity matrix corresponding to panel $S$:</p>
+$$(A_S)_{jg} = \begin{cases} 1 & \text{if gene } g \text{ is the } j\text{-th gene in panel } S \\ 0 & \text{otherwise} \end{cases}$$
+<p>Observation fraction: $\rho = m/G$. For Xenium 313-gene panel: $\rho \approx 0.016$ (1.6%).</p>
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: LOW RANK -->
+<!-- ============================================ -->
+<section id="lowrank">
+<h2>2. Low-Rank Structure</h2>
+
+<div class="formula-card purple">
+<div class="formula-title">Gene Program Decomposition</div>
+$$\log \lambda_{ig} = \mu_g + \sum_{k=1}^{K} u_{ik} \, v_{gk} + \epsilon_{ig}$$
+<p>In matrix form:</p>
+$$\log \boldsymbol{\Lambda} = \mathbf{1}\boldsymbol{\mu}^\top + \mathbf{U}\mathbf{V}^\top + \mathbf{E}$$
+<table>
+<tr><th>Symbol</th><th>Dimension</th><th>Meaning</th></tr>
+<tr><td>$\boldsymbol{\mu}$</td><td>$G \times 1$</td><td>Baseline log-expression per gene</td></tr>
+<tr><td>$\mathbf{U}$</td><td>$N \times K$</td><td>Cell loading matrix (program activities)</td></tr>
+<tr><td>$\mathbf{V}$</td><td>$G \times K$</td><td>Gene program matrix (gene membership)</td></tr>
+<tr><td>$K$</td><td>scalar</td><td>Number of gene programs ($K \ll \min(N,G)$)</td></tr>
+<tr><td>$\mathbf{E}$</td><td>$N \times G$</td><td>Residual noise</td></tr>
+</table>
+</div>
+
+<h3>Why Recovery Is Possible</h3>
+
+<div class="formula-card green">
+<div class="formula-title">Degrees of Freedom Argument</div>
+<p><strong>Without structure:</strong> $N \times G$ unknowns, $N \times m$ observations. Ratio $= G/m \approx 64\times$ underdetermined.</p>
+<p><strong>With rank $K$:</strong> Parameters $= G + K(N + G)$. Recovery requires:</p>
+$$m > \frac{G}{N} + K\left(1 + \frac{G}{N}\right)$$
+<p>For $N = 100{,}000$, $G = 20{,}000$, $K = 30$:</p>
+$$m > 0.2 + 36.0 = 36.2$$
+</div>
+
+<div class="interp">
+<strong>Key insight:</strong> You need roughly $m > K$ measured genes. With ~30 gene programs, even 50 genes is theoretically sufficient. This is why imputation works at all.
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: RECOVERY -->
+<!-- ============================================ -->
+<section id="recovery">
+<h2>3. Recovery Guarantees</h2>
+
+<div class="formula-card orange">
+<div class="formula-title">Poisson Matrix Completion Bound (Cao &amp; Xie, 2015)</div>
+<p>Under rank-$K$ structure, incoherence, and uniform panel selection:</p>
+$$\boxed{\frac{1}{NG}\|\hat{\boldsymbol{\Lambda}} - \boldsymbol{\Lambda}\|_F^2 \leq C \cdot \frac{K(N+G)\,\lambda_{\max}}{Nm}}$$
+<p>For $N \gg G$, simplifies to:</p>
+$$\text{MSE} \approx C \cdot \frac{K \, \lambda_{\max}}{m}$$
+</div>
+
+<table>
+<tr><th>Term</th><th>Effect</th><th>Meaning</th></tr>
+<tr><td>$K$ &uarr;</td><td>Error &uarr;</td><td>More gene programs = harder recovery</td></tr>
+<tr><td>$\lambda_{\max}$ &uarr;</td><td>Error &uarr;</td><td>Poisson variance scales with rate</td></tr>
+<tr><td>$m$ &uarr;</td><td>Error &darr;</td><td>Larger panel = better recovery</td></tr>
+<tr><td>$N$ &uarr;</td><td>Error &darr;</td><td>More cells help learn gene programs</td></tr>
+</table>
+
+<div class="warning">
+<strong>Critical ratio: $K/m$</strong> &mdash; rank divided by panel size governs reconstruction quality. If $K/m \to 1$, recovery degrades catastrophically.
+</div>
+
+<h3>Penalized Maximum Likelihood Estimator</h3>
+
+<div class="formula-card">
+<div class="formula-title">Nuclear Norm Regularized Estimation</div>
+$$\hat{\boldsymbol{\Lambda}} = \arg\min_{\boldsymbol{\Lambda} \succ 0} \left[ -\ell(\boldsymbol{\Lambda}) + \tau \|\boldsymbol{\Lambda}\|_* \right]$$
+<p>Log-likelihood:</p>
+$$\ell(\boldsymbol{\Lambda}) = \sum_{i=1}^N \sum_{g \in S} \left[ y_{ig} \log \lambda_{ig} - \lambda_{ig} - \log(y_{ig}!) \right]$$
+<p>$\|\boldsymbol{\Lambda}\|_* = \sum_k \sigma_k(\boldsymbol{\Lambda})$ is the nuclear norm (convex surrogate for rank).</p>
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: PER GENE MSE -->
+<!-- ============================================ -->
+<section id="genemse">
+<h2>4. Per-Gene Reconstruction Error</h2>
+
+<div class="formula-card">
+<div class="formula-title">Gene-Specific MSE Decomposition</div>
+$$\text{MSE}(g) = \underbrace{\frac{1}{\delta_g \bar{\lambda}_g}}_{\text{Poisson shot noise}} + \underbrace{\|\mathbf{v}_g\|^2(1 - R_g^2)}_{\text{Panel incompleteness}}$$
+</div>
+
+<h3>Gene Predictability ($R^2_g$)</h3>
+
+<div class="formula-card purple">
+<div class="formula-title">Latent-Space Coefficient of Determination</div>
+$$R_g^2 = \frac{\mathbf{v}_g^\top \mathbf{V}_S^\top (\mathbf{V}_S \mathbf{V}_S^\top)^{-1} \mathbf{V}_S \, \mathbf{v}_g}{\|\mathbf{v}_g\|^2}$$
+<p>Residual variance:</p>
+$$\sigma_g^2 = \|\mathbf{v}_g\|^2 (1 - R_g^2)$$
+</div>
+
+<table>
+<tr><th>$R_g^2$ Value</th><th>Meaning</th><th>Recovery Quality</th></tr>
+<tr><td>$\approx 1$</td><td>Gene lies in span of measured genes</td><td><span class="tag tag-green">Reliable</span></td></tr>
+<tr><td>$0.5 - 0.8$</td><td>Partially predictable</td><td><span class="tag tag-orange">Moderate</span></td></tr>
+<tr><td>$\approx 0$</td><td>Orthogonal to measured panel</td><td><span class="tag tag-red">Unrecoverable</span></td></tr>
+</table>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: MORAN'S I -->
+<!-- ============================================ -->
+<section id="morans">
+<h2>5. Moran's I (Global Spatial Autocorrelation)</h2>
+
+<p><span class="tag tag-blue">Spatial Statistic</span> <span class="tag tag-green">Used in Regression Calibration</span></p>
+
+<h3>Question</h3>
+<p>"Are nearby cells more similar in expression than expected by chance?"</p>
+
+<div class="formula-card">
+<div class="formula-title">Moran's I</div>
+$$I = \frac{N}{W} \cdot \frac{\displaystyle\sum_{i=1}^{N} \sum_{j=1}^{N} w_{ij}(x_i - \bar{x})(x_j - \bar{x})}{\displaystyle\sum_{i=1}^{N} (x_i - \bar{x})^2}$$
+<table>
+<tr><th>Symbol</th><th>Meaning</th></tr>
+<tr><td>$N$</td><td>Number of cells</td></tr>
+<tr><td>$x_i$</td><td>Expression of the gene in cell $i$</td></tr>
+<tr><td>$\bar{x}$</td><td>Mean expression across all cells</td></tr>
+<tr><td>$w_{ij}$</td><td>Spatial weight: 1 if $i,j$ are neighbors, 0 otherwise</td></tr>
+<tr><td>$W = \sum_{i}\sum_{j} w_{ij}$</td><td>Total weight (2 &times; number of edges)</td></tr>
+</table>
+</div>
+
+<h3>Worked Example</h3>
+
+<p>9 cells in a 3&times;3 grid with gene X expression:</p>
+
+<div class="example-grid">
+<div class="cell" style="background:rgba(255,80,80,0.8)">8</div>
+<div class="cell" style="background:rgba(255,100,80,0.75)">7</div>
+<div class="cell" style="background:rgba(255,60,60,0.85)">9</div>
+<div class="cell" style="background:rgba(255,100,80,0.75)">7</div>
+<div class="cell" style="background:rgba(255,80,80,0.8)">8</div>
+<div class="cell" style="background:rgba(80,130,255,0.5)">2</div>
+<div class="cell" style="background:rgba(80,100,255,0.35)">1</div>
+<div class="cell" style="background:rgba(80,130,255,0.5)">2</div>
+<div class="cell" style="background:rgba(80,100,255,0.35)">1</div>
+</div>
+
+<div class="formula-card green">
+<div class="formula-title">Step-by-Step Computation</div>
+
+<h4>Step 1: Mean</h4>
+$$\bar{x} = \frac{8+7+9+7+8+2+1+2+1}{9} = 5.0$$
+
+<h4>Step 2: Deviations</h4>
+<pre>
++3   +2   +4
++2   +3   -3
+-4   -3   -4
+</pre>
+
+<h4>Step 3: Neighbor Products</h4>
+<table>
+<tr><th>Pair</th><th>$(x_i-\bar{x})$</th><th>$(x_j-\bar{x})$</th><th>Product</th></tr>
+<tr><td>(1,2)</td><td>+3</td><td>+2</td><td style="color:var(--accent2)">+6</td></tr>
+<tr><td>(1,4)</td><td>+3</td><td>+2</td><td style="color:var(--accent2)">+6</td></tr>
+<tr><td>(2,3)</td><td>+2</td><td>+4</td><td style="color:var(--accent2)">+8</td></tr>
+<tr><td>(2,5)</td><td>+2</td><td>+3</td><td style="color:var(--accent2)">+6</td></tr>
+<tr><td>(3,6)</td><td>+4</td><td>-3</td><td style="color:var(--accent5)">-12</td></tr>
+<tr><td>(4,5)</td><td>+2</td><td>+3</td><td style="color:var(--accent2)">+6</td></tr>
+<tr><td>(4,7)</td><td>+2</td><td>-4</td><td style="color:var(--accent5)">-8</td></tr>
+<tr><td>(5,6)</td><td>+3</td><td>-3</td><td style="color:var(--accent5)">-9</td></tr>
+<tr><td>(5,8)</td><td>+3</td><td>-3</td><td style="color:var(--accent5)">-9</td></tr>
+<tr><td>(6,9)</td><td>-3</td><td>-4</td><td style="color:var(--accent2)">+12</td></tr>
+<tr><td>(7,8)</td><td>-4</td><td>-3</td><td style="color:var(--accent2)">+12</td></tr>
+<tr><td>(8,9)</td><td>-3</td><td>-4</td><td style="color:var(--accent2)">+12</td></tr>
+</table>
+
+<h4>Step 4: Compute</h4>
+$$\sum\sum w_{ij}(x_i-\bar{x})(x_j-\bar{x}) = 2 \times 30 = 60$$
+$$\sum(x_i - \bar{x})^2 = 92, \quad W = 24$$
+$$I = \frac{9}{24} \times \frac{60}{92} = 0.375 \times 0.652 = \mathbf{0.245}$$
+</div>
+
+<h3>Interpretation Scale</h3>
+<table>
+<tr><th>Value</th><th>Pattern</th><th>Visual</th></tr>
+<tr><td>$I \approx +1$</td><td>Strong clustering (similar neighbors)</td><td><span class="tag tag-green">Clustered</span></td></tr>
+<tr><td>$I \approx 0$</td><td>Random spatial distribution</td><td><span class="tag tag-blue">Random</span></td></tr>
+<tr><td>$I \approx -1$</td><td>Checkerboard (dissimilar neighbors)</td><td><span class="tag tag-red">Dispersed</span></td></tr>
+</table>
+
+<div class="interp">
+<strong>Role in your framework:</strong> Moran's I of imputed gene expression estimates the <em>spatial correlation of imputation errors</em>. Graph-based methods (GNN, diffusion) produce high Moran's I in their errors because they share information across spatial neighbors. This correlated error is what inflates CCI statistics.
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: GEARY'S C -->
+<!-- ============================================ -->
+<section id="gearys">
+<h2>6. Geary's C (Local Dissimilarity)</h2>
+
+<p><span class="tag tag-blue">Spatial Statistic</span> <span class="tag tag-orange">Detects Local Heterogeneity</span></p>
+
+<h3>Question</h3>
+<p>"How different are neighboring cells from each other?"</p>
+
+<div class="formula-card orange">
+<div class="formula-title">Geary's C</div>
+$$C = \frac{(N-1)}{2W} \cdot \frac{\displaystyle\sum_{i=1}^{N}\sum_{j=1}^{N} w_{ij}(x_i - x_j)^2}{\displaystyle\sum_{i=1}^{N}(x_i - \bar{x})^2}$$
+</div>
+
+<h3>Key Difference from Moran's I</h3>
+<table>
+<tr><th>Property</th><th>Moran's I</th><th>Geary's C</th></tr>
+<tr><td>Numerator</td><td>$(x_i - \bar{x})(x_j - \bar{x})$<br>Deviations from <em>global</em> mean</td><td>$(x_i - x_j)^2$<br><em>Direct</em> pairwise differences</td></tr>
+<tr><td>Sensitive to</td><td>Global pattern</td><td>Local differences</td></tr>
+<tr><td>High clustering</td><td>$I \to +1$</td><td>$C \to 0$</td></tr>
+<tr><td>Random</td><td>$I \to 0$</td><td>$C \to 1$</td></tr>
+<tr><td>Checkerboard</td><td>$I \to -1$</td><td>$C \to +2$</td></tr>
+</table>
+
+<h3>Worked Example (Same Grid)</h3>
+
+<div class="formula-card">
+<div class="formula-title">Computation</div>
+<table>
+<tr><th>Pair</th><th>$x_i$</th><th>$x_j$</th><th>$(x_i-x_j)^2$</th></tr>
+<tr><td>(1,2)</td><td>8</td><td>7</td><td>1</td></tr>
+<tr><td>(2,3)</td><td>7</td><td>9</td><td>4</td></tr>
+<tr><td>(3,6)</td><td>9</td><td>2</td><td style="color:var(--accent5);font-weight:700">49</td></tr>
+<tr><td>(4,7)</td><td>7</td><td>1</td><td style="color:var(--accent5);font-weight:700">36</td></tr>
+<tr><td>(5,6)</td><td>8</td><td>2</td><td style="color:var(--accent5);font-weight:700">36</td></tr>
+<tr><td>(5,8)</td><td>8</td><td>2</td><td style="color:var(--accent5);font-weight:700">36</td></tr>
+<tr><td>(6,9)</td><td>2</td><td>1</td><td>1</td></tr>
+<tr><td>(7,8)</td><td>1</td><td>2</td><td>1</td></tr>
+</table>
+<p>Boundary pairs (3,6), (4,7), (5,6), (5,8) dominate &mdash; they are where the spatial pattern <strong>breaks</strong>.</p>
+$$C = \frac{8}{48} \times \frac{336}{92} = 0.167 \times 3.652 = \mathbf{0.609}$$
+<p>$C < 1$ confirms positive spatial autocorrelation (consistent with $I > 0$).</p>
+</div>
+
+<div class="interp">
+<strong>Role in your framework:</strong> Geary's C detects <em>local</em> heterogeneity in imputation quality. If errors are regionally variable (good in tumor core, bad at tumor-stroma interface), Geary's C of the errors flags these boundary regions where CCI inference is least reliable.
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: NE SCORE -->
+<!-- ============================================ -->
+<section id="ne">
+<h2>7. Neighborhood Enrichment (NE Score)</h2>
+
+<p><span class="tag tag-purple">Categorical Statistic</span> <span class="tag tag-green">Validates Downstream Biology</span></p>
+
+<h3>Question</h3>
+<p>"Do specific cell types cluster near each other more than expected by chance?"</p>
+
+<div class="formula-card purple">
+<div class="formula-title">Neighborhood Enrichment Score</div>
+$$NE(a, b) = \frac{\text{observed}(a,b) - \mathbb{E}_{\text{perm}}[\text{count}(a,b)]}{\text{Std}_{\text{perm}}[\text{count}(a,b)]}$$
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td>$\text{observed}(a,b)$</td><td>Number of edges where type $a$ neighbors type $b$</td></tr>
+<tr><td>$\mathbb{E}_{\text{perm}}$</td><td>Expected count under random label permutations</td></tr>
+<tr><td>$\text{Std}_{\text{perm}}$</td><td>Standard deviation under permutations</td></tr>
+</table>
+</div>
+
+<h3>Worked Example</h3>
+<p>9 cells, 5 Tumor (T) and 4 Fibroblast (F):</p>
+<div class="example-grid">
+<div class="cell" style="background:rgba(255,80,80,0.6)">T</div>
+<div class="cell" style="background:rgba(255,80,80,0.6)">T</div>
+<div class="cell" style="background:rgba(255,80,80,0.6)">T</div>
+<div class="cell" style="background:rgba(255,80,80,0.6)">T</div>
+<div class="cell" style="background:rgba(255,80,80,0.6)">T</div>
+<div class="cell" style="background:rgba(80,160,255,0.6)">F</div>
+<div class="cell" style="background:rgba(80,160,255,0.6)">F</div>
+<div class="cell" style="background:rgba(80,160,255,0.6)">F</div>
+<div class="cell" style="background:rgba(80,160,255,0.6)">F</div>
+</div>
+
+<div class="formula-card">
+<div class="formula-title">Computation</div>
+<p>Observed T-T neighbor edges: <strong>5</strong></p>
+<p>Expected under random permutation:</p>
+$$\mathbb{E}[\text{T-T}] \approx E \times \frac{\binom{n_T}{2}}{\binom{N}{2}} = 12 \times \frac{10}{36} = 3.33$$
+<p>Permutation std $\approx 1.2$</p>
+$$NE(T,T) = \frac{5 - 3.33}{1.2} = \mathbf{1.39}$$
+</div>
+
+<table>
+<tr><th>NE Score</th><th>Meaning</th></tr>
+<tr><td>$> 0$ (positive)</td><td>Cell types cluster together <span class="tag tag-green">Enriched</span></td></tr>
+<tr><td>$\approx 0$</td><td>Random mixing <span class="tag tag-blue">Neutral</span></td></tr>
+<tr><td>$< 0$ (negative)</td><td>Cell types avoid each other <span class="tag tag-red">Depleted</span></td></tr>
+</table>
+
+<div class="interp">
+<strong>Role in your framework:</strong> NE scores validate whether spatial cell type organization survives imputation. If imputation errors cause cell type misclassification, NE scores change &mdash; indicating the imputation has corrupted the spatial biology.
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: COMPARISON -->
+<!-- ============================================ -->
+<section id="comparison">
+<h2>8. Spatial Statistics Comparison</h2>
+
+<table>
+<tr><th>Property</th><th>Moran's I</th><th>Geary's C</th><th>NE Score</th></tr>
+<tr><td><strong>Input type</strong></td><td>Continuous (expression)</td><td>Continuous (expression)</td><td>Categorical (cell types)</td></tr>
+<tr><td><strong>Measures</strong></td><td>Global autocorrelation</td><td>Local dissimilarity</td><td>Cell type co-localization</td></tr>
+<tr><td><strong>Null model</strong></td><td>Random permutation</td><td>Random permutation</td><td>Label permutation</td></tr>
+<tr><td><strong>Range</strong></td><td>$[-1, +1]$</td><td>$[0, +2]$</td><td>$(-\infty, +\infty)$</td></tr>
+<tr><td><strong>Clustering signal</strong></td><td>$I \to +1$</td><td>$C \to 0$</td><td>$NE \gg 0$</td></tr>
+<tr><td><strong>Random signal</strong></td><td>$I \to 0$</td><td>$C \to 1$</td><td>$NE \approx 0$</td></tr>
+<tr><td><strong>Your framework use</strong></td><td>Estimate $\rho_{lr}$ for bias correction</td><td>Detect local error heterogeneity</td><td>Validate downstream biology</td></tr>
+<tr><td><strong>Component</strong></td><td><span class="tag tag-green">Regression Calibration</span></td><td><span class="tag tag-orange">Reliability Scoring</span></td><td><span class="tag tag-purple">Downstream Validation</span></td></tr>
+</table>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: CCI -->
+<!-- ============================================ -->
+<section id="cci">
+<h2>9. Cell-Cell Interaction Test Statistic</h2>
+
+<div class="formula-card">
+<div class="formula-title">CCI Score for Ligand-Receptor Pair $(l, r)$</div>
+$$T_{lr} = \frac{1}{|\mathcal{E}|} \sum_{(i,j) \in \mathcal{E}} x_{il} \cdot x_{jr}$$
+<p>where $\mathcal{E}$ is the set of spatially adjacent cell pairs (edges in the spatial graph).</p>
+</div>
+
+<h3>Significance Testing</h3>
+<div class="formula-card">
+<div class="formula-title">Permutation Test</div>
+<p>Under the null hypothesis of no spatial interaction:</p>
+<ol style="padding-left:20px; margin-top:8px;">
+<li>Randomly permute cell labels: $\pi \sim \text{Uniform}(S_N)$</li>
+<li>Compute null statistic: $T_{lr}^{(\pi)} = \frac{1}{|\mathcal{E}|} \sum_{(i,j) \in \mathcal{E}} x_{\pi(i),l} \cdot x_{j,r}$</li>
+<li>Repeat $B$ times</li>
+<li>$p\text{-value} = \frac{\#\{T_{lr}^{(\pi)} \geq T_{lr}\} + 1}{B + 1}$</li>
+</ol>
+<p>Multiple testing correction via Benjamini-Hochberg: reject if $p_{\text{adj}} < 0.05$.</p>
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: BIAS -->
+<!-- ============================================ -->
+<section id="bias">
+<h2>10. Bias Decomposition (The Core Insight)</h2>
+
+<div class="formula-card red">
+<div class="formula-title">Why Imputation Inflates CCI</div>
+<p>If the imputed expression is $\hat{\lambda}_{ig} = \lambda_{ig} + e_{ig}$, then:</p>
+$$\mathbb{E}[\hat{\lambda}_{il} \cdot \hat{\lambda}_{jr}] = \underbrace{\lambda_{il} \cdot \lambda_{jr}}_{\text{true signal}} + \underbrace{\lambda_{il} \cdot \mathbb{E}[e_{jr}] + \lambda_{jr} \cdot \mathbb{E}[e_{il}]}_{\text{= 0 if unbiased}} + \underbrace{\text{Cov}(e_{il}, e_{jr})}_{\text{BIAS}}$$
+</div>
+
+<div class="warning">
+<strong>The problem:</strong> For graph-based imputation methods (GNN, diffusion, any method using spatial neighbors), $\text{Cov}(e_{il}, e_{jr}) > 0$ when cells $i$ and $j$ are neighbors. The imputation algorithm shares information across spatial edges &mdash; the exact same edges used to compute CCI. This creates a <em>systematic positive bias</em> in the CCI statistic.
+</div>
+
+<div class="formula-card red">
+<div class="formula-title">CCI Bias Decomposition</div>
+$$\mathbb{E}[\hat{T}_{lr}] = T_{lr}^{\text{true}} + \underbrace{\frac{1}{|\mathcal{E}|}\sum_{(i,j) \in \mathcal{E}} \text{Cov}(e_{il}, e_{jr})}_{\text{bias} > 0 \text{ for graph-based methods}}$$
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: REGRESSION CALIBRATION -->
+<!-- ============================================ -->
+<section id="regcal">
+<h2>11. Regression Calibration</h2>
+
+<p><span class="tag tag-red">Core Contribution</span> <span class="tag tag-green">Paper Lead</span></p>
+
+<div class="formula-card green">
+<div class="formula-title">Bias Estimation via Moran's I</div>
+<p>Estimate spatial error correlation for each gene:</p>
+$$\hat{\rho}_g = I_g = \frac{N}{W} \cdot \frac{\sum_{i,j} w_{ij}(\hat{\lambda}_{ig} - \bar{\hat{\lambda}}_g)(\hat{\lambda}_{jg} - \bar{\hat{\lambda}}_g)}{\sum_i (\hat{\lambda}_{ig} - \bar{\hat{\lambda}}_g)^2}$$
+<p>Cross-gene spatial error correlation:</p>
+$$\hat{\rho}_{lr} = \sqrt{|\hat{\rho}_l| \cdot |\hat{\rho}_r|}$$
+<p>Bias estimate:</p>
+$$\widehat{\text{bias}}_{lr} = \hat{\rho}_{lr} \cdot \sqrt{\text{MSE}(l) \cdot \text{MSE}(r)}$$
+</div>
+
+<div class="formula-card green">
+<div class="formula-title">Corrected CCI Statistic</div>
+$$\hat{T}_{lr}^{\text{corrected}} = \hat{T}_{lr}^{\text{naive}} - \widehat{\text{bias}}_{lr}$$
+<p>Corrected variance:</p>
+$$\text{Var}(\hat{T}_{lr}^{\text{corrected}}) \approx \text{Var}(\hat{T}_{lr}^{\text{naive}}) + \frac{\text{MSE}(l) \cdot \text{MSE}(r)}{|\mathcal{E}|}$$
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: CORRECTED INFERENCE -->
+<!-- ============================================ -->
+<section id="corrected">
+<h2>12. Corrected Inference Procedure</h2>
+
+<div class="formula-card">
+<div class="formula-title">Complete Algorithm</div>
+<ol style="padding-left:20px; line-height:2.2;">
+<li>Compute naive CCI: $\hat{T}_{lr}$ on imputed data</li>
+<li>Estimate per-gene MSE: $\widehat{\text{MSE}}(g)$ via cross-validation on measured genes</li>
+<li>Compute Moran's I for ligand and receptor: $\hat{\rho}_l, \hat{\rho}_r$</li>
+<li>Estimate bias: $\widehat{\text{bias}}_{lr} = \sqrt{|\hat{\rho}_l||\hat{\rho}_r|} \cdot \sqrt{\widehat{\text{MSE}}(l) \cdot \widehat{\text{MSE}}(r)}$</li>
+<li>Correct: $\hat{T}_{lr}^{\text{corr}} = \hat{T}_{lr} - \widehat{\text{bias}}_{lr}$</li>
+<li>Permutation test on corrected statistic (subtract same bias from null)</li>
+<li>BH correction for multiple testing</li>
+</ol>
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: ERROR PROPAGATION - CELL TYPE -->
+<!-- ============================================ -->
+<section id="celltype">
+<h2>13. Error Propagation: Cell Type Classification</h2>
+
+<div class="formula-card orange">
+<div class="formula-title">Misclassification Bound</div>
+<p>For cell $i$ of true type $t$, classified via nearest centroid on reconstructed expression:</p>
+$$P(\text{misclassify cell } i) \leq \exp\left(-\frac{\Delta_t^2}{8 \cdot \sigma_{\text{recon}}^2}\right)$$
+<p>where:</p>
+$$\Delta_t = \min_{t' \neq t} \|\boldsymbol{\mu}^{(t)} - \boldsymbol{\mu}^{(t')}\|_2 \quad \text{(minimum inter-type distance)}$$
+$$\sigma_{\text{recon}}^2 = \sum_{g=1}^{G} \text{MSE}(g) \quad \text{(total reconstruction variance)}$$
+</div>
+
+<div class="interp">
+<strong>Prediction:</strong> Cell types with small $\Delta_t$ (e.g., CD4 naive vs CD4 memory T cells) fail first as panel size $m$ decreases. The critical panel size for type $t$:
+$$m_t^* \approx \frac{8 \, K \, \lambda_{\max}}{\Delta_t^2}$$
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: ERROR PROPAGATION - CCI FPR -->
+<!-- ============================================ -->
+<section id="cci-fpr">
+<h2>14. Error Propagation: CCI False Positive Rate</h2>
+
+<div class="formula-card red">
+<div class="formula-title">Variance Inflation of CCI Statistic</div>
+$$\text{Var}(\hat{T}_{lr}) \geq \frac{1}{|\mathcal{E}|}\left[\bar{\lambda}_r^2 \cdot \text{MSE}(l) + \bar{\lambda}_l^2 \cdot \text{MSE}(r) + \text{MSE}(l) \cdot \text{MSE}(r)\right]$$
+</div>
+
+<table>
+<tr><th>Scenario</th><th>Variance Scaling</th><th>Reliability</th></tr>
+<tr><td>Both $l, r$ measured ($\in S$)</td><td>Poisson noise only</td><td><span class="tag tag-green">High</span></td></tr>
+<tr><td>One imputed, one measured</td><td>$\propto \text{MSE}(\text{imputed gene})$</td><td><span class="tag tag-orange">Moderate</span></td></tr>
+<tr><td>Both $l, r$ imputed ($\notin S$)</td><td>$\propto \text{MSE}(l) \times \text{MSE}(r)$</td><td><span class="tag tag-red">Low (quadratic)</span></td></tr>
+</table>
+
+<div class="warning">
+<strong>Quadratic degradation:</strong> CCI involving two imputed genes is quadratically less reliable than CCI with one measured gene. This is the strongest argument for panel-aware CCI analysis.
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: SPATIAL DOMAIN -->
+<!-- ============================================ -->
+<section id="spatial-domain">
+<h2>15. Error Propagation: Spatial Domain Detection</h2>
+
+<div class="formula-card purple">
+<div class="formula-title">Spatial Domain Stability</div>
+<p>Spatial domain detection typically uses Leiden/Louvain clustering on a spatial + expression graph. The clustering output depends on edge weights:</p>
+$$w_{ij}^{\text{eff}} = \text{sim}(\hat{\boldsymbol{\lambda}}_i, \hat{\boldsymbol{\lambda}}_j) \cdot \text{spatial\_weight}(i,j)$$
+<p>Reconstruction error perturbs the similarity:</p>
+$$\text{sim}(\hat{\boldsymbol{\lambda}}_i, \hat{\boldsymbol{\lambda}}_j) = \text{sim}(\boldsymbol{\lambda}_i, \boldsymbol{\lambda}_j) + O\left(\frac{\sigma_{\text{recon}}}{\Delta_{\min}}\right)$$
+<p>Domains merge or split when $\sigma_{\text{recon}} / \Delta_{\min} \gtrsim 1$.</p>
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: STABILITY -->
+<!-- ============================================ -->
+<section id="stability">
+<h2>16. Panel Perturbation Stability Analysis</h2>
+
+<p><span class="tag tag-purple">NOT a Bootstrap</span> <span class="tag tag-blue">Stability Measure</span></p>
+
+<div class="formula-card purple">
+<div class="formula-title">Procedure</div>
+<ol style="padding-left:20px; line-height:2.2;">
+<li>From panel $S$ ($m$ genes), create $B$ sub-panels $S_1^*, \dots, S_B^*$ by dropping fraction $\alpha$ of genes</li>
+<li>For each $S_b^*$: re-impute $\hat{\boldsymbol{\Lambda}}_b$, re-compute CCI $\hat{T}_{lr}^{(b)}$</li>
+<li>Compute per-pair stability metrics</li>
+</ol>
+</div>
+
+<div class="formula-card">
+<div class="formula-title">Stability Metrics</div>
+
+<h4>Coefficient of Variation</h4>
+$$\text{CV}_{lr} = \frac{\text{Std}_b[\hat{T}_{lr}^{(b)}]}{|\text{Mean}_b[\hat{T}_{lr}^{(b)}]| + \epsilon}$$
+
+<h4>Stability Score</h4>
+$$\text{Stability}_{lr} = 1 - \text{clip}(\text{CV}_{lr}, 0, 1)$$
+
+<h4>Robustness</h4>
+$$\text{Robustness}_{lr} = \frac{1}{B}\sum_{b=1}^{B} \mathbb{1}[\hat{T}_{lr}^{(b)} > 0]$$
+</div>
+
+<table>
+<tr><th>Stability</th><th>Meaning</th><th>Action</th></tr>
+<tr><td>$\approx 1.0$</td><td>Robust to panel composition</td><td><span class="tag tag-green">Trust</span></td></tr>
+<tr><td>$\approx 0.5$</td><td>Fragile &mdash; depends on which genes are included</td><td><span class="tag tag-orange">Flag</span></td></tr>
+<tr><td>$\approx 0.0$</td><td>Unstable &mdash; conclusion is noise</td><td><span class="tag tag-red">Discard</span></td></tr>
+</table>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: CALIBRATION -->
+<!-- ============================================ -->
+<section id="calibration">
+<h2>17. Calibration Analysis</h2>
+
+<div class="formula-card">
+<div class="formula-title">Calibration Plot Construction</div>
+<ol style="padding-left:20px; line-height:2.2;">
+<li>Bin significant CCI pairs by predicted reliability (stability score)</li>
+<li>In each bin $b$, compute <strong>False Discovery Proportion</strong>:</li>
+</ol>
+$$\text{FDP}(b) = 1 - \frac{\text{\# true positives in bin } b}{\text{\# total in bin } b}$$
+<p><strong>Perfect calibration:</strong> FDP decreases monotonically as reliability increases.</p>
+</div>
+
+<div class="interp">
+<strong>Target:</strong> Spearman correlation between predicted reliability and actual error $\geq 0.7$. FDP in highest reliability bin $< 0.1$. FDP in lowest reliability bin $> 0.5$.
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: RELIABILITY CERTIFICATE -->
+<!-- ============================================ -->
+<section id="reliability-cert">
+<h2>18. Reliability Certificate</h2>
+
+<div class="formula-card green">
+<div class="formula-title">Per-Conclusion Reliability Output</div>
+<p>Given panel $S$, for each biological conclusion $c$:</p>
+$$R(c \mid S) = f\left(\frac{K}{m}, \; \{R_g^2\}_{g \in \text{genes}(c)}, \; \{\text{MSE}(g)\}_{g \in \text{genes}(c)}, \; \text{Stability}(c)\right)$$
+</div>
+
+<h3>Example Output</h3>
+<table>
+<tr><th>Conclusion</th><th>Reliability</th><th>Status</th></tr>
+<tr><td>Cell types {Tumor, Fibroblast, Macrophage}: identifiable</td><td>0.94</td><td><span class="tag tag-green">Reliable</span></td></tr>
+<tr><td>Cell type {CD4+ T naive}: identifiable</td><td>0.31</td><td><span class="tag tag-red">Unreliable</span></td></tr>
+<tr><td>CCI: SPP1&ndash;CD44 interaction</td><td>0.87</td><td><span class="tag tag-green">Reliable</span></td></tr>
+<tr><td>CCI: CXCL12&ndash;CXCR4 interaction</td><td>0.23</td><td><span class="tag tag-red">Unreliable</span> (both imputed)</td></tr>
+<tr><td>Spatial domain: 5 domains at m=300</td><td>0.78</td><td><span class="tag tag-orange">Moderate</span></td></tr>
+</table>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: INTERACTIVE SIMULATOR -->
+<!-- ============================================ -->
+<section id="simulator">
+<h2>19. Interactive Error Simulator</h2>
+
+<div class="formula-card">
+<div class="formula-title">Explore: MSE vs Panel Size and Rank</div>
+<p>$$\text{MSE} \approx C \cdot \frac{K \cdot \lambda_{\max}}{m}$$</p>
+
+<div class="slider-container">
+  <label>Gene programs ($K$): <span id="k-val" class="slider-output">30</span></label>
+  <input type="range" id="k-slider" min="5" max="100" value="30" oninput="updateSim()">
+</div>
+<div class="slider-container">
+  <label>Panel size ($m$): <span id="m-val" class="slider-output">300</span></label>
+  <input type="range" id="m-slider" min="50" max="2000" value="300" oninput="updateSim()">
+</div>
+<div class="slider-container">
+  <label>Max expression ($\lambda_{\max}$): <span id="lam-val" class="slider-output">500</span></label>
+  <input type="range" id="lam-slider" min="50" max="2000" value="500" oninput="updateSim()">
+</div>
+
+<canvas id="mse-canvas" width="800" height="300"></canvas>
+<p id="mse-result" style="font-size:15px; margin-top:8px;"></p>
+</div>
+
+<div class="formula-card orange">
+<div class="formula-title">Explore: CCI Bias vs Spatial Autocorrelation</div>
+<p>$$\text{bias}_{lr} = \rho_{lr} \cdot \sqrt{\text{MSE}(l) \cdot \text{MSE}(r)}$$</p>
+
+<div class="slider-container">
+  <label>Moran's I of ligand ($\rho_l$): <span id="rho-l-val" class="slider-output">0.5</span></label>
+  <input type="range" id="rho-l-slider" min="0" max="100" value="50" oninput="updateBias()">
+</div>
+<div class="slider-container">
+  <label>Moran's I of receptor ($\rho_r$): <span id="rho-r-val" class="slider-output">0.5</span></label>
+  <input type="range" id="rho-r-slider" min="0" max="100" value="50" oninput="updateBias()">
+</div>
+<div class="slider-container">
+  <label>MSE(ligand): <span id="mse-l-val" class="slider-output">5.0</span></label>
+  <input type="range" id="mse-l-slider" min="1" max="100" value="50" oninput="updateBias()">
+</div>
+<div class="slider-container">
+  <label>MSE(receptor): <span id="mse-r-val" class="slider-output">5.0</span></label>
+  <input type="range" id="mse-r-slider" min="1" max="100" value="50" oninput="updateBias()">
+</div>
+<p id="bias-result" style="font-size:15px; margin-top:8px;"></p>
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: GO/NOGO -->
+<!-- ============================================ -->
+<section id="gonogo">
+<h2>20. Go / No-Go Decision Criteria</h2>
+
+<table>
+<tr><th>Criterion</th><th>Threshold</th><th>Metric</th></tr>
+<tr><td>CCI inflation rate</td><td>$> 20\%$ across $\geq 2$ methods</td><td>$\frac{n_{\text{sig,imputed}} - n_{\text{sig,truth}}}{n_{\text{sig,truth}}}$</td></tr>
+<tr><td>False positive reduction</td><td>$> 50\%$ removed by calibration</td><td>$\frac{n_{\text{FP,naive}} - n_{\text{FP,corrected}}}{n_{\text{FP,naive}}}$</td></tr>
+<tr><td>Reliability-error correlation</td><td>Spearman $r > 0.5$</td><td>$r_s(\text{Stability}, |\hat{T} - T_{\text{true}}|)$</td></tr>
+<tr><td>Calibration</td><td>Monotonic FDP decrease</td><td>FDP per reliability bin</td></tr>
+</table>
+
+<div class="formula-card green">
+<div class="formula-title">Decision Matrix</div>
+<table>
+<tr><th>Result</th><th>Verdict</th><th>Target Venue</th></tr>
+<tr><td>All 4 criteria met, large effect</td><td><span class="tag tag-green">STRONG GO</span></td><td>Genome Biology / Nature Methods</td></tr>
+<tr><td>3 of 4 criteria met</td><td><span class="tag tag-green">GO</span></td><td>Bioinformatics / Biostatistics</td></tr>
+<tr><td>1&ndash;2 criteria met</td><td><span class="tag tag-orange">WEAK</span></td><td>Bioinformatics (with caveats)</td></tr>
+<tr><td>0 criteria met</td><td><span class="tag tag-red">NO-GO</span></td><td>Pivot project direction</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: NOTATION -->
+<!-- ============================================ -->
+<section id="notation">
+<h2>21. Complete Notation Reference</h2>
+
+<table>
+<tr><th>Symbol</th><th>Type</th><th>Definition</th></tr>
+<tr><td>$N$</td><td>Scalar</td><td>Number of cells</td></tr>
+<tr><td>$G$</td><td>Scalar</td><td>Total genes in genome</td></tr>
+<tr><td>$m$</td><td>Scalar</td><td>Number of measured genes ($|S|$)</td></tr>
+<tr><td>$K$</td><td>Scalar</td><td>Number of latent gene programs (rank)</td></tr>
+<tr><td>$S$</td><td>Set</td><td>Measured gene panel $\subset \{1,\dots,G\}$</td></tr>
+<tr><td>$\mathbf{s}_i$</td><td>$\mathbb{R}^2$</td><td>Spatial coordinates of cell $i$</td></tr>
+<tr><td>$y_{ig}$</td><td>$\mathbb{Z}_+$</td><td>Observed transcript count</td></tr>
+<tr><td>$\lambda_{ig}$</td><td>$\mathbb{R}_+$</td><td>True expression rate</td></tr>
+<tr><td>$\hat{\lambda}_{ig}$</td><td>$\mathbb{R}_+$</td><td>Imputed expression rate</td></tr>
+<tr><td>$e_{ig}$</td><td>$\mathbb{R}$</td><td>Imputation error ($\hat{\lambda}_{ig} - \lambda_{ig}$)</td></tr>
+<tr><td>$\delta_g$</td><td>$(0,1]$</td><td>Detection efficiency for gene $g$</td></tr>
+<tr><td>$\mathbf{U}$</td><td>$\mathbb{R}^{N \times K}$</td><td>Cell loading matrix</td></tr>
+<tr><td>$\mathbf{V}$</td><td>$\mathbb{R}^{G \times K}$</td><td>Gene program matrix</td></tr>
+<tr><td>$\mathbf{v}_g$</td><td>$\mathbb{R}^K$</td><td>Gene $g$'s program membership vector</td></tr>
+<tr><td>$R_g^2$</td><td>$[0,1]$</td><td>Gene $g$'s predictability from panel $S$</td></tr>
+<tr><td>$w_{ij}$</td><td>$\{0,1\}$</td><td>Spatial adjacency (1 if neighbors)</td></tr>
+<tr><td>$\mathcal{E}$</td><td>Set</td><td>Set of spatial edges (neighbor pairs)</td></tr>
+<tr><td>$T_{lr}$</td><td>$\mathbb{R}$</td><td>CCI test statistic for pair $(l,r)$</td></tr>
+<tr><td>$I_g$</td><td>$[-1,1]$</td><td>Moran's I for gene $g$</td></tr>
+<tr><td>$C_g$</td><td>$[0,2]$</td><td>Geary's C for gene $g$</td></tr>
+<tr><td>$\rho_{lr}$</td><td>$[0,1]$</td><td>Cross-gene spatial error correlation</td></tr>
+<tr><td>$\Delta_t$</td><td>$\mathbb{R}_+$</td><td>Minimum inter-cell-type distance</td></tr>
+</table>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: FULL MODEL -->
+<!-- ============================================ -->
+<section id="fullmodel">
+<h2>22. Complete Model Summary</h2>
+
+<div class="formula-card" style="border-left-color:var(--accent); border-width:4px;">
+<div class="formula-title" style="font-size:16px;">The Entire Framework in One Box</div>
+
+$$\boxed{\begin{aligned}
+&\textbf{Observation:} && y_{ig} \sim \text{Poisson}(\delta_g \lambda_{ig}), \quad g \in S,\; |S| = m \\[6pt]
+&\textbf{Structure:} && \log \lambda_{ig} = \mu_g + \sum_{k=1}^K u_{ik}\,v_{gk} + \epsilon_{ig} \\[6pt]
+&\textbf{Recovery MSE:} && \frac{1}{NG}\|\hat{\boldsymbol{\Lambda}} - \boldsymbol{\Lambda}\|_F^2 \leq C\,\frac{K\lambda_{\max}}{m} \\[6pt]
+&\textbf{Per-gene error:} && \text{MSE}(g) = \frac{1}{\delta_g \bar{\lambda}_g} + \|\mathbf{v}_g\|^2(1-R_g^2) \\[6pt]
+&\textbf{CCI bias:} && \mathbb{E}[\hat{T}_{lr}] = T_{lr}^{\text{true}} + \rho_{lr}\sqrt{\text{MSE}(l)\,\text{MSE}(r)} \\[6pt]
+&\textbf{Corrected CCI:} && \hat{T}_{lr}^{\text{corr}} = \hat{T}_{lr} - \hat{\rho}_{lr}\sqrt{\widehat{\text{MSE}}(l)\,\widehat{\text{MSE}}(r)} \\[6pt]
+&\textbf{Cell typing:} && P(\text{misclassify}) \leq \exp\!\left(-\frac{\Delta_t^2}{8\sum_g \text{MSE}(g)}\right) \\[6pt]
+&\textbf{CCI variance:} && \text{Var}(\hat{T}_{lr}) \propto \text{MSE}(l)\cdot\text{MSE}(r) \;\text{ if both imputed}
+\end{aligned}}$$
+
+<p style="margin-top:16px;">Three governing quantities:</p>
+<table>
+<tr><td style="width:120px"><strong>$K/m$</strong></td><td>Rank over panel size &mdash; can you capture the latent structure?</td></tr>
+<tr><td><strong>$R_g^2$</strong></td><td>Per-gene predictability &mdash; is this gene in the measured subspace?</td></tr>
+<tr><td><strong>$\Delta_t$ / effect size</strong></td><td>Biological signal strength &mdash; can biology survive the noise?</td></tr>
+</table>
+</div>
+
+<p style="margin-top:30px; text-align:center; color:var(--text-dim); font-size:13px;">
+Dashboard generated for: <em>Measurement Error Framework for Spatial Omics Inference</em><br>
+Framework version 1.0 &bull; All formulations are paper-ready
+</p>
+</section>
+
+</div><!-- /main -->
+
+<!-- JAVASCRIPT -->
+<script>
+// NAV active state
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('.nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if(window.scrollY >= s.offsetTop - 60) current = s.id; });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if(a.getAttribute('href') === '#' + current) a.classList.add('active');
+  });
+});
+
+// MSE SIMULATOR
+function updateSim() {
+  const K = parseInt(document.getElementById('k-slider').value);
+  const m = parseInt(document.getElementById('m-slider').value);
+  const lam = parseInt(document.getElementById('lam-slider').value);
+  document.getElementById('k-val').textContent = K;
+  document.getElementById('m-val').textContent = m;
+  document.getElementById('lam-val').textContent = lam;
+
+  const C = 2.0;
+  const canvas = document.getElementById('mse-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Draw MSE vs m for current K and lambda
+  ctx.strokeStyle = '#30363d';
+  ctx.lineWidth = 1;
+  // Axes
+  ctx.beginPath(); ctx.moveTo(60,10); ctx.lineTo(60,H-30); ctx.lineTo(W-20,H-30); ctx.stroke();
+  ctx.fillStyle = '#8b949e'; ctx.font = '12px system-ui';
+  ctx.fillText('Panel size (m)', W/2 - 40, H-8);
+  ctx.save(); ctx.translate(14, H/2+20); ctx.rotate(-Math.PI/2); ctx.fillText('MSE', 0, 0); ctx.restore();
+
+  // Grid lines
+  ctx.strokeStyle = '#21262d'; ctx.lineWidth = 0.5;
+  for(let i=1;i<=4;i++){
+    let gy = H-30 - (i/4)*(H-40);
+    ctx.beginPath(); ctx.moveTo(60,gy); ctx.lineTo(W-20,gy); ctx.stroke();
+  }
+
+  const mMin=50, mMax=2000;
+  const mseMax = C * K * lam / mMin;
+
+  // Curve
+  ctx.strokeStyle = '#58a6ff'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for(let px=0; px<=W-80; px++){
+    let mVal = mMin + (px/(W-80))*(mMax-mMin);
+    let mse = C * K * lam / mVal;
+    let x = 60 + px;
+    let y = H-30 - (mse/mseMax)*(H-40);
+    if(px===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Current point
+  let curX = 60 + ((m-mMin)/(mMax-mMin))*(W-80);
+  let curMSE = C * K * lam / m;
+  let curY = H-30 - (curMSE/mseMax)*(H-40);
+  ctx.fillStyle = '#ffa657'; ctx.beginPath(); ctx.arc(curX, curY, 6, 0, 2*Math.PI); ctx.fill();
+  ctx.strokeStyle = '#ffa657'; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(curX, curY); ctx.lineTo(curX, H-30); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(curX, curY); ctx.lineTo(60, curY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Labels
+  ctx.fillStyle = '#e6edf3'; ctx.font = '11px system-ui';
+  ctx.fillText(mMin.toString(), 58, H-14);
+  ctx.fillText(mMax.toString(), W-40, H-14);
+  ctx.fillText(curMSE.toFixed(1), 10, curY+4);
+  ctx.fillText('m='+m, curX-15, H-14);
+
+  // K/m ratio
+  let ratio = K/m;
+  let ratioColor = ratio < 0.1 ? '#7ee787' : ratio < 0.3 ? '#ffa657' : '#ff7b72';
+  document.getElementById('mse-result').innerHTML =
+    `MSE ≈ <strong>${curMSE.toFixed(2)}</strong> | K/m = <strong style="color:${ratioColor}">${ratio.toFixed(3)}</strong> | ` +
+    (ratio < 0.1 ? '<span style="color:#7ee787">Good regime</span>' :
+     ratio < 0.3 ? '<span style="color:#ffa657">Marginal</span>' :
+     '<span style="color:#ff7b72">Poor recovery expected</span>');
+}
+
+// BIAS SIMULATOR
+function updateBias() {
+  const rhoL = parseInt(document.getElementById('rho-l-slider').value) / 100;
+  const rhoR = parseInt(document.getElementById('rho-r-slider').value) / 100;
+  const mseL = parseInt(document.getElementById('mse-l-slider').value) / 10;
+  const mseR = parseInt(document.getElementById('mse-r-slider').value) / 10;
+
+  document.getElementById('rho-l-val').textContent = rhoL.toFixed(2);
+  document.getElementById('rho-r-val').textContent = rhoR.toFixed(2);
+  document.getElementById('mse-l-val').textContent = mseL.toFixed(1);
+  document.getElementById('mse-r-val').textContent = mseR.toFixed(1);
+
+  const rhoLR = Math.sqrt(Math.abs(rhoL) * Math.abs(rhoR));
+  const bias = rhoLR * Math.sqrt(mseL * mseR);
+
+  let severity = bias < 0.5 ? ['#7ee787','Low bias'] : bias < 2 ? ['#ffa657','Moderate bias'] : ['#ff7b72','HIGH bias — CCI unreliable'];
+
+  document.getElementById('bias-result').innerHTML =
+    `ρ<sub>lr</sub> = <strong>${rhoLR.toFixed(3)}</strong> | ` +
+    `bias = <strong style="color:${severity[0]}">${bias.toFixed(3)}</strong> | ` +
+    `<span style="color:${severity[0]}">${severity[1]}</span>`;
+}
+
+// Initialize
+updateSim();
+updateBias();
+</script>
+
+</body>
+</html>
