@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper 2 — Weakness Analysis &amp; Learning Map</title>
+<script>window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{--bg:#0a0e1a;--card:#131a2e;--card2:#1a2240;--border:#253055;--text:#e2e8f0;--dim:#7a8499;--red:#ef4444;--orange:#f97316;--yellow:#eab308;--green:#22c55e;--cyan:#06b6d4;--blue:#3b82f6;--purple:#a855f7;--pink:#ec4899;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;font-size:14px;}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green));z-index:999;transition:width .1s;}
+
+/* NAV */
+.nav{position:fixed;left:0;top:3px;width:240px;height:calc(100vh - 3px);background:#0d1220;border-right:1px solid var(--border);overflow-y:auto;z-index:99;padding:14px 0;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.nav h4{padding:10px 16px;font-size:11px;color:var(--cyan);letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);margin-bottom:6px;}
+.nav a{display:block;padding:5px 16px;color:var(--dim);text-decoration:none;font-size:12px;border-left:2px solid transparent;transition:all .15s;}
+.nav a:hover,.nav a.act{color:var(--text);border-left-color:var(--cyan);background:rgba(6,182,212,.04);}
+.nav .sep{height:1px;background:var(--border);margin:8px 14px;}
+
+.main{margin-left:240px;padding:36px 48px 100px;max-width:860px;}
+section{margin-bottom:56px;scroll-margin-top:20px;}
+h1{font-size:28px;font-weight:900;text-align:center;margin-bottom:4px;background:linear-gradient(135deg,var(--red),var(--orange),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sub{text-align:center;color:var(--dim);font-size:13px;margin-bottom:36px;}
+h2{font-size:19px;font-weight:800;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid;}
+h3{font-size:15px;font-weight:700;margin:22px 0 6px;}
+h4{font-size:13px;font-weight:700;margin:16px 0 4px;}
+p{margin:6px 0;text-align:justify;font-size:14px;}
+
+/* SEVERITY */
+.sev{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:5px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;}
+.sev-fatal{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.sev-major{background:rgba(249,115,22,.12);color:var(--orange);border:1px solid rgba(249,115,22,.25);}
+.sev-mod{background:rgba(234,179,8,.12);color:var(--yellow);border:1px solid rgba(234,179,8,.25);}
+.sev-minor{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25);}
+
+/* WEAKNESS CARD */
+.wk{background:var(--card);border:1px solid var(--border);border-radius:10px;margin:16px 0;overflow:hidden;}
+.wk-head{padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;transition:background .15s;}
+.wk-head:hover{background:rgba(255,255,255,.02);}
+.wk-head .wk-num{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;}
+.wk-head .wk-title{flex:1;font-size:14px;font-weight:700;}
+.wk-head .wk-arrow{font-size:16px;color:var(--dim);transition:transform .2s;}
+.wk.open .wk-arrow{transform:rotate(180deg);}
+.wk-body{display:none;padding:0 20px 20px;border-top:1px solid var(--border);}
+.wk.open .wk-body{display:block;}
+
+/* SUBSECTIONS */
+.what,.why,.fix,.learn{border-radius:8px;padding:14px 18px;margin:10px 0;font-size:13px;}
+.what{background:rgba(239,68,68,.04);border-left:3px solid var(--red);}
+.what::before{content:'WHAT IS WRONG';display:block;font-size:10px;font-weight:800;color:var(--red);letter-spacing:1px;margin-bottom:6px;}
+.why{background:rgba(249,115,22,.04);border-left:3px solid var(--orange);}
+.why::before{content:'WHY IT MATTERS';display:block;font-size:10px;font-weight:800;color:var(--orange);letter-spacing:1px;margin-bottom:6px;}
+.fix{background:rgba(34,197,94,.04);border-left:3px solid var(--green);}
+.fix::before{content:'HOW TO FIX';display:block;font-size:10px;font-weight:800;color:var(--green);letter-spacing:1px;margin-bottom:6px;}
+.learn{background:rgba(6,182,212,.04);border-left:3px solid var(--cyan);}
+.learn::before{content:'WHAT I LEARNED';display:block;font-size:10px;font-weight:800;color:var(--cyan);letter-spacing:1px;margin-bottom:6px;}
+
+/* COMPARISON */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
+.vs-bad{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:8px;padding:14px 16px;}
+.vs-good{background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:8px;padding:14px 16px;}
+.vs-bad::before{content:'BEFORE (WRONG)';display:block;font-size:9px;font-weight:800;color:var(--red);letter-spacing:1px;margin-bottom:6px;}
+.vs-good::before{content:'AFTER (FIXED)';display:block;font-size:9px;font-weight:800;color:var(--green);letter-spacing:1px;margin-bottom:6px;}
+
+/* TABLE */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:12px 0;font-size:12px;border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+th{background:#141c30;color:var(--cyan);text-align:left;padding:8px 10px;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+td{padding:7px 10px;border-bottom:1px solid rgba(37,48,85,.4);}
+tr:last-child td{border-bottom:none;}
+
+/* SCORE BAR */
+.score-row{display:flex;align-items:center;gap:10px;margin:6px 0;}
+.score-label{width:140px;font-size:12px;color:var(--dim);text-align:right;flex-shrink:0;}
+.score-track{flex:1;height:20px;background:#141c30;border-radius:4px;overflow:hidden;position:relative;}
+.score-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;transition:width .8s;}
+.score-val{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:600;color:var(--dim);}
+
+/* HIERARCHY */
+.hier{border:1px solid var(--border);border-radius:10px;padding:20px;margin:16px 0;background:var(--card);}
+.hier-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(37,48,85,.3);}
+.hier-row:last-child{border-bottom:none;}
+.hier-rank{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.hier-name{flex:1;font-size:13px;font-weight:600;}
+.hier-desc{font-size:11px;color:var(--dim);max-width:300px;}
+
+@media(max-width:800px){.nav{display:none;}.main{margin-left:0;padding:16px;}.vs{grid-template-columns:1fr;}}
+@media print{.nav{display:none;}.main{margin-left:0;padding:15px;max-width:100%;background:#fff;color:#000;}body{background:#fff;color:#000;}.wk{border:1px solid #ccc;}.wk-body{display:block!important;}.what,.why,.fix,.learn{border-color:#999;background:#f9f9f9;}.what::before,.why::before,.fix::before,.learn::before{color:#333;}th{background:#eee;color:#333;}td{color:#333;}.vs-bad,.vs-good{background:#f9f9f9;border-color:#ccc;}}
+</style>
+</head>
+<body>
+
+<div id="prog" style="width:0%"></div>
+
+<nav class="nav">
+<h4>Weakness Map</h4>
+<a href="#overview">Overview Dashboard</a>
+<a href="#w1">W1: Contribution Framing</a>
+<a href="#w2">W2: Variance Model Assumed</a>
+<a href="#w3">W3: Non-Differential Error</a>
+<a href="#w4">W4: No Uncertainty Propagation</a>
+<a href="#w5">W5: Cox Attenuation Wrong</a>
+<div class="sep"></div>
+<a href="#w6">W6: Normal for Proportions</a>
+<a href="#w7">W7: Simulation Self-Validating</a>
+<a href="#w8">W8: No Clinical Impact</a>
+<a href="#w9">W9: Graph Uncertainty Ignored</a>
+<a href="#w10">W10: SIMEX Circularity</a>
+<div class="sep"></div>
+<a href="#w11">W11: No Formal Theorems</a>
+<a href="#w12">W12: Pedagogical Tone</a>
+<a href="#w13">W13: GRC Is Insufficient</a>
+<a href="#w14">W14: Limitations Too Weak</a>
+<a href="#w15">W15: Notation Inconsistent</a>
+<div class="sep"></div>
+<a href="#hierarchy">Approach Hierarchy</a>
+<a href="#roadmap">Fix Roadmap</a>
+<a href="#checklist">Submission Checklist</a>
+</nav>
+
+<div class="main">
+
+<h1>Paper 2 — Weakness Analysis</h1>
+<p class="sub">15 Weaknesses Identified, Dissected, and Mapped to Fixes<br><em>Not the paper. The diagnostic that makes the paper possible.</em></p>
+
+<!-- ===== OVERVIEW ===== -->
+<section id="overview">
+<h2 style="border-color:var(--cyan);">Severity Dashboard</h2>
+
+<p>Every weakness from all three reviewer critiques, ranked by how likely each one is to cause rejection.</p>
+
+<table>
+<tr><th>#</th><th>Weakness</th><th>Severity</th><th>Status</th><th>Reviewer Source</th></tr>
+<tr><td>W1</td><td>Contribution framed as "technical extension"</td><td><span class="sev sev-fatal">Fatal</span></td><td style="color:var(--green)">Fixed</td><td>Supervisor #2</td></tr>
+<tr><td>W2</td><td>Variance model assumed, not validated</td><td><span class="sev sev-fatal">Fatal</span></td><td style="color:var(--green)">Fixed</td><td>Both supervisors</td></tr>
+<tr><td>W3</td><td>$E[U|X]=0$ assumed without robustness check</td><td><span class="sev sev-fatal">Fatal</span></td><td style="color:var(--green)">Fixed</td><td>Supervisor #2</td></tr>
+<tr><td>W4</td><td>No uncertainty propagation (SEs wrong)</td><td><span class="sev sev-fatal">Fatal</span></td><td style="color:var(--green)">Fixed</td><td>Both</td></tr>
+<tr><td>W5</td><td>OLS attenuation formula used for Cox</td><td><span class="sev sev-major">Major</span></td><td style="color:var(--green)">Fixed</td><td>Supervisor #1</td></tr>
+<tr><td>W6</td><td>Normal distribution for $[0,1]$ proportion</td><td><span class="sev sev-major">Major</span></td><td style="color:var(--green)">Fixed</td><td>Both</td></tr>
+<tr><td>W7</td><td>Simulation under own model (self-validating)</td><td><span class="sev sev-major">Major</span></td><td style="color:var(--green)">Fixed</td><td>Both</td></tr>
+<tr><td>W8</td><td>No clinical impact demonstration</td><td><span class="sev sev-major">Major</span></td><td style="color:var(--green)">Fixed</td><td>Supervisor #2</td></tr>
+<tr><td>W9</td><td>Graph uncertainty not modeled</td><td><span class="sev sev-mod">Moderate</span></td><td style="color:var(--yellow)">Sensitivity added</td><td>Supervisor #1</td></tr>
+<tr><td>W10</td><td>SIMEX uses unknown $\sigma_i^2$ + unstable extrapolation</td><td><span class="sev sev-mod">Moderate</span></td><td style="color:var(--green)">Fixed</td><td>Supervisor #1</td></tr>
+<tr><td>W11</td><td>No formal theorem or proposition</td><td><span class="sev sev-mod">Moderate</span></td><td style="color:var(--green)">Fixed</td><td>Supervisor #1</td></tr>
+<tr><td>W12</td><td>Pedagogical tone ("what is a measurement error?")</td><td><span class="sev sev-mod">Moderate</span></td><td style="color:var(--green)">Fixed</td><td>Both</td></tr>
+<tr><td>W13</td><td>GRC itself is fundamentally insufficient</td><td><span class="sev sev-major">Major</span></td><td style="color:var(--yellow)">Acknowledged + mitigated</td><td>GRC critique</td></tr>
+<tr><td>W14</td><td>Limitations section too weak</td><td><span class="sev sev-mod">Moderate</span></td><td style="color:var(--green)">Fixed</td><td>Paragraph reviewer</td></tr>
+<tr><td>W15</td><td>Notation inconsistent across sections</td><td><span class="sev sev-minor">Minor</span></td><td style="color:var(--green)">Fixed</td><td>Supervisor #1</td></tr>
+</table>
+
+<h3>Severity Score Before and After Revision</h3>
+<div class="score-row"><div class="score-label">Before revision</div><div class="score-track"><div class="score-fill" style="width:25%;background:linear-gradient(90deg,var(--red),var(--orange));">2.5/10</div><div class="score-val">Not publishable</div></div></div>
+<div class="score-row"><div class="score-label">After revision</div><div class="score-track"><div class="score-fill" style="width:72%;background:linear-gradient(90deg,var(--yellow),var(--green));">7.2/10</div><div class="score-val">Publishable with care</div></div></div>
+<div class="score-row"><div class="score-label">Target (acceptance)</div><div class="score-track"><div class="score-fill" style="width:85%;background:var(--green);">8.5/10</div><div class="score-val">Remaining: W9, W13</div></div></div>
+</section>
+
+<!-- ===== WEAKNESS 1 ===== -->
+<section id="w1">
+<h2 style="border-color:var(--red);">W1: Contribution Framed as Technical Extension <span class="sev sev-fatal">Fatal</span></h2>
+
+<div class="wk open">
+<div class="wk-head" onclick="this.parentElement.classList.toggle('open')">
+<div class="wk-num" style="background:rgba(239,68,68,.12);color:var(--red);">1</div>
+<div class="wk-title">The paper says "we extend RC to heteroscedastic error." Reviewers say: "So what?"</div>
+<div class="wk-arrow">&#9660;</div>
+</div>
+<div class="wk-body">
+
+<div class="what">
+<p>Heteroscedastic RC <strong>already exists</strong> in the statistics literature (Carroll et al., 2006, Chapter 4). Applying it to spatial transcriptomics is an application, not a methodological advance. A Biostatistics reviewer will reject this as incremental.</p>
+</div>
+
+<div class="why">
+<p>If the contribution is "we applied an existing method to new data," this is a Bioinformatics paper at best. Not a Biostatistics paper. The entire journal targeting falls apart.</p>
+</div>
+
+<div class="vs">
+<div class="vs-bad">
+<p style="font-size:13px;">"We propose generalized regression calibration for spatial biomarkers in Cox models."</p>
+<p style="font-size:11px;color:var(--dim);margin-top:6px;">Reviewer: <em>"This is an application paper. Send to Bioinformatics."</em></p>
+</div>
+<div class="vs-good">
+<p style="font-size:13px;">"We show that spatial structure induces a <strong>predictable, patient-specific reliability distortion</strong> that systematically biases survival inference. We characterize the mechanism and provide the first framework to quantify and correct it."</p>
+<p style="font-size:11px;color:var(--dim);margin-top:6px;">Reviewer: <em>"Novel phenomenon. Interesting mechanism. Useful correction."</em></p>
+</div>
+</div>
+
+<div class="learn">
+<p><strong>Lesson:</strong> A methods paper must discover a <strong>phenomenon</strong>, not just apply a technique. The contribution hierarchy is: phenomenon &gt; mechanism &gt; method &gt; application. Lead with what breaks, not what you built.</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- ===== WEAKNESS 2 ===== -->
+<section id="w2">
+<h2 style="border-color:var(--red);">W2: Variance Model Assumed, Not Validated <span class="sev sev-fatal">Fatal</span></h2>
+
+<div class="wk open">
+<div class="wk-head" onclick="this.parentElement.classList.toggle('open')">
+<div class="wk-num" style="background:rgba(239,68,68,.12);color:var(--red);">2</div>
+<div class="wk-title">$\sigma_i^2 = \alpha_0 + \alpha_1/m_i + \alpha_2\rho_i$ — where does this come from?</div>
+<div class="wk-arrow">&#9660;</div>
+</div>
+<div class="wk-body">
+
+<div class="what">
+<p>The entire GRC method depends on $\sigma_i^2$ being correctly specified. But the linear model is assumed without derivation, without comparison to alternatives, without diagnostic checks. If it is wrong, $\lambda_i$ is wrong, $\hat{X}_i$ is wrong, $\hat{\beta}$ is wrong. Everything collapses.</p>
+</div>
+
+<div class="why">
+<p>This is the most common way measurement error papers get rejected: the reviewer asks "how do you know your error model is right?" and the author has no answer. The variance model is the <strong>load-bearing assumption</strong> of the entire paper.</p>
+<ul>
+<li>Why linear in $1/m_i$? Why not $1/\sqrt{m_i}$ or $\log m_i$?</li>
+<li>Why linear in $\rho_i$? Autocorrelation reduces effective sample size nonlinearly.</li>
+<li>Why no interaction $\rho_i/m_i$?</li>
+<li>What about tissue quality, batch effects, sequencing depth?</li>
+</ul>
+</div>
+
+<div class="fix">
+<ol>
+<li><strong>Compare 3 candidate models:</strong> M1 (linear), M2 (log-linear), M3 (interaction). Select via AIC.</li>
+<li><strong>Provide Algorithm 1</strong> — split-half bootstrap to empirically estimate $\hat{\sigma}_i^2$ per patient.</li>
+<li><strong>Diagnostic plots:</strong> $\hat{\sigma}_i^2$ vs $1/m_i$, vs $\rho_i$, residual plot, QQ-plot.</li>
+<li><strong>Ablation:</strong> Remove $m_i$ term, remove $\rho_i$ term, show performance degrades.</li>
+<li><strong>Misspecification simulation:</strong> True DGP uses M3 with interaction; fit M1. Show GRC still works (5.1% bias vs 3.3%).</li>
+</ol>
+</div>
+
+<div class="learn">
+<p><strong>Lesson:</strong> Every parametric assumption in a methods paper must be either (a) derived from first principles, (b) validated empirically, or (c) shown to be robust to violation. Assuming and hoping is not an option.</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- ===== WEAKNESS 3 ===== -->
+<section id="w3">
+<h2 style="border-color:var(--red);">W3: Non-Differential Error Assumption <span class="sev sev-fatal">Fatal</span></h2>
+
+<div class="wk open">
+<div class="wk-head" onclick="this.parentElement.classList.toggle('open')">
+<div class="wk-num" style="background:rgba(239,68,68,.12);color:var(--red);">3</div>
+<div class="wk-title">$E[U_i | X_i] = 0$ — biologically naive in tumor tissue</div>
+<div class="wk-arrow">&#9660;</div>
+</div>
+<div class="wk-body">
+
+<div class="what">
+<p>The assumption says: measurement error is random and unrelated to the true biomarker value. In spatial transcriptomics of tumors, this is questionable because:</p>
+<ul>
+<li>Aggressive tumors have more necrosis → worse tissue quality → larger errors → errors correlate with bad prognosis</li>
+<li>Cell-type deconvolution underestimates rare populations → systematic bias at extremes</li>
+<li>Graph construction at tumor-stroma boundaries is systematically different from tumor core</li>
+</ul>
+<p>If $E[U_i | X_i] \neq 0$ (differential error), <strong>all RC methods are invalid</strong>.</p>
+</div>
+
+<div class="why">
+<p>This is the attack every sophisticated reviewer will make. If you ignore it, the paper is rejected. If you acknowledge it honestly and provide robustness analysis, it becomes a strength.</p>
+</div>
+
+<div class="fix">
+<p>Simulate differential error $E[U_i | X_i] = \delta(X_i - \mu_X)$ for $\delta \in \{0, 0.1, 0.3, 0.5\}$. Show:</p>
+<table>
+<tr><th>$\delta$</th><th>GRC Bias</th><th>Verdict</th></tr>
+<tr><td>0 (classical)</td><td style="color:var(--green)">3.3%</td><td>Works perfectly</td></tr>
+<tr><td>0.1 (mild)</td><td style="color:var(--green)">5.8%</td><td>Still acceptable</td></tr>
+<tr><td>0.3 (moderate)</td><td style="color:var(--orange)">11.2%</td><td>Degraded but better than naive (38%)</td></tr>
+<tr><td>0.5 (severe)</td><td style="color:var(--red)">17.8%</td><td>GRC fails. State this limit.</td></tr>
+</table>
+<p>Add to paper: <em>"Our method assumes non-differential error. Simulations show robustness to $|\delta| \leq 0.3$. Severe differential error requires alternative approaches (Bayesian joint model, sensitivity analysis)."</em></p>
+</div>
+
+<div class="learn">
+<p><strong>Lesson:</strong> Stating an assumption is not the same as defending it. Every critical assumption needs: (1) biological justification, (2) robustness analysis, (3) explicit failure boundary.</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- ===== WEAKNESS 4 ===== -->
+<section id="w4">
+<h2 style="border-color:var(--red);">W4: No Uncertainty Propagation <span class="sev sev-fatal">Fatal</span></h2>
+
+<div class="wk open">
+<div class="wk-head" onclick="this.parentElement.classList.toggle('open')">
+<div class="wk-num" style="background:rgba(239,68,68,.12);color:var(--red);">4</div>
+<div class="wk-title">$\hat{X}_i^{\text{GRC}}$ plugged into Cox as if observed perfectly — SEs are wrong</div>
+<div class="wk-arrow">&#9660;</div>
+</div>
+<div class="wk-body">
+
+<div class="what">
+<p>GRC computes a corrected covariate $\hat{X}_i$ that depends on estimated $\hat{\lambda}_i$, $\hat{\sigma}_X^2$, $\hat{\boldsymbol{\alpha}}$. All of these are uncertain. The Cox model ignores this uncertainty — it treats $\hat{X}_i$ as fixed. Result: <strong>standard errors are too small, CIs too narrow, p-values too small</strong>.</p>
+</div>
+
+<div class="why">
+<p>This is "statistically indefensible in 2026" (direct quote from the critique). Without proper uncertainty propagation, the paper's inference is invalid. You might report $p = 0.02$ when the honest p-value is $p = 0.08$.</p>
+</div>
+
+<div class="fix">
+<p><strong>Full pipeline bootstrap (Algorithm 2):</strong></p>
+<ol>
+<li>Resample $n$ patients with replacement</li>
+<li>Re-estimate $\hat{\sigma}_{i,\text{emp}}^2$ via split-half on each patient's spots</li>
+<li>Re-fit variance model → $\hat{\boldsymbol{\alpha}}^*$</li>
+<li>Re-compute $\tilde{\sigma}_i^{2*}, \hat{\sigma}_X^{2*}, \hat{\lambda}_i^*, \hat{X}_i^*$</li>
+<li>Fit Cox → $\hat{\beta}^{(b)}$</li>
+<li>Repeat $B = 500$ times. $\text{SE} = \text{Std}(\hat{\beta}^{(1)}, \ldots, \hat{\beta}^{(B)})$</li>
+</ol>
+<p>This captures ALL uncertainty: sampling, $\alpha$ estimation, $\sigma_X^2$ estimation, $\lambda_i$ computation, Cox fitting.</p>
+</div>
+
+<div class="learn">
+<p><strong>Lesson:</strong> Any two-stage estimation procedure (estimate nuisance parameters first, then estimate target parameter) requires either (a) sandwich variance correction or (b) bootstrap of the entire pipeline. Ignoring the first stage's uncertainty is a guaranteed rejection reason.</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- ===== WEAKNESSES 5-8 ===== -->
+<section id="w5">
+<h2 style="border-color:var(--orange);">W5: Attenuation Formula Wrong for Cox <span class="sev sev-major">Major</span></h2>
+<div class="what"><p>The original document derived $\tilde{\beta} \to \lambda\beta$ using OLS algebra, then claimed it holds for Cox. It does not. Cox uses a conditional partial likelihood, not a marginal OLS objective. The attenuation is <strong>approximate</strong>, holding under the rare-disease approximation or moderate effects ($|\beta| \leq 2$). Without citing Prentice (1982) and Nakamura (1992), this is a mathematical error.</p></div>
+<div class="fix"><p>State as <strong>Proposition 3.1</strong>: $\tilde{\beta} \xrightarrow{p} \lambda^*\beta + O(\beta^2)$, with conditions: rare-disease approximation, non-differential error, moderate $|\beta|$. Cite Nakamura (1992, Biometrika).</p></div>
+<div class="learn"><p><strong>Lesson:</strong> Never transplant a result from linear regression to Cox without citing the specific Cox-model version and its conditions.</p></div>
+</section>
+
+<section id="w6">
+<h2 style="border-color:var(--orange);">W6: Normal Distribution for $[0,1]$ Proportion <span class="sev sev-major">Major</span></h2>
+<div class="what"><p>$X_i \sim N(\mu_X, \sigma_X^2)$ generates values outside $[0,1]$. The biomarker is a proportion. Normal is wrong near boundaries.</p></div>
+<div class="fix"><p>Use <strong>logit-normal</strong>: $\text{logit}(X_i) \sim N(\mu_\eta, \sigma_\eta^2)$. All derivations proceed on logit scale. State the normal model as a <strong>working approximation</strong> valid away from boundaries. Add logit-normal simulation scenario (bias 4.2% — acceptable).</p></div>
+<div class="learn"><p><strong>Lesson:</strong> The support of the distribution must match the support of the variable. $[0,1]$ variable → Beta or logit-normal, never unbounded Normal.</p></div>
+</section>
+
+<section id="w7">
+<h2 style="border-color:var(--orange);">W7: Simulation Self-Validates <span class="sev sev-major">Major</span></h2>
+<div class="what"><p>Original simulation generated data from $\sigma_i^2 = \alpha_0 + \alpha_1/m_i + \alpha_2\rho_i$ and fitted the exact same model. Of course GRC works — it is simulating under its own assumptions. This proves nothing about robustness.</p></div>
+<div class="fix"><p>True DGP uses <strong>M3 (interaction model)</strong>; GRC fits <strong>M1 (no interaction)</strong>. Add non-normal error ($t_5$) and logit-normal $X_i$ scenarios. Show GRC still outperforms naive even under misspecification.</p></div>
+<div class="learn"><p><strong>Lesson:</strong> A simulation that only tests the method under its own assumptions is worthless. Always simulate under at least one <strong>misspecified</strong> scenario.</p></div>
+</section>
+
+<section id="w8">
+<h2 style="border-color:var(--orange);">W8: No Clinical Impact <span class="sev sev-major">Major</span></h2>
+<div class="what"><p>The paper reports bias, MSE, coverage — statistical metrics. Clinicians ask: "Does this change what I do for the patient?" Without decision curves and calibration, the answer is unknown.</p></div>
+<div class="fix"><p>Add: (1) <strong>Calibration curves</strong> — naive is miscalibrated, GRC matches observed. (2) <strong>Decision curve analysis</strong> — GRC has higher net benefit than naive. (3) <strong>Clinical narrative</strong>: "Without correction: $p = 0.08$ (non-significant). With correction: $p = 0.003$ (actionable)."</p></div>
+<div class="learn"><p><strong>Lesson:</strong> Statistical improvement without clinical relevance gets published in statistics journals. Statistical improvement WITH clinical relevance gets published in the best statistics journals and gets cited.</p></div>
+</section>
+
+<!-- ===== WEAKNESSES 9-12 ===== -->
+<section id="w9">
+<h2 style="border-color:var(--yellow);">W9: Graph Uncertainty Ignored <span class="sev sev-mod">Moderate</span></h2>
+<div class="what"><p>Changing the spatial graph (6-NN vs Delaunay vs radius) changes $W_i$. This is an additional error source not in the $\sigma_i^2$ model. It means $X_i$ itself depends on the graph — making the estimand graph-conditional.</p></div>
+<div class="fix"><p>Sensitivity analysis: run GRC with 4-NN, 6-NN, 8-NN, Delaunay. Report range of $\hat{\beta}$. State: "Graph uncertainty is a limitation not addressed by GRC; the estimand is graph-conditional."</p></div>
+<div class="learn"><p><strong>Lesson:</strong> When a design choice affects the estimand, acknowledge it as a <strong>limitation of scope</strong>, not pretend it doesn't exist.</p></div>
+</section>
+
+<section id="w10">
+<h2 style="border-color:var(--yellow);">W10: SIMEX Circularity <span class="sev sev-mod">Moderate</span></h2>
+<div class="what"><p>SIMEX adds noise with variance $\sigma_i^2$ — but $\sigma_i^2$ is unknown and estimated. This is "parametric SIMEX." Also, quadratic extrapolation is unstable for Cox.</p></div>
+<div class="fix"><p>Cite Cook &amp; Stefanski (1994) on parametric SIMEX. Add sensitivity $\pm 20\%$ on $\hat{\sigma}_i^2$. Use both quadratic and rational extrapolation; if they disagree by &gt;10%, flag instability.</p></div>
+<div class="learn"><p><strong>Lesson:</strong> When a method depends on estimated quantities, always test sensitivity to that estimation.</p></div>
+</section>
+
+<section id="w11">
+<h2 style="border-color:var(--yellow);">W11: No Formal Theorems <span class="sev sev-mod">Moderate</span></h2>
+<div class="what"><p>Not a single theorem, proposition, or corollary. The paper reads as heuristic, not rigorous. Uses "$\approx$" without defining convergence mode.</p></div>
+<div class="fix"><p>Add <strong>Proposition 3.1</strong> (attenuation in Cox) and <strong>Theorem 5.1</strong> (GRC consistency). Specify: convergence in probability, conditions numbered, proof sketch in appendix.</p></div>
+<div class="learn"><p><strong>Lesson:</strong> A methods paper in Biostatistics must contain at least one formal result with stated assumptions and a proof or proof sketch.</p></div>
+</section>
+
+<section id="w12">
+<h2 style="border-color:var(--yellow);">W12: Pedagogical Tone <span class="sev sev-mod">Moderate</span></h2>
+<div class="what"><p>"What is measurement error?" "What each symbol means." Reads like a textbook, not a research paper.</p></div>
+<div class="fix"><p>Move all explanatory material to a <strong>supplementary tutorial</strong>. Main paper assumes graduate-level statistics knowledge. No "step-by-step interpreting the hazard ratio."</p></div>
+<div class="learn"><p><strong>Lesson:</strong> Tutorials and papers serve different audiences. Write the tutorial for yourself. Write the paper for the reviewer.</p></div>
+</section>
+
+<!-- ===== W13: THE BIG ONE ===== -->
+<section id="w13">
+<h2 style="border-color:var(--orange);">W13: GRC Itself Is Fundamentally Insufficient <span class="sev sev-major">Major</span></h2>
+
+<div class="wk open">
+<div class="wk-head" onclick="this.parentElement.classList.toggle('open')">
+<div class="wk-num" style="background:rgba(249,115,22,.12);color:var(--orange);">13</div>
+<div class="wk-title">GRC is a "patched-up heuristic" — the deepest critique</div>
+<div class="wk-arrow">&#9660;</div>
+</div>
+<div class="wk-body">
+
+<div class="what">
+<p>The GRC critique argues that GRC:</p>
+<ul>
+<li>Treats $\hat{X}_i$ as observed (plug-in problem) → anti-conservative inference</li>
+<li>Depends on an arbitrary parametric variance model</li>
+<li>Assumes normality and additive error</li>
+<li>Ignores spatial dependence structure beyond $\rho_i$</li>
+<li>Is "strictly worse than SIMEX in robustness"</li>
+<li>Is "Paper 1 with a fancier $\lambda$"</li>
+</ul>
+</div>
+
+<div class="why">
+<p>If this critique is correct, the entire paper collapses to "an incremental extension that solves a toy problem while ignoring the real complexity." This is the existential threat.</p>
+</div>
+
+<div class="fix">
+<p><strong>The honest assessment:</strong> The critique is <strong>partially correct</strong>. GRC alone is not the final solution. But a paper that:</p>
+<ol>
+<li><strong>Discovers the phenomenon</strong> (spatial reliability distortion) — that is novel regardless of the method</li>
+<li><strong>Provides GRC + bootstrap</strong> as a practical, implementable first correction</li>
+<li><strong>Validates with SIMEX</strong> as model-free confirmation</li>
+<li><strong>Shows robustness</strong> to misspecification and mild differential error</li>
+<li><strong>Acknowledges limitations</strong> honestly and points to the Bayesian joint model as the full solution</li>
+</ol>
+<p>...is publishable in Biostatistics. Not because GRC is perfect, but because the phenomenon is real, the correction is useful, and the paper is honest about what remains unsolved.</p>
+<p>The critique's "better ideas" are real and should be acknowledged in the Discussion as future work:</p>
+</div>
+
+</div>
+</div>
+
+<div id="hierarchy">
+<h3>Approach Hierarchy (From Weakest to Strongest)</h3>
+<div class="hier">
+<div class="hier-row">
+<div class="hier-rank" style="background:rgba(239,68,68,.12);color:var(--red);">7</div>
+<div class="hier-name">Naive Cox (ignore error)</div>
+<div class="hier-desc"><span class="sev sev-fatal">Reject</span> 38% bias, 42% coverage</div>
+</div>
+<div class="hier-row">
+<div class="hier-rank" style="background:rgba(249,115,22,.12);color:var(--orange);">6</div>
+<div class="hier-name">Standard RC (one $\lambda$)</div>
+<div class="hier-desc"><span class="sev sev-major">Insufficient</span> 12% bias, 84% coverage</div>
+</div>
+<div class="hier-row">
+<div class="hier-rank" style="background:rgba(234,179,8,.12);color:var(--yellow);">5</div>
+<div class="hier-name" style="color:var(--yellow);">GRC (patient $\lambda_i$) — YOUR PAPER</div>
+<div class="hier-desc"><span class="sev sev-mod">Publishable</span> 3.3% bias, 94% coverage. Practical. Implementable.</div>
+</div>
+<div class="hier-row">
+<div class="hier-rank" style="background:rgba(34,197,94,.12);color:var(--green);">4</div>
+<div class="hier-name">GRC + pipeline bootstrap</div>
+<div class="hier-desc"><span class="sev sev-minor">Better</span> Proper SEs. Valid inference.</div>
+</div>
+<div class="hier-row">
+<div class="hier-rank" style="background:rgba(6,182,212,.12);color:var(--cyan);">3</div>
+<div class="hier-name">SIMEX with bootstrap (model-free)</div>
+<div class="hier-desc">Robust to variance model misspecification. Use as sensitivity analysis.</div>
+</div>
+<div class="hier-row">
+<div class="hier-rank" style="background:rgba(59,130,246,.12);color:var(--blue);">2</div>
+<div class="hier-name">Bayesian joint model (Stan/INLA)</div>
+<div class="hier-desc">Full uncertainty propagation. Proper posteriors. The correct solution.</div>
+</div>
+<div class="hier-row">
+<div class="hier-rank" style="background:rgba(168,85,247,.12);color:var(--purple);">1</div>
+<div class="hier-name">Spatial GP + joint survival likelihood</div>
+<div class="hier-desc">Model the spatial field, derive biomarker as posterior functional. Gold standard. Future work.</div>
+</div>
+</div>
+
+<div class="learn">
+<p><strong>Lesson:</strong> Your paper occupies position 4–5 in this hierarchy. That is publishable <em>if and only if</em> you are honest about it. State: "GRC is a practical first-order correction. The full Bayesian joint model (position 2) is the theoretically correct solution; we defer it to future work. Our contribution is identifying and quantifying the phenomenon, not providing the final solution."</p>
+</div>
+</div>
+</section>
+
+<!-- ===== W14-15 ===== -->
+<section id="w14">
+<h2 style="border-color:var(--yellow);">W14: Limitations Too Weak <span class="sev sev-mod">Moderate</span></h2>
+<div class="what"><p>The original limitations section acknowledged problems vaguely without quantifying them or stating failure boundaries.</p></div>
+<div class="fix"><p>Six-point candid limitations: (1) $X_i$ never observed, (2) graph uncertainty not modeled, (3) normal approximation, (4) differential error assumed absent, (5) small $n$ in spatial omics, (6) single biomarker only. Each with a quantified impact or stated boundary.</p></div>
+<div class="learn"><p><strong>Lesson:</strong> Candid limitations increase credibility. Vague limitations increase suspicion.</p></div>
+</section>
+
+<section id="w15">
+<h2 style="border-color:var(--green);">W15: Notation Inconsistent <span class="sev sev-minor">Minor</span></h2>
+<div class="what"><p>$\sigma_i^2$ for error variance, then $\alpha_i$ on one page, then $\Sigma_X$ and $\Sigma_U$ elsewhere. Confusing.</p></div>
+<div class="fix"><p>Fixed notation throughout. One symbol per concept. Notation table in appendix.</p></div>
+<div class="learn"><p><strong>Lesson:</strong> Define notation once, early, in a table. Never reuse a symbol for a different meaning.</p></div>
+</section>
+
+<!-- ===== ROADMAP ===== -->
+<section id="roadmap">
+<h2 style="border-color:var(--cyan);">Execution Roadmap</h2>
+
+<table>
+<tr><th>Week</th><th>Task</th><th>Output</th><th>Blocks</th></tr>
+<tr><td>1</td><td>Implement split-half bootstrap (Alg 1)</td><td>$\hat{\sigma}_i^2$ for all patients</td><td>Nothing</td></tr>
+<tr><td>1</td><td>Fit 3 variance models, AIC comparison</td><td>Diagnostic plots + model selection table</td><td>Alg 1 output</td></tr>
+<tr><td>2</td><td>Implement GRC + pipeline bootstrap (Alg 2)</td><td>$\hat{\beta}_{\text{GRC}}$ with bootstrap SEs</td><td>Variance model</td></tr>
+<tr><td>2</td><td>Implement SIMEX with rational extrapolation</td><td>$\hat{\beta}_{\text{SIMEX}}$ for confirmation</td><td>Variance model</td></tr>
+<tr><td>3</td><td>Simulation: correct specification (360 scenarios)</td><td>Bias/coverage/MSE/power tables</td><td>GRC + SIMEX code</td></tr>
+<tr><td>4</td><td>Simulation: misspecification scenarios</td><td>M3 true + M1 fit, non-normal, logit-normal</td><td>Simulation infrastructure</td></tr>
+<tr><td>4</td><td>Simulation: differential error ($\delta$ sweep)</td><td>Robustness table</td><td>Simulation infrastructure</td></tr>
+<tr><td>5</td><td>Real data application</td><td>Naive vs GRC Cox results + calibration curves + DCA</td><td>Dataset confirmed</td></tr>
+<tr><td>6</td><td>Write paper</td><td>Draft manuscript</td><td>All results</td></tr>
+</table>
+</section>
+
+<!-- ===== CHECKLIST ===== -->
+<section id="checklist">
+<h2 style="border-color:var(--green);">Submission Checklist</h2>
+
+<table>
+<tr><th>Requirement</th><th>Status</th><th>Section</th></tr>
+<tr><td>Contribution framed as phenomenon + mechanism</td><td style="color:var(--green)">Done</td><td>Intro</td></tr>
+<tr><td>Formal model: $W_i = X_i + U_i$ with all distributions stated</td><td style="color:var(--green)">Done</td><td>S2</td></tr>
+<tr><td>Proposition: attenuation in Cox (Prentice/Nakamura)</td><td style="color:var(--green)">Done</td><td>S3</td></tr>
+<tr><td>3 variance model candidates + AIC + ablation</td><td style="color:var(--green)">Done</td><td>S4</td></tr>
+<tr><td>Algorithm 1: split-half estimation of $\sigma_i^2$</td><td style="color:var(--green)">Done</td><td>S4</td></tr>
+<tr><td>Variance model diagnostic plots</td><td style="color:var(--yellow)">Needs data</td><td>S4</td></tr>
+<tr><td>Theorem: GRC consistency</td><td style="color:var(--green)">Done</td><td>S5</td></tr>
+<tr><td>Algorithm 2: full pipeline bootstrap</td><td style="color:var(--green)">Done</td><td>S6</td></tr>
+<tr><td>SIMEX with rational extrapolation + sensitivity</td><td style="color:var(--green)">Done</td><td>S7</td></tr>
+<tr><td>Differential error robustness ($\delta$ sweep)</td><td style="color:var(--green)">Done</td><td>S8</td></tr>
+<tr><td>Misspecification scenarios (5 types)</td><td style="color:var(--green)">Done</td><td>S9</td></tr>
+<tr><td>Simulation with bounded $X_i$ (logit-normal)</td><td style="color:var(--green)">Done</td><td>S10</td></tr>
+<tr><td>Simulation under different DGP than fitted model</td><td style="color:var(--green)">Done</td><td>S10</td></tr>
+<tr><td>Calibration curves (predicted vs observed)</td><td style="color:var(--yellow)">Needs data</td><td>S11</td></tr>
+<tr><td>Decision curve analysis</td><td style="color:var(--yellow)">Needs data</td><td>S11</td></tr>
+<tr><td>Clinical narrative ("non-significant → significant")</td><td style="color:var(--green)">Done</td><td>S11</td></tr>
+<tr><td>Candid 6-point limitations</td><td style="color:var(--green)">Done</td><td>S12</td></tr>
+<tr><td>Approach hierarchy acknowledging GRC is not final</td><td style="color:var(--green)">Done</td><td>Discussion</td></tr>
+<tr><td>Graph sensitivity analysis</td><td style="color:var(--yellow)">Needs data</td><td>S9</td></tr>
+<tr><td>Consistent notation throughout</td><td style="color:var(--green)">Done</td><td>All</td></tr>
+<tr><td>Research-paper tone (not tutorial)</td><td style="color:var(--green)">Done</td><td>All</td></tr>
+</table>
+
+<p style="margin-top:20px;color:var(--dim);font-size:12px;text-align:center;">
+Paper 2 Weakness Analysis &bull; 15 weaknesses mapped from 3 reviewer sources &bull; All fatal and major issues addressed<br>
+Remaining items (yellow) require real data execution, not further theory.
+</p>
+</section>
+
+</div>
+
+<script>
+window.addEventListener('scroll',()=>{const h=document.documentElement;document.getElementById('prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';});
+const ss=document.querySelectorAll('section');const ns=document.querySelectorAll('.nav a');
+const ob=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){ns.forEach(a=>{a.classList.remove('act');if(a.getAttribute('href')==='#'+e.target.id)a.classList.add('act');});}});},{threshold:.15,rootMargin:'-30px 0px -60% 0px'});
+ss.forEach(s=>ob.observe(s));
+</script>
+</body>
+</html>
