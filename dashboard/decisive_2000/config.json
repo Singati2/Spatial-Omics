@@ -1,0 +1,11 @@
+{
+  "n_reps": 2000,
+  "n_patients": 50,
+  "beta": -1.0,
+  "gamma": 0.5,
+  "scenarios": [
+    "S1",
+    "S5",
+    "S6"
+  ]
+}
