@@ -20,14 +20,14 @@ functions {
     real exp_eta = exp(eta);
 
     for (k in 1:K) {
-      real lower = (k == 1) ? 0.0 : s[k-1];
-      real upper = (k == K) ? t : fmin(t, s[k]);
+      real lo = (k == 1) ? 0.0 : s[k-1];
+      real hi = (k == K) ? t : fmin(t, s[k]);
 
-      if (t > lower) {
-        real width = upper - lower;
+      if (t > lo) {
+        real width = hi - lo;
         cum_haz += lambda0[k] * width * exp_eta;
 
-        if (event == 1 && t <= upper + 1e-10 && t > lower) {
+        if (event == 1 && t <= hi + 1e-10 && t > lo) {
           // Event occurs in this interval
           log_lik += log(lambda0[k]) + eta;
         }
@@ -46,7 +46,7 @@ data {
   vector[N] W;                       // observed biomarker (proportion in [0,1])
   matrix[N, P] Z;                    // confounder matrix
   vector<lower=0>[N] T_obs;          // observed survival time
-  int<lower=0, upper=1> event[N];    // event indicator (1=died, 0=censored)
+  array[N] int<lower=0, upper=1> event;    // event indicator (1=died, 0=censored)
 
   // Spatial tissue characteristics (observed)
   vector<lower=1>[N] m;              // number of spots per patient
@@ -97,7 +97,7 @@ transformed parameters {
   for (i in 1:N) {
     log_sigma2_mean[i] = alpha0 + alpha1 * log_m[i] + alpha2 * rho[i];
     log_sigma2[i] = log_sigma2_mean[i] + tau * log_sigma2_raw[i];
-    sigma2[i] = exp(log_sigma2[i]);
+    sigma2[i] = exp(log_sigma2[i]) + 1e-6;  // floor to prevent zero
   }
 
   // Baseline hazard on natural scale
